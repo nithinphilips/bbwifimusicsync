@@ -12,18 +12,16 @@ namespace WifiMusicSync
     {
         static string deviceRoot = "file:///SDCard/BlackBerry/music/Media%20Sync/";
 
-        public static List<string> ReadPlaylist(string data)
+        public static List<string> ReadPlaylist(StringReader reader)
         {
             List<string> result = new List<string>();
-
-            System.IO.StringReader reader = new System.IO.StringReader(data);
 
             using (reader)
             {
                 while (reader.Peek() > 0)
                 {
                     String line = reader.ReadLine();
-                    //line = line.Remove(0, deviceRoot.Length);
+                    
                     result.Add(line);
                 }
             }
@@ -59,9 +57,7 @@ namespace WifiMusicSync
                 //string albumArtist = string.IsNullOrEmpty(((IITFileOrCDTrack)iTrack).AlbumArtist) ? ((IITFileOrCDTrack)iTrack).Artist : ((IITFileOrCDTrack)iTrack).AlbumArtist;
                 string albumArtist = ((IITFileOrCDTrack)iTrack).AlbumArtist;
 
-                bool isCompilation = (string.IsNullOrEmpty(albumArtist) && iTrack.Compilation) ||
-                                     (!string.IsNullOrEmpty(albumArtist) && (albumArtist != iTrack.Artist)) ||
-                                     iTrack.Album == "Greatest Hits";
+                bool isCompilation = (string.IsNullOrEmpty(albumArtist) && iTrack.Compilation);
 
                 string artist = string.IsNullOrEmpty(((IITFileOrCDTrack)iTrack).AlbumArtist) ? ((IITFileOrCDTrack)iTrack).Artist : ((IITFileOrCDTrack)iTrack).AlbumArtist;
 
@@ -82,7 +78,6 @@ namespace WifiMusicSync
 
         static string EscapeString(string name)
         {
-
             string result = Uri.EscapeUriString(name) ;
             result = result.Replace("&", Uri.HexEscape('&'));
             result = result.Replace(" ", Uri.HexEscape(' '));

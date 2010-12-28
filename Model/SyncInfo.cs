@@ -13,7 +13,8 @@ namespace WifiMusicSync
         }
 
         public string ServerId { get; set; }
-        public string PlaylistPath { get; set; }
+        public string PlaylistServerPath { get; set; }
+        public string PlaylistDevicePath { get; set; }
         public SyncAction[] Actions { get; set; }
     }
 }

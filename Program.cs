@@ -6,6 +6,8 @@ using System.IO;
 using System.Diagnostics;
 using iTunesLib;
 using System.Security.Cryptography;
+using Kayak.Framework;
+using Kayak;
 
 namespace WifiMusicSync
 {
@@ -61,90 +63,78 @@ namespace WifiMusicSync
 
             // For JSON see <http://james.newtonking.com/projects/json-net.aspx>
 
-            string fileName = @"M:\BlackBerry\music\Media Sync\Playlists\aa13ee3a6953da19\Stare at Ceiling.m3u";
+            //string fileName = @"M:\BlackBerry\music\Media Sync\Playlists\aa13ee3a6953da19\Stare at Ceiling.m3u";
             
-            // Links playlist entries with iTunes tracks.
-            Dictionary<string, IITFileOrCDTrack> lookupTable;
+            //// Links playlist entries with iTunes tracks.
+            //Dictionary<string, IITFileOrCDTrack> lookupTable;
 
-            // Read and sort the playlists
-            Console.Write("Loading Phone Playlist...");
-            List<string> devicePlaylist = PlaylistGenerator.ReadPlaylist(File.ReadAllText(fileName));
-            Console.WriteLine("Done");
+            //// Read and sort the playlists
+            //Console.Write("Loading Phone Playlist...");
+            //List<string> devicePlaylist = PlaylistGenerator.ReadPlaylist(File.ReadAllText(fileName));
+            //Console.WriteLine("Done");
 
-            Console.Write("Loading iTunes Playlist...");
-            List<string> desktopPlaylist = PlaylistGenerator.GeneratePlaylist(Path.GetFileNameWithoutExtension(fileName), out lookupTable);
-            Console.WriteLine("Done");
+            //// TODO: Read iTunes XML for headless operation.
+            //Console.Write("Loading iTunes Playlist...");
+            //List<string> desktopPlaylist = PlaylistGenerator.GeneratePlaylist(Path.GetFileNameWithoutExtension(fileName), out lookupTable);
+            //Console.WriteLine("Done");
 
-            devicePlaylist.Sort();
-            desktopPlaylist.Sort();
+            //devicePlaylist.Sort();
+            //desktopPlaylist.Sort();
 
-            SavePlaylist(devicePlaylist, "Device.txt");
-            SavePlaylist(desktopPlaylist, "Desktop.txt");
+            //Utilities.SavePlaylist(devicePlaylist, "Device.txt");
+            //Utilities.SavePlaylist(desktopPlaylist, "Desktop.txt");
 
-            // create diff
-            //TODO: Use diff command from cygwin instead
-            Console.WriteLine("Checking diff...");
-            string parameters = string.Format("/createunifieddiff /origfile:{0} /modifiedfile:{1} /outfile:{2}", "Device.txt", "Desktop.txt", "Diff.diff");
-            ProcessStartInfo si = new ProcessStartInfo("TortoiseMerge", parameters);
-            si.CreateNoWindow = true;
-            si.WindowStyle = ProcessWindowStyle.Minimized;
-            Process.Start(si).WaitForExit();
+            //// create diff
+            ////TODO: Use diff command from cygwin instead
+            //Console.Write("Diffing...");
+            //IEnumerable<SyncAction> actions = DiffHandler.Diff("Diff.diff");
+            //Console.WriteLine("Done");
 
-            IEnumerable<SyncAction> actions = DiffHandler.ReadDiff("Diff.diff");
+            //foreach (var item in actions)
+            //{
+            //    if (item.Type == SyncType.Add)
+            //    {
+            //        if (lookupTable.ContainsKey(item.DeviceLocation))
+            //        {
+            //            item.ServerLocation = lookupTable[item.DeviceLocation].Location;
+            //            item.TrackPath = "/songs/" + Utilities.GetSHA1Hash(item.DeviceLocation);
+            //        }
+            //    }
+            //}
 
-            foreach (var item in actions)
-            {
-                if (item.Type == SyncType.Add)
-                {
-                    if (lookupTable.ContainsKey(item.RemotePath))
-                    {
-                        item.LocalPath = lookupTable[item.RemotePath].Location;
-                        item.Id = GetSHA1Hash(item.RemotePath);
-                    }
-                }
-            }
+            //SyncInfo syncInfo = new SyncInfo();
+            //syncInfo.PlaylistServerPath = "/playlists/Stare at Ceiling.m3u";
+            //syncInfo.PlaylistServerPath = "file:///SDCard/BlackBerry/music/Media Sync/Playlists/aa13ee3a6953da19/Stare at Ceiling.m3u";
+            //syncInfo.Actions = actions.ToArray();
 
-            Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(actions, Newtonsoft.Json.Formatting.Indented));
+            //Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(syncInfo, Newtonsoft.Json.Formatting.Indented));
 
-            foreach (var item in actions)
-            {
-                if (item.Type == SyncType.Add)
-                {
-                    Console.WriteLine("{0}: {1}", item.Type, item.LocalPath);
-                }
-                else
-                {
-                    Console.WriteLine("{0}: {1}", item.Type, item.RemotePath);   
-                }
-            }
+            //foreach (var item in actions)
+            //{
+            //    if (item.Type == SyncType.Add)
+            //    {
+            //        Console.WriteLine("{0}: {1}", item.Type, item.ServerLocation);
+            //    }
+            //    else
+            //    {
+            //        Console.WriteLine("{0}: {1}", item.Type, item.DeviceLocation);   
+            //    }
+            //}
 
+
+            var server = new KayakServer(new System.Net.IPEndPoint(0, 9000));
+            var behavior = new KayakFrameworkBehavior();
+            behavior.JsonMapper.SetOutputConversion<int>((i, w) => w.Write(i.ToString()));
+
+            var framework = server.UseFramework();
+
+            Console.WriteLine("Kayak listening on " + server.ListenEndPoint);
+            Console.ReadLine();
+
+            // unsubscribe from server (close the listening socket)
+            framework.Dispose();
         }
 
-        static string GetSHA1Hash(string str)
-        {
-            SHA1 sha1 = new SHA1CryptoServiceProvider();
-            byte[] retVal = sha1.ComputeHash(UTF8Encoding.UTF8.GetBytes(str));
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < retVal.Length; i++)
-            {
-                sb.Append(retVal[i].ToString("x2"));
-            }
-            return sb.ToString();
-        }
-
-        private static void SavePlaylist(List<string> playlist, string path)
-        {
-            using (FileStream playlistFs = File.OpenWrite(path))
-            {
-                using (StreamWriter stream = new StreamWriter(playlistFs))
-                {
-                    foreach (var item in playlist)
-                    {
-                        stream.WriteLine(item);
-                    }
-                }
-            }
-        }
+        
     }
 }

@@ -58,10 +58,12 @@ namespace WifiMusicSync.Wireless
         {
             if (songDb.ContainsKey(id))
             {
+                Console.WriteLine("Sending file: " + songDb[id]);
                 return new FileInfo(songDb[id]);
             }
             else
             {
+                Console.WriteLine("File Not Found: " + id);
                 Response.SetStatusToNotFound();
                 return null;
             }
@@ -86,6 +88,8 @@ namespace WifiMusicSync.Wireless
         [Path("/query")]
         public object Query([RequestBody]PlaylistRequest t)
         {
+            Console.WriteLine(t.ToString());
+
             string playlistName = Path.GetFileNameWithoutExtension(t.PlaylistDevicePath);
             string playlistId = Utilities.GetSHA1Hash(t.PlaylistDevicePath);
 
@@ -101,12 +105,16 @@ namespace WifiMusicSync.Wireless
 
             // Read and sort the playlists
             Console.Write("Loading Phone Playlist...");
-            List<string> devicePlaylist = new List<string>(t.PlaylistData);
+            List<string> devicePlaylist = new List<string>();
+            foreach (var item in t.PlaylistData)
+            {
+                devicePlaylist.Add(PlaylistGenerator.UnEscapeString(item));
+            }
             Console.WriteLine("Done");
 
             // TODO: Read iTunes XML for headless operation.
             Console.Write("Loading iTunes Playlist ({0})...", playlistName);
-            List<string> desktopPlaylist = PlaylistGenerator.GeneratePlaylist(playlistName, out iTunesDb);
+            List<string> desktopPlaylist = PlaylistGenerator.GeneratePlaylist(playlistName, t.DeviceMediaRoot, out iTunesDb);
             Console.WriteLine("Done");
 
             IEnumerable<SyncAction> desktopChanges = null; // changes that were made on the DESKTOP. Apply to DEVICE.
@@ -131,7 +139,14 @@ namespace WifiMusicSync.Wireless
                     if (change.Type == SyncType.Remove)
                     {
                        reconciledPlaylist.Remove(change.DeviceLocation);
-                       Console.WriteLine("{0} {1} from iTunes Playlist", change.Type, iTunesDb[change.DeviceLocation].Location);
+                       if (iTunesDb.ContainsKey(change.DeviceLocation))
+                       {
+                           Console.WriteLine("{0} {1} from iTunes Playlist", change.Type, iTunesDb[change.DeviceLocation].Location);
+                       }
+                       else
+                       {
+                           Console.WriteLine("WARNING: Asked to delete non existent iTunes track: {0}", change.DeviceLocation);
+                       }
                     }
                 }
             }
@@ -159,6 +174,11 @@ namespace WifiMusicSync.Wireless
             syncInfo.PlaylistServerPath = "/playlists/" + playlistId;
             syncInfo.PlaylistDevicePath = t.PlaylistDevicePath; ;
             syncInfo.Actions = desktopChanges.ToArray();
+
+            foreach (var item in syncInfo.Actions)
+            {
+                item.DeviceLocation = PlaylistGenerator.UnEscapeString(item.DeviceLocation);
+            }
 
             return syncInfo;
         }

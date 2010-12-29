@@ -26,12 +26,10 @@ namespace WifiMusicSync
         {
             using (FileStream playlistFs = File.OpenWrite(path))
             {
-                using (StreamWriter stream = new StreamWriter(playlistFs))
+                foreach (var item in playlist)
                 {
-                    foreach (var item in playlist)
-                    {
-                        stream.WriteLine(item);
-                    }
+                    byte[] line = Encoding.UTF8.GetBytes(item + Environment.NewLine);
+                    playlistFs.Write(line, 0, line.Length);
                 }
             }
         }

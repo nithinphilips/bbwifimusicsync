@@ -10,8 +10,6 @@ namespace WifiMusicSync
 {
     class PlaylistGenerator
     {
-        static string deviceRoot = "file:///SDCard/BlackBerry/music/Media%20Sync/";
-
         public static List<string> ReadPlaylist(StringReader reader)
         {
             List<string> result = new List<string>();
@@ -29,7 +27,7 @@ namespace WifiMusicSync
             return result;
         }
 
-        public static List<string> GeneratePlaylist(string itunesPlaylist, out Dictionary<string, IITFileOrCDTrack> lookupTable)
+        public static List<string> GeneratePlaylist(string itunesPlaylist, string deviceRoot, out Dictionary<string, IITFileOrCDTrack> lookupTable)
         {
             lookupTable = new Dictionary<string, IITFileOrCDTrack>();
 
@@ -64,9 +62,9 @@ namespace WifiMusicSync
                 if (isCompilation) { artist = "Compilations"; }
 
                 playlistStr = string.Format("{0}/{1}/{2}",
-                         EscapeString(MakeFileNameSafe(artist)),
-                         EscapeString(MakeFileNameSafe(iTrack.Album)),
-                         EscapeString(Path.GetFileName(((IITFileOrCDTrack)iTrack).Location)));
+                         MakeFileNameSafe(artist),
+                         MakeFileNameSafe(iTrack.Album),
+                         Path.GetFileName(((IITFileOrCDTrack)iTrack).Location));
 
                 string playlistLine = deviceRoot + playlistStr;
                 result.Add(playlistLine);
@@ -76,7 +74,7 @@ namespace WifiMusicSync
             return result;
         }
 
-        static string EscapeString(string name)
+        public static string EscapeString(string name)
         {
             string result = Uri.EscapeUriString(name) ;
             result = result.Replace("&", Uri.HexEscape('&'));
@@ -85,10 +83,24 @@ namespace WifiMusicSync
             return result;
         }
 
+        public static string UnEscapeString(string name)
+        {
+            string result = Uri.UnescapeDataString(name);
+            result = result.Replace(Uri.HexEscape('&'), "&");
+            result = result.Replace(Uri.HexEscape(' '), " ");
+            result = result.Replace(Uri.HexEscape('#'), "#");
+            return result;
+        }
+
         static string MakeFileNameSafe(string name)
         {
             string result = name.Replace('/', '_');
-            result = result.Replace(':', '_');
+
+            foreach (char invalidChar in Path.GetInvalidFileNameChars())
+            {
+                result = result.Replace(invalidChar, '_');
+            }
+            
             if (result.StartsWith(".")) result = "_" + result.Substring(1);
             if (result.EndsWith(".")) result = result.Substring(0, result.Length - 1) + "_";
 

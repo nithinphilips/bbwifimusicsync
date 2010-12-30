@@ -8,6 +8,7 @@ using iTunesLib;
 using System.Security.Cryptography;
 using Kayak.Framework;
 using Kayak;
+using WifiMusicSync.Properties;
 
 namespace WifiMusicSync
 {
@@ -58,7 +59,7 @@ namespace WifiMusicSync
              * 11. Hopefully music player will auto update.
              */
 
-            var server = new KayakServer(new System.Net.IPEndPoint(0, 9000));
+            var server = new KayakServer(new System.Net.IPEndPoint(0, Settings.Default.Port));
             var behavior = new KayakFrameworkBehavior();
             behavior.JsonMapper.SetOutputConversion<int>((i, w) => w.Write(i.ToString()));
 

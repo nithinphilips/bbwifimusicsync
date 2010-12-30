@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KayakExamples", "Kayak\Kaya
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kayak.Framework", "Kayak\Kayak.Framework\Kayak.Framework.csproj", "{88EB6BDB-6585-4CA3-87BE-11F7262B95DF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kayak", "Kayak", "{C5A6834A-90B9-40EF-86F1-0008CE508725}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -66,6 +68,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{79DDD0CE-6F79-4212-A972-8618AD6E405F} = {C5A6834A-90B9-40EF-86F1-0008CE508725}
+		{88EB6BDB-6585-4CA3-87BE-11F7262B95DF} = {C5A6834A-90B9-40EF-86F1-0008CE508725}
+		{33318990-37F5-4B9D-B3F9-19E7736EE1DC} = {C5A6834A-90B9-40EF-86F1-0008CE508725}
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = Kayak\Kayak.csproj

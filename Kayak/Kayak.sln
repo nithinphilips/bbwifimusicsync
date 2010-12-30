@@ -1,0 +1,75 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{F12DB620-9897-4380-A9AD-95BA8680D044}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{C99D1FEC-8D1D-4479-B80A-1AFF9ACB7E86}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kayak", "Kayak\Kayak.csproj", "{79DDD0CE-6F79-4212-A972-8618AD6E405F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C7975722-C5BC-4E2F-A1B5-38D66BBE3DA9} = {C7975722-C5BC-4E2F-A1B5-38D66BBE3DA9}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KayakTests", "KayakTests\KayakTests.csproj", "{DA201FE7-FDAF-4B9E-821D-589F93F7245F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kayak.Oars", "Kayak.Oars\Kayak.Oars.csproj", "{AEDCAE89-F0C1-41FA-820D-DF96D79BCB3C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KayakExamples", "KayakExamples\KayakExamples.csproj", "{33318990-37F5-4B9D-B3F9-19E7736EE1DC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kayak.Framework", "Kayak.Framework\Kayak.Framework.csproj", "{88EB6BDB-6585-4CA3-87BE-11F7262B95DF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C7975722-C5BC-4E2F-A1B5-38D66BBE3DA9} = {C7975722-C5BC-4E2F-A1B5-38D66BBE3DA9}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KayakFrameworkTests", "KayakFrameworkTests\KayakFrameworkTests.csproj", "{CF67FC75-3DA5-4797-ACAB-16AB5F55C4B1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KayakDocs", "tools\KayakDocs\KayakDocs.csproj", "{C7975722-C5BC-4E2F-A1B5-38D66BBE3DA9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{79DDD0CE-6F79-4212-A972-8618AD6E405F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79DDD0CE-6F79-4212-A972-8618AD6E405F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79DDD0CE-6F79-4212-A972-8618AD6E405F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79DDD0CE-6F79-4212-A972-8618AD6E405F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA201FE7-FDAF-4B9E-821D-589F93F7245F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA201FE7-FDAF-4B9E-821D-589F93F7245F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA201FE7-FDAF-4B9E-821D-589F93F7245F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA201FE7-FDAF-4B9E-821D-589F93F7245F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEDCAE89-F0C1-41FA-820D-DF96D79BCB3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEDCAE89-F0C1-41FA-820D-DF96D79BCB3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEDCAE89-F0C1-41FA-820D-DF96D79BCB3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEDCAE89-F0C1-41FA-820D-DF96D79BCB3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33318990-37F5-4B9D-B3F9-19E7736EE1DC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33318990-37F5-4B9D-B3F9-19E7736EE1DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33318990-37F5-4B9D-B3F9-19E7736EE1DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33318990-37F5-4B9D-B3F9-19E7736EE1DC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88EB6BDB-6585-4CA3-87BE-11F7262B95DF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88EB6BDB-6585-4CA3-87BE-11F7262B95DF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88EB6BDB-6585-4CA3-87BE-11F7262B95DF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88EB6BDB-6585-4CA3-87BE-11F7262B95DF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF67FC75-3DA5-4797-ACAB-16AB5F55C4B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF67FC75-3DA5-4797-ACAB-16AB5F55C4B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF67FC75-3DA5-4797-ACAB-16AB5F55C4B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF67FC75-3DA5-4797-ACAB-16AB5F55C4B1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7975722-C5BC-4E2F-A1B5-38D66BBE3DA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7975722-C5BC-4E2F-A1B5-38D66BBE3DA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7975722-C5BC-4E2F-A1B5-38D66BBE3DA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7975722-C5BC-4E2F-A1B5-38D66BBE3DA9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{79DDD0CE-6F79-4212-A972-8618AD6E405F} = {F12DB620-9897-4380-A9AD-95BA8680D044}
+		{88EB6BDB-6585-4CA3-87BE-11F7262B95DF} = {F12DB620-9897-4380-A9AD-95BA8680D044}
+		{DA201FE7-FDAF-4B9E-821D-589F93F7245F} = {C99D1FEC-8D1D-4479-B80A-1AFF9ACB7E86}
+		{CF67FC75-3DA5-4797-ACAB-16AB5F55C4B1} = {C99D1FEC-8D1D-4479-B80A-1AFF9ACB7E86}
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Kayak\Kayak.csproj
+	EndGlobalSection
+EndGlobal

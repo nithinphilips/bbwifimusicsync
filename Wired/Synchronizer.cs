@@ -16,7 +16,7 @@ namespace WifiMusicSync.Wired
             return bbPath.Replace("file:///SDCard/", "M:/");
         }
 
-        public void Sync(SyncInfo info)
+        public void Sync(SyncResponse info)
         {
             foreach (var item in info.Actions)
             {

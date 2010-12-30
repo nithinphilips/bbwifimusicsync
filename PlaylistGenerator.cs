@@ -27,28 +27,22 @@ namespace WifiMusicSync
             return result;
         }
 
-        public static List<string> GeneratePlaylist(string itunesPlaylist, string deviceRoot, out Dictionary<string, IITFileOrCDTrack> lookupTable)
+        public static bool TryGetiTunesPlaylist(string playlistName, out IITPlaylist iPlaylist)
+        {
+            iTunesApp app = new iTunesApp();
+            IITSource library = app.Sources.get_ItemByName("Library");
+            iPlaylist = library.Playlists.get_ItemByName(playlistName);
+            return (iPlaylist != null);
+        }
+
+        public static List<string> GeneratePlaylist(IITPlaylist iPlaylist, string deviceRoot, out Dictionary<string, IITFileOrCDTrack> lookupTable)
         {
             lookupTable = new Dictionary<string, IITFileOrCDTrack>();
 
             List<string> result = new List<string>();
 
-            Debug.WriteLine("Connecting to iTunes...");
-            iTunesApp app = new iTunesApp();
 
-            IITSource library = app.Sources.get_ItemByName("Library");
-            IITPlaylist lookupSourcePlaylist;
-
-
-            if (string.IsNullOrEmpty(itunesPlaylist))
-            {
-                itunesPlaylist = "Music";
-            }
-
-            lookupSourcePlaylist = library.Playlists.get_ItemByName(itunesPlaylist);
-
-
-            foreach (IITTrack iTrack in lookupSourcePlaylist.Tracks)
+            foreach (IITTrack iTrack in iPlaylist.Tracks)
             {
                 string playlistStr;
 

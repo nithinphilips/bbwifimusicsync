@@ -7,6 +7,7 @@ using Kayak.Framework;
 using iTunesLib;
 using System.IO;
 using WifiMusicSync.Model;
+using System.Diagnostics;
 
 namespace WifiMusicSync.Wireless
 {
@@ -88,12 +89,20 @@ namespace WifiMusicSync.Wireless
         [Path("/query")]
         public object Query([RequestBody]PlaylistRequest t)
         {
-            Console.WriteLine(t.ToString());
+            t.CheckValidate();
 
+            Console.WriteLine("Received Data:");
+            Console.WriteLine("---------------------------------------------");
+            Console.WriteLine(t);
+            Console.WriteLine("---------------------------------------------");
+
+
+            string deviceIdSha1 = Utilities.GetSHA1Hash(t.DeviceId ?? "");
             string playlistName = Path.GetFileNameWithoutExtension(t.PlaylistDevicePath);
-            string playlistId = Utilities.GetSHA1Hash(t.PlaylistDevicePath);
+            string playlistId = Utilities.GetSHA1Hash(t.PlaylistDevicePath ?? "");
 
-            string playlistPath = playlistId;
+            Directory.CreateDirectory(deviceIdSha1);
+            string playlistPath = Path.Combine(deviceIdSha1, playlistId);
 
             songDb.Clear();
             playlistDb.Clear();
@@ -114,7 +123,18 @@ namespace WifiMusicSync.Wireless
 
             // TODO: Read iTunes XML for headless operation.
             Console.Write("Loading iTunes Playlist ({0})...", playlistName);
-            List<string> desktopPlaylist = PlaylistGenerator.GeneratePlaylist(playlistName, t.DeviceMediaRoot, out iTunesDb);
+            IITPlaylist iPlaylist;
+            List<string> desktopPlaylist;
+            if (PlaylistGenerator.TryGetiTunesPlaylist(playlistName, out iPlaylist))
+            {
+                desktopPlaylist = PlaylistGenerator.GeneratePlaylist(iPlaylist, t.DeviceMediaRoot, out iTunesDb);
+            }
+            else
+            {
+                Console.WriteLine("Fail. Playlist ({0}) does not exist", playlistName);
+                return new SyncResponse { ErrorMessage = "Playlist does not exist", Error = 100 };
+
+            }
             Console.WriteLine("Done");
 
             IEnumerable<SyncAction> desktopChanges = null; // changes that were made on the DESKTOP. Apply to DEVICE.
@@ -163,24 +183,32 @@ namespace WifiMusicSync.Wireless
                 {
                     string id = Utilities.GetSHA1Hash(change.DeviceLocation);
                     change.TrackPath = "/songs/" + id;
+                    // Remember songs, we we can serve them when client requests
                     songDb.Add(id, iTunesDb[change.DeviceLocation].Location);
                 }
             }
 
-            Utilities.SavePlaylist(reconciledPlaylist, playlistId);
-            playlistDb.Add(playlistId, playlistId);
+            string playlistKey = Utilities.GetSHA1Hash(playlistPath);
+            Utilities.SavePlaylist(reconciledPlaylist, playlistPath);
+            playlistDb.Add(playlistKey, playlistPath);
 
-            SyncInfo syncInfo = new SyncInfo();
-            syncInfo.PlaylistServerPath = "/playlists/" + playlistId;
-            syncInfo.PlaylistDevicePath = t.PlaylistDevicePath; ;
-            syncInfo.Actions = desktopChanges.ToArray();
+            SyncResponse syncResponse = new SyncResponse();
+            syncResponse.PlaylistServerPath = "/playlists/" + playlistKey;
+            syncResponse.PlaylistDevicePath = t.PlaylistDevicePath; ;
+            syncResponse.Actions = desktopChanges.ToArray();
 
-            foreach (var item in syncInfo.Actions)
+            foreach (var item in syncResponse.Actions)
             {
                 item.DeviceLocation = PlaylistGenerator.UnEscapeString(item.DeviceLocation);
+                Debug.Assert(item.DeviceLocation.StartsWith("file"));
             }
 
-            return syncInfo;
+            Console.WriteLine("Sending Data:");
+            Console.WriteLine("---------------------------------------------");
+            Console.WriteLine(syncResponse);
+            Console.WriteLine("---------------------------------------------");
+
+            return syncResponse;
         }
     }
 }

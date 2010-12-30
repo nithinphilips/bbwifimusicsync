@@ -4,11 +4,14 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Security.Cryptography;
+using System.Diagnostics;
 
 namespace WifiMusicSync
 {
     class Utilities
     {
+        const string NEWLINE = "\n";
+
         public static string GetSHA1Hash(string str)
         {
             SHA1 sha1 = new SHA1CryptoServiceProvider();
@@ -22,13 +25,15 @@ namespace WifiMusicSync
             return sb.ToString();
         }
 
-        public static void SavePlaylist(List<string> playlist, string path)
+        public static void SavePlaylist(IEnumerable<string> playlist, string path)
         {
-            using (FileStream playlistFs = File.OpenWrite(path))
+            if (File.Exists(path)) File.Delete(path);
+            using (FileStream playlistFs = new FileStream(path, FileMode.CreateNew))
             {
                 foreach (var item in playlist)
                 {
-                    byte[] line = Encoding.UTF8.GetBytes(item + Environment.NewLine);
+                    Debug.Assert(item.StartsWith("file"));
+                    byte[] line = Encoding.UTF8.GetBytes(item + NEWLINE);
                     playlistFs.Write(line, 0, line.Length);
                 }
             }
@@ -39,11 +44,13 @@ namespace WifiMusicSync
             List<string> playlist = new List<string>();
             using (FileStream playlistFs = File.OpenRead(path))
             {
-                using (StreamReader sr = new StreamReader(playlistFs))
+                using (StreamReader sr = new StreamReader(playlistFs, Encoding.UTF8))
                 {
                     while (sr.Peek() > 0)
                     {
-                        playlist.Add(sr.ReadLine());
+                        string line = sr.ReadLine();
+                        Debug.Assert(line.StartsWith("file"));
+                        playlist.Add(line);
                     }
                 }
             }

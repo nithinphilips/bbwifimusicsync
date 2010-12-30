@@ -66,7 +66,7 @@
     <Compile Include="Model\PlaylistRequest.cs" />
     <Compile Include="PlaylistGenerator.cs" />
     <Compile Include="Model\SyncAction.cs" />
-    <Compile Include="Model\SyncInfo.cs" />
+    <Compile Include="Model\SyncResponse.cs" />
     <Compile Include="Model\SyncType.cs" />
     <Compile Include="TrackInfo.cs" />
     <Compile Include="PlaylistParser.cs" />

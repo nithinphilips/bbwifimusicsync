@@ -6,7 +6,7 @@ using iTunesLib;
 using System.IO;
 using System.Diagnostics;
 
-namespace WifiMusicSync
+namespace WifiMusicSync.Helpers
 {
     class PlaylistGenerator
     {

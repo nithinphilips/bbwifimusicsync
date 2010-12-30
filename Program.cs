@@ -11,11 +11,13 @@ using Kayak;
 
 namespace WifiMusicSync
 {
-    class Program
+    public sealed class Program
     {
         static void Main(string[] args)
         {
-            /* Basic Operation:
+            /* NOTE: This info is out-of-date
+             * 
+             * Basic Operation:
              * 1. Listen on port 8000 for http connection
              * 
              * For each playlist:

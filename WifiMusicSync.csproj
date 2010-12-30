@@ -60,19 +60,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DiffHandler.cs" />
-    <Compile Include="iTunesHelper.cs" />
-    <Compile Include="LevenshteinDistance.cs" />
+    <Compile Include="Helpers\DiffHandler.cs" />
     <Compile Include="Model\PlaylistRequest.cs" />
-    <Compile Include="PlaylistGenerator.cs" />
+    <Compile Include="Helpers\PlaylistGenerator.cs" />
     <Compile Include="Model\SyncAction.cs" />
     <Compile Include="Model\SyncResponse.cs" />
     <Compile Include="Model\SyncType.cs" />
-    <Compile Include="TrackInfo.cs" />
-    <Compile Include="PlaylistParser.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utilities.cs" />
+    <Compile Include="Helpers\Utilities.cs" />
     <Compile Include="Wired\Synchronizer.cs" />
     <Compile Include="Wireless\ServerService.cs" />
   </ItemGroup>
@@ -96,9 +92,6 @@
       <Project>{79DDD0CE-6F79-4212-A972-8618AD6E405F}</Project>
       <Name>Kayak %28Kayak\Kayak%29</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

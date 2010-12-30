@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace WifiMusicSync
+namespace WifiMusicSync.Model
 {
     public class SyncAction
     {

@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using WifiMusicSync.Model;
 
-namespace WifiMusicSync
+namespace WifiMusicSync.Helpers
 {
     class DiffHandler
     {

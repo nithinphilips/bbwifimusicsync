@@ -8,6 +8,7 @@ using iTunesLib;
 using System.IO;
 using WifiMusicSync.Model;
 using System.Diagnostics;
+using WifiMusicSync.Helpers;
 
 namespace WifiMusicSync.Wireless
 {

@@ -6,7 +6,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Diagnostics;
 
-namespace WifiMusicSync
+namespace WifiMusicSync.Helpers
 {
     class Utilities
     {

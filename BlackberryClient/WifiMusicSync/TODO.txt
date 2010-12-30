@@ -1,0 +1,7 @@
+Test:
+  * Jibberish from server (instead of JSON)
+  * Very large playlist
+  * null actions with no errors
+  
+  * How to handle failed file downloads (inform server?)
+  

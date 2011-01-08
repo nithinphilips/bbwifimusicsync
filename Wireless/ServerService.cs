@@ -122,7 +122,7 @@ namespace WifiMusicSync.Wireless
             }
             Console.WriteLine("Done");
 
-            // TODO: Read iTunes XML for headless operation.
+            //BMK TODO: Read iTunes XML for headless operation.
             Console.Write("Loading iTunes Playlist ({0})...", playlistName);
             IITPlaylist iPlaylist;
             List<string> desktopPlaylist;

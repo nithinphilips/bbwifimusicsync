@@ -98,6 +98,10 @@
       <Project>{79DDD0CE-6F79-4212-A972-8618AD6E405F}</Project>
       <Name>Kayak %28Kayak\Kayak%29</Name>
     </ProjectReference>
+    <ProjectReference Include="lib\LibraryParser\LibraryParser.csproj">
+      <Project>{AC3FD357-F5F8-47C2-9843-F6991F0DD539}</Project>
+      <Name>LibraryParser</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

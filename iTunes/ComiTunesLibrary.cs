@@ -9,89 +9,80 @@ using System.IO;
 
 namespace WifiMusicSync.iTunes
 {
-    public class ComiTunesLibrary : IiTunesLibrary
+    public class ComiTunesLibrary : iTunesLibrary
     {
         iTunesApp app;
+        Dictionary<IPlaylist, IITPlaylist> playlistLookupTable = new Dictionary<IPlaylist, IITPlaylist>();
 
         public ComiTunesLibrary()
         {
             app = new iTunesApp();
             CanModify = true;
             MusicFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
-            
+            Playlists = GetPlaylists();
         }
 
-        public bool CanModify { get; private set; }
-        public string MusicFolderPath { get; private set; }
-        public IEnumerable<IPlaylist> Playlists { get; private set; }
+        public bool RemoveTrack(IPlaylist playlist, ITrack track)
+        {
+            IITPlaylist pls = playlistLookupTable[playlist];
+
+            foreach (IITTrack item in pls.Tracks)
+            {
+                if (item is IITFileOrCDTrack)
+                {
+                    IITFileOrCDTrack _item = (IITFileOrCDTrack)item;
+
+                    if (_item.Location == track.Location)
+                    {
+                        item.Delete();
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public bool AddTrack(IPlaylist playlist, string playlistLine, string searchHint, string root)
+        {
+            IPlaylist hintPlaylist = this.GetFirstPlaylistByName(searchHint);
+            
+            if (hintPlaylist != null)
+            {
+                IITPlaylist searchPlaylist = playlistLookupTable[hintPlaylist];
+                IITUserPlaylist targetPlaylist = playlistLookupTable[playlist] as IITUserPlaylist;
+
+                foreach (IITTrack iTrack in searchPlaylist.Tracks)
+                {
+                    if (iTrack is IITFileOrCDTrack)
+                    {
+                        IITFileOrCDTrack _iTrack = iTrack as IITFileOrCDTrack;
+                        if (_iTrack.GetPlaylistLine(root) == playlistLine)
+                        {
+                            targetPlaylist.AddTrack(_iTrack);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
 
         public IEnumerable<IPlaylist> GetPlaylists()
         {
-            List<Playlist> playlists = new List<Playlist>();
+            List<IPlaylist> playlists = new List<IPlaylist>();
             IITSource library = app.Sources.get_ItemByName("Library");
 
             foreach (IITPlaylist item in library.Playlists)
             {
-                List<Track> tracks = new List<Track>();
-
-                foreach (IITTrack track in item.Tracks)
-	            {
-                    string location = "";
-                    if(track is IITFileOrCDTrack)
-                    {
-                        IITFileOrCDTrack ctrack = track as IITFileOrCDTrack;
-                        location = ctrack.Location;
-                    }
-
-		            //tracks.Add(new Track(track.trackID.ToString(), track.Name, track.Artist, track.Duration, location, true, !track.Enabled));
-	            }
-
-                Playlist playlist = new Playlist(item.playlistID, item.Name, false, tracks.ToArray());
+                IPlaylist pls = new Playlist(item.playlistID, item.Name, false, new IITTrackEnumerator(item));
+                playlists.Add(pls);
+                playlistLookupTable.Add(pls, item);
             }
-
 
             return playlists;
         }
 
-        public static List<string> ToPlaylist(IPlaylist playlist, string deviceRoot)
-        {
-            List<string> result = new List<string>();
-
-            foreach (IITTrack iTrack in playlist.Tracks)
-            {
-                string playlistStr;
-
-                //string albumArtist = string.IsNullOrEmpty(((IITFileOrCDTrack)iTrack).AlbumArtist) ? ((IITFileOrCDTrack)iTrack).Artist : ((IITFileOrCDTrack)iTrack).AlbumArtist;
-                string albumArtist = ((IITFileOrCDTrack)iTrack).AlbumArtist;
-
-                bool isCompilation = (string.IsNullOrEmpty(albumArtist) && iTrack.Compilation);
-
-                string artist = string.IsNullOrEmpty(((IITFileOrCDTrack)iTrack).AlbumArtist) ? ((IITFileOrCDTrack)iTrack).Artist : ((IITFileOrCDTrack)iTrack).AlbumArtist;
-
-                if (isCompilation) { artist = "Compilations"; }
-
-                playlistStr = string.Format("{0}/{1}/{2}",
-                         Utilities.MakeFileNameSafe(artist),
-                         Utilities.MakeFileNameSafe(iTrack.Album),
-                         Path.GetFileName(((IITFileOrCDTrack)iTrack).Location));
-
-                string playlistLine = deviceRoot + playlistStr;
-                result.Add(playlistLine);
-                //lookupTable.Add(playlistLine, (IITFileOrCDTrack)iTrack);
-            }
-
-            return result;
-        }
-
-
-        public List<string> GeneratePlaylist(IPlaylist playlist, string root)
-        {
-            throw new NotImplementedException();
-        }
-
-        public ITrack GetTrack(string playlistLine)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

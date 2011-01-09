@@ -125,9 +125,9 @@ namespace WifiMusicSync.Wireless
             List<string> desktopPlaylist;
             long aTick = DateTime.Now.Ticks;
             // TODO: Keep the libary around and only read it if the file has actually changed.
-            XmliTunesLibrary library = new XmliTunesLibrary();
+            ComiTunesLibrary library = new ComiTunesLibrary();
             long bTick = DateTime.Now.Ticks;
-            IPlaylist playlist = library.GetPlaylistByName(playlistName);
+            IPlaylist playlist = library.GetFirstPlaylistByName(playlistName);
             
             if (playlist != null)
             {
@@ -168,12 +168,20 @@ namespace WifiMusicSync.Wireless
                        if (track != null)
                        {
                            // TODO: Generate the actions and run them asynchronously.
+                           library.RemoveTrack(playlist, track);
                            Console.WriteLine("{0} {1} from iTunes Playlist", change.Type, track.Location);
                        }
                        else
                        {
                            Console.WriteLine("WARNING: Asked to delete non existent iTunes track: {0}", change.DeviceLocation);
                        }
+                    }
+                    else if (change.Type == SyncType.Add)
+                    {
+                        // This is a long and costly action and at worst case take proportionally long as (s * a) s = SearchPlaylistCount, a = ActionCount
+                        // Possible improvements: Pool all ADDs together and Call AddTrack only once.
+                        library.AddTrack(playlist, change.DeviceLocation, "All Music", t.DeviceMediaRoot);
+                        Console.WriteLine("{0} {1} to iTunes Playlist", change.Type, change.DeviceLocation);
                     }
                 }
             }

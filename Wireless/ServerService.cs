@@ -9,6 +9,8 @@ using System.IO;
 using WifiMusicSync.Model;
 using System.Diagnostics;
 using WifiMusicSync.Helpers;
+using WifiMusicSync.iTunes;
+using iTunesExport.Parser;
 
 namespace WifiMusicSync.Wireless
 {
@@ -110,25 +112,25 @@ namespace WifiMusicSync.Wireless
 
             List<string> reconciledPlaylist;
 
-            // Links playlist entries with iTunes tracks.
-            Dictionary<string, IITFileOrCDTrack> iTunesDb;
-
             // Read and sort the playlists
             Console.Write("Loading Phone Playlist...");
             List<string> devicePlaylist = new List<string>();
             foreach (var item in t.PlaylistData)
             {
-                devicePlaylist.Add(PlaylistGenerator.UnEscapeString(item));
+                devicePlaylist.Add(Utilities.UnEscapeString(item));
             }
             Console.WriteLine("Done");
 
             //BMK TODO: Read iTunes XML for headless operation.
             Console.Write("Loading iTunes Playlist ({0})...", playlistName);
-            IITPlaylist iPlaylist;
+
             List<string> desktopPlaylist;
-            if (PlaylistGenerator.TryGetiTunesPlaylist(playlistName, out iPlaylist))
+            XmliTunesLibrary library = new XmliTunesLibrary();
+            Playlist playlist = library.GetPlaylistByName(playlistName);
+            
+            if (playlist != null)
             {
-                desktopPlaylist = PlaylistGenerator.GeneratePlaylist(iPlaylist, t.DeviceMediaRoot, out iTunesDb);
+                desktopPlaylist = library.GeneratePlaylist(playlist, t.DeviceMediaRoot);
             }
             else
             {
@@ -160,9 +162,10 @@ namespace WifiMusicSync.Wireless
                     if (change.Type == SyncType.Remove)
                     {
                        reconciledPlaylist.Remove(change.DeviceLocation);
-                       if (iTunesDb.ContainsKey(change.DeviceLocation))
+                       Track track = library.GetTrack(change.DeviceLocation);
+                       if (track != null)
                        {
-                           Console.WriteLine("{0} {1} from iTunes Playlist", change.Type, iTunesDb[change.DeviceLocation].Location);
+                           Console.WriteLine("{0} {1} from iTunes Playlist", change.Type, track.Location);
                        }
                        else
                        {
@@ -185,7 +188,7 @@ namespace WifiMusicSync.Wireless
                     string id = Utilities.GetSHA1Hash(change.DeviceLocation);
                     change.TrackPath = "/songs/" + id;
                     // Remember songs, we we can serve them when client requests
-                    songDb.Add(id, iTunesDb[change.DeviceLocation].Location);
+                    songDb.Add(id, library.GetTrack(change.DeviceLocation).Location);
                 }
             }
 
@@ -200,7 +203,7 @@ namespace WifiMusicSync.Wireless
 
             foreach (var item in syncResponse.Actions)
             {
-                item.DeviceLocation = PlaylistGenerator.UnEscapeString(item.DeviceLocation);
+                item.DeviceLocation = Utilities.UnEscapeString(item.DeviceLocation);
                 Debug.Assert(item.DeviceLocation.StartsWith("file"));
             }
 

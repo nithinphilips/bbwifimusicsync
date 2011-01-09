@@ -8,97 +8,93 @@ namespace iTunesExport.Parser
     /// </summary>
     public class Track
     {
-        private string _id;
-        private string _name;
-        private string _artist;
-        private int _trackTime;
-        private string _location;
-        private bool _inLibrary;
-        private bool _disabled;
-
-
-        public Track( string id, string name, string artist, string trackTime, string location, bool inLibrary, bool disabled )
+        public Track(
+            int id, string name, string artist, string albumArtist,
+            string album, string genre, int year, int trackTime,  string location, bool inLibrary, bool disabled)
         {
-            _id = id;
-            _name = name != null ? name : "";
-            _artist = artist != null ? artist : "";
-            int.TryParse(trackTime, out _trackTime);
-            _location = location;
-            _inLibrary = inLibrary;
-            _disabled = disabled;
+            this.Id = id;
+            this.Name = name ?? "";
+            this.Artist = artist ?? "";
+            this.AlbumArtist = albumArtist ?? "";
+            this.Album = album ?? "";
+            this.Genre = genre ?? "";
+            this.Year = year;
+            this.TrackTime = trackTime;
+            this.Location = location;
+            this.InLibrary = inLibrary;
+            this.Disabled = disabled;
         }
 
         /// <summary>
         /// The unique ID for this track.
         /// </summary>
-        public string Id
-        {
-            get{ return _id; }
-        }
+        public int Id { get; private set; }
 
         /// <summary>
         /// The display name for this track.
         /// </summary>
-        public string Name
-        {
-            get{ return _name; }
-        }
+        public string Name { get; private set; }
 
         /// <summary>
         /// The filename for this track, without the full path.
         /// </summary>
-        public string FileName
+        public string FileName 
         {
             get
             {
-                int index = _location.LastIndexOf(Path.DirectorySeparatorChar);
-                if( index == -1 )
-                {
-                    return Location;
-                }
-                else
-                {
-                    return _location.Substring( index + 1 );
-                }
+                return Path.GetFileName(Location);
             }
         }
 
         /// <summary>
         /// The artist performing this track.
         /// </summary>
-        public string Artist
-        {
-            get{ return _artist; }
-        }
+        public string Artist { get; private set; }
 
         /// <summary>
-        /// The duration of the track, in seconds.
+        /// The album artist performing this album.
         /// </summary>
-        public int TrackTime
-        {
-            get { return _trackTime / 1000; }
-        }
+        public string AlbumArtist { get; private set; }
+
+        /// <summary>
+        /// The album to which this track belongs to.
+        /// </summary>
+        public string Album { get; private set; }
+
+        /// <summary>
+        /// The genre of this track.
+        /// </summary>
+        public string Genre { get; private set; }
+
+        /// <summary>
+        /// The year of this track.
+        /// </summary>
+        public int Year { get; private set; }
+
+        /// <summary>
+        /// The duration of the track, in milliseconds.
+        /// </summary>
+        public int TrackTime { get; private set; }
 
         /// <summary>
         /// The complete path and filename on disc for this track.
         /// </summary>
-        public string Location
-        {
-            get{ return _location; }
-        }
+        public string Location { get; private set; }
 
         /// <summary>
         /// Indicates whether this track is located in the location managed
         /// by the iTunes library.
         /// </summary>
-        public bool InLibrary
-        {
-            get{ return _inLibrary; }
-        }
+        public bool InLibrary { get; private set; }
 
-        public bool Disabled
+        /// <summary>
+        /// Indicates whether this track was unchecked by the user
+        /// </summary>
+        public bool Disabled { get; private set; }
+
+        public override string ToString()
         {
-            get { return _disabled; }
+            return string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}", Name, Artist, AlbumArtist, Album, Genre, Year, TrackTime, Location);
         }
     }
 }

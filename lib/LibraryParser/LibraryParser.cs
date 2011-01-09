@@ -4,6 +4,8 @@ using System.IO;
 using System.Web;
 using System.Xml;
 using System.Xml.XPath;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace iTunesExport.Parser
 {
@@ -14,8 +16,8 @@ namespace iTunesExport.Parser
     {
         private string _originalMusicFolder = null;
         private string _musicFolder = null;
-        private Hashtable _tracks = null;
-        private Hashtable _playlists = null;
+        private Dictionary<int, Track> _tracks = null;
+        private Dictionary<int, Playlist> _playlists = null;
 
         #region Constructor
 
@@ -26,8 +28,8 @@ namespace iTunesExport.Parser
         /// of the LibraryParser.</param>
         public LibraryParser( string fileLocation )
         {
-            _tracks = new Hashtable();
-            _playlists = new Hashtable();
+            _tracks = new Dictionary<int, Track>();
+            _playlists = new Dictionary<int, Playlist>();
 
             parseLibrary( fileLocation );
         }
@@ -48,13 +50,11 @@ namespace iTunesExport.Parser
         /// An array of Playlist references, representing the playlists found in the current
         /// iTunes XML library.
         /// </summary>
-        public Playlist[] Playlists
+        public IEnumerable<Playlist> Playlists
         {
             get 
             {
-                Playlist[] playlists = new Playlist[_playlists.Count];
-                _playlists.Values.CopyTo( playlists, 0 );
-                return playlists;
+                return _playlists.Values;
             }
         }
 
@@ -135,13 +135,19 @@ namespace iTunesExport.Parser
 
         private void parseTrack( XPathNodeIterator nodeIterator )
         {
-            string id = null;
+            int id = -1;
             string name = null;
             string artist = null;
-            string tracktime = null;
+            int tracktime = -1;
             string location = null;
             bool inLibrary = false;
             bool disabled = false;
+
+            string albumArtist = null;
+            string album = null;
+            string genre = null;
+            int year = -1;
+
 
             string currentValue;
             while( nodeIterator.MoveNext() )
@@ -149,29 +155,58 @@ namespace iTunesExport.Parser
                 currentValue = nodeIterator.Current.Value;
                 if( currentValue.Equals( "Track ID" ) )
                 {
-                    if( nodeIterator.MoveNext() )
+                    if (nodeIterator.MoveNext())
                     {
-                        id = nodeIterator.Current.Value;;
+                        if (!int.TryParse(nodeIterator.Current.Value, out id))
+                        {
+                            Debug.WriteLine("Error parsing integer value: " + nodeIterator.Current.Value);
+                        }
                     }
                 }
                 else if( currentValue.Equals( "Name" ) )
                 {
-                    if( nodeIterator.MoveNext() )
-                    {
-                        name = nodeIterator.Current.Value;;
-                    }
+                    if( nodeIterator.MoveNext() ) 
+                        name = nodeIterator.Current.Value;
                 }
                 else if( currentValue.Equals( "Artist" ) )
                 {
                     if( nodeIterator.MoveNext() )
+                        artist = nodeIterator.Current.Value;
+                }
+                else if (currentValue.Equals("Album Artist"))
+                {
+                    if (nodeIterator.MoveNext())
+                        albumArtist = nodeIterator.Current.Value;
+                }
+                else if (currentValue.Equals("Album"))
+                {
+                    if (nodeIterator.MoveNext())
+                        album = nodeIterator.Current.Value;
+                }
+                else if (currentValue.Equals("Genre"))
+                {
+                    if (nodeIterator.MoveNext())
+                        genre = nodeIterator.Current.Value;
+                }
+                else if (currentValue.Equals("Year"))
+                {
+                    if (nodeIterator.MoveNext())
                     {
-                        artist = nodeIterator.Current.Value;;
+                        if (!int.TryParse(nodeIterator.Current.Value, out year))
+                        {
+                            Debug.WriteLine("Error parsing integer value: " + nodeIterator.Current.Value);
+                        }
                     }
                 }
                 else if ( currentValue.Equals( "Total Time" ) )
                 {
-                    if ( nodeIterator.MoveNext() )
-                        tracktime = nodeIterator.Current.Value;
+                    if (nodeIterator.MoveNext())
+                    {
+                        if (!int.TryParse(nodeIterator.Current.Value, out tracktime))
+                        {
+                            Debug.WriteLine("Error parsing integer value: " + nodeIterator.Current.Value);
+                        }
+                    }
                 }
                 else if( currentValue.Equals( "Location" ) )
                 {
@@ -212,16 +247,18 @@ namespace iTunesExport.Parser
                 }
             }
 
-            if (id != null && name != null && location != null && location.Length > 0 )
-                _tracks.Add(id, new Track(id, name, artist, tracktime, location, inLibrary, disabled));
+            if (id != -1 && name != null && location != null && location.Length > 0)
+            {
+                _tracks.Add(id, new Track(id, name, artist, albumArtist, album, genre, year, tracktime, location, inLibrary, disabled));
+            }
         }
 
         private void parsePlaylist( XPathNodeIterator nodeIterator )
         {
-            string id = null;
+            int id = -1;
             string name = null;
             bool folder = false;
-            ArrayList tracks = new ArrayList();
+            List<int> tracks = new List<int>();
 
             string currentName;
             string currentValue;
@@ -242,7 +279,10 @@ namespace iTunesExport.Parser
                     {
                         if( nodeIterator.MoveNext() )
                         {
-                            id = nodeIterator.Current.Value;
+                            if (!int.TryParse(nodeIterator.Current.Value, out id))
+                            {
+                                Debug.WriteLine("Error parsing integer value: " + nodeIterator.Current.Value);
+                            }
                         }
                     }
                     else if( currentValue.Equals( "Folder" ) )
@@ -258,12 +298,20 @@ namespace iTunesExport.Parser
                     XPathNodeIterator trackIterator = nodeIterator.Current.Select( "dict/integer" );
                     while( trackIterator.MoveNext() )
                     {
-                        tracks.Add( trackIterator.Current.Value );
+                        int trackId = -1;
+                        if (int.TryParse(trackIterator.Current.Value, out trackId))
+                        {
+                            tracks.Add(trackId);
+                        }
+                        else
+                        {
+                            Debug.WriteLine("Error parsing integer value: " + trackIterator.Current.Value);
+                        }
                     }
                 }
             }
 
-            if( id != null && name != null && tracks.Count > 0 )
+            if( id != -1 && name != null && tracks.Count > 0 )
             {
                 _playlists.Add( id, new Playlist( id, name, folder, getTracks( tracks ) ) );
             }
@@ -274,13 +322,13 @@ namespace iTunesExport.Parser
         /// </summary>
         /// <param name="trackIds">The list of track IDs to be returned.</param>
         /// <returns>An array of Track references. If none are found, an empty array is returned.</returns>
-        private Track[] getTracks( IList trackIds )
+        private Track[] getTracks( List<int> trackIds )
         {
             Track[] tracks = new Track[trackIds.Count];
             int index = 0;
-            foreach( string id in trackIds )
+            foreach( int id in trackIds )
             {
-                tracks[index++] = (Track) _tracks[id];
+                tracks[index++] = _tracks[id];
             }
 
             return tracks;

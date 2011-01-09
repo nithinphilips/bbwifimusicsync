@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using Kayak.Framework;
 using Kayak;
 using WifiMusicSync.Properties;
+using WifiMusicSync.iTunes;
 
 namespace WifiMusicSync
 {

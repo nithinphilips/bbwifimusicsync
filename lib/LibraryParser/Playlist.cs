@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace iTunesExport.Parser
 {
@@ -7,54 +8,43 @@ namespace iTunesExport.Parser
     /// </summary>
     public class Playlist
     {
-        private string _id = null;
-        private string _name = null;
-        private bool _folder = false;
-        private Track[] _tracks = null;
-        private char[] illegalCharacters = System.IO.Path.GetInvalidFileNameChars();
 
-        public Playlist( string id, string name, bool folder, Track[] tracks )
+        protected Playlist()
         {
-            _id = id;
-            _name = name;
-            _folder = folder;
 
-            foreach (char illegalChar in illegalCharacters)
-                _name = _name.Replace(illegalChar, '-');
-            
-            _tracks = tracks;
+        }
+
+        public Playlist(int id, string name, bool folder, IEnumerable<Track> tracks)
+        {
+            this.Id = id;
+            this.Name = name;
+            this.Folder = folder;
+            this.Tracks = tracks;
         }
 
         /// <summary>
         /// The unique ID for this playlist.
         /// </summary>
-        public string Id
-        {
-            get { return _id; }
-        }
+        public int Id { get; protected set; }
 
         /// <summary>
         /// The display name for this playlist.
         /// </summary>
-        public string Name
-        {
-            get { return _name; }
-        }
+        public string Name { get; protected set; }
 
         /// <summary>
         /// Indicates whether this playlist is based on a folder in iTunes.
         /// </summary>
-        public bool Folder
-        {
-            get { return _folder; }
-        }
+        public bool Folder { get; protected set; }
 
         /// <summary>
         /// An array of the Tracks that appear within this playlist.
         /// </summary>
-        public Track[] Tracks
+        public IEnumerable<Track> Tracks { get; protected set; }
+
+        public override string ToString()
         {
-            get { return _tracks; }
+            return Name;
         }
     }
 }

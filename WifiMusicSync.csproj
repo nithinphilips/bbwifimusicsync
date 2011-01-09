@@ -61,8 +61,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\DiffHandler.cs" />
+    <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="iTunes\ComiTunesLibrary.cs" />
+    <Compile Include="iTunes\IiTunesLibrary.cs" />
+    <Compile Include="iTunes\XmliTunesLibrary.cs" />
     <Compile Include="Model\PlaylistRequest.cs" />
-    <Compile Include="Helpers\PlaylistGenerator.cs" />
     <Compile Include="Model\SyncAction.cs" />
     <Compile Include="Model\SyncResponse.cs" />
     <Compile Include="Model\SyncType.cs" />
@@ -101,6 +104,10 @@
     <ProjectReference Include="lib\LibraryParser\LibraryParser.csproj">
       <Project>{AC3FD357-F5F8-47C2-9843-F6991F0DD539}</Project>
       <Name>LibraryParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="lib\taglib-sharp\taglib-sharp.csproj">
+      <Project>{4CC18776-125E-4318-9D24-D60110AD9697}</Project>
+      <Name>taglib-sharp</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

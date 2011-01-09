@@ -56,5 +56,39 @@ namespace WifiMusicSync.Helpers
             }
             return playlist;
         }
+
+
+        public static string EscapeString(string name)
+        {
+            string result = Uri.EscapeUriString(name);
+            result = result.Replace("&", Uri.HexEscape('&'));
+            result = result.Replace(" ", Uri.HexEscape(' '));
+            result = result.Replace("#", Uri.HexEscape('#'));
+            return result;
+        }
+
+        public static string UnEscapeString(string name)
+        {
+            string result = Uri.UnescapeDataString(name);
+            result = result.Replace(Uri.HexEscape('&'), "&");
+            result = result.Replace(Uri.HexEscape(' '), " ");
+            result = result.Replace(Uri.HexEscape('#'), "#");
+            return result;
+        }
+
+        public static string MakeFileNameSafe(string name)
+        {
+            string result = name.Replace('/', '_');
+
+            foreach (char invalidChar in Path.GetInvalidFileNameChars())
+            {
+                result = result.Replace(invalidChar, '_');
+            }
+
+            if (result.StartsWith(".")) result = "_" + result.Substring(1);
+            if (result.EndsWith(".")) result = result.Substring(0, result.Length - 1) + "_";
+
+            return result;
+        }
     }
 }

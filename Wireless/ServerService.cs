@@ -121,12 +121,13 @@ namespace WifiMusicSync.Wireless
             }
             Console.WriteLine("Done");
 
-            //BMK TODO: Read iTunes XML for headless operation.
-            Console.Write("Loading iTunes Playlist ({0})...", playlistName);
-
+            Console.Write("Loading iTunes Library ({0})...", playlistName);
             List<string> desktopPlaylist;
+            long aTick = DateTime.Now.Ticks;
+            // TODO: Keep the libary around and only read it if the file has actually changed.
             XmliTunesLibrary library = new XmliTunesLibrary();
-            Playlist playlist = library.GetPlaylistByName(playlistName);
+            long bTick = DateTime.Now.Ticks;
+            IPlaylist playlist = library.GetPlaylistByName(playlistName);
             
             if (playlist != null)
             {
@@ -138,7 +139,7 @@ namespace WifiMusicSync.Wireless
                 return new SyncResponse { ErrorMessage = "Playlist does not exist", Error = 100 };
 
             }
-            Console.WriteLine("Done");
+            Console.WriteLine("Done (Took {0}ms)", (int)new TimeSpan(bTick - aTick).TotalMilliseconds);
 
             IEnumerable<SyncAction> desktopChanges = null; // changes that were made on the DESKTOP. Apply to DEVICE.
             IEnumerable<SyncAction> deviceChanges = null;  // changes that were made on the DEVICE. Apply to DESKTOP.
@@ -148,7 +149,7 @@ namespace WifiMusicSync.Wireless
             if (File.Exists(playlistPath))
             {
                 // TODO: Read iTunes XML for headless operation.
-                Console.Write("Loading reference playlist ...");
+                Console.Write("Loading reference playlist {0}...", playlistPath);
                 List<string> referencePlaylist = Utilities.LoadPlaylist(playlistPath);
                 Console.WriteLine("Done");
 
@@ -159,12 +160,14 @@ namespace WifiMusicSync.Wireless
                 reconciledPlaylist = new List<string>(desktopPlaylist);
                 foreach (var change in deviceChanges)
                 {
+                    // TODO: Find tracks that are already in the iTunes library and were added to the playlist on the phone.
                     if (change.Type == SyncType.Remove)
                     {
                        reconciledPlaylist.Remove(change.DeviceLocation);
-                       Track track = library.GetTrack(change.DeviceLocation);
+                       ITrack track = library.GetTrack(change.DeviceLocation);
                        if (track != null)
                        {
+                           // TODO: Generate the actions and run them asynchronously.
                            Console.WriteLine("{0} {1} from iTunes Playlist", change.Type, track.Location);
                        }
                        else

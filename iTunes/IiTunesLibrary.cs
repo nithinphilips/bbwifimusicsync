@@ -10,9 +10,9 @@ namespace WifiMusicSync.iTunes
     {
         bool CanModify { get; }
         string MusicFolderPath { get; }
-        IEnumerable<Playlist> Playlists { get; }
+        IEnumerable<IPlaylist> Playlists { get; }
 
-        List<string> GeneratePlaylist(Playlist playlist, string root);
-        Track GetTrack(string playlistLine);
+        List<string> GeneratePlaylist(IPlaylist playlist, string root);
+        ITrack GetTrack(string playlistLine);
     }
 }

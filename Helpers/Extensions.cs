@@ -10,7 +10,7 @@ namespace WifiMusicSync.Helpers
 {
     public static class Extensions
     {
-        public static string GetPlaylistLine(this Track track, string root)
+        public static string GetPlaylistLine(this ITrack track, string root)
         {
             string playlistStr;
 
@@ -44,6 +44,11 @@ namespace WifiMusicSync.Helpers
                      Path.GetFileName(track.Location));
 
             return root + playlistStr;
+        }
+
+        public static ITrack ToTrack(this IITFileOrCDTrack track)
+        {
+            return new Track(track.trackID, track.Name, track.Artist, track.AlbumArtist, track.Album, track.Genre, track.Year, track.Duration, track.Location, false, !track.Enabled);
         }
     }
 }

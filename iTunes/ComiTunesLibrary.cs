@@ -23,9 +23,9 @@ namespace WifiMusicSync.iTunes
 
         public bool CanModify { get; private set; }
         public string MusicFolderPath { get; private set; }
-        public IEnumerable<Playlist> Playlists { get; private set; }
+        public IEnumerable<IPlaylist> Playlists { get; private set; }
 
-        public IEnumerable<Playlist> GetPlaylists()
+        public IEnumerable<IPlaylist> GetPlaylists()
         {
             List<Playlist> playlists = new List<Playlist>();
             IITSource library = app.Sources.get_ItemByName("Library");
@@ -53,7 +53,7 @@ namespace WifiMusicSync.iTunes
             return playlists;
         }
 
-        public static List<string> ToPlaylist(Playlist playlist, string deviceRoot)
+        public static List<string> ToPlaylist(IPlaylist playlist, string deviceRoot)
         {
             List<string> result = new List<string>();
 
@@ -84,12 +84,12 @@ namespace WifiMusicSync.iTunes
         }
 
 
-        public List<string> GeneratePlaylist(Playlist playlist, string root)
+        public List<string> GeneratePlaylist(IPlaylist playlist, string root)
         {
             throw new NotImplementedException();
         }
 
-        public Track GetTrack(string playlistLine)
+        public ITrack GetTrack(string playlistLine)
         {
             throw new NotImplementedException();
         }

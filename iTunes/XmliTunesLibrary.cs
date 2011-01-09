@@ -25,12 +25,12 @@ namespace WifiMusicSync.iTunes
 
         public bool CanModify { get; private set; }
         public string MusicFolderPath { get; private set; }
-        public IEnumerable<Playlist> Playlists { get; private set; }
+        public IEnumerable<IPlaylist> Playlists { get; private set; }
 
 
-        Dictionary<string, Track> lookupTable = new Dictionary<string, Track>();
+        Dictionary<string, ITrack> lookupTable = new Dictionary<string, ITrack>();
 
-        public List<string> GeneratePlaylist(Playlist playlist, string root)
+        public List<string> GeneratePlaylist(IPlaylist playlist, string root)
         {
             List<string> result = new List<string>();
             foreach (var track in playlist.Tracks)
@@ -43,7 +43,7 @@ namespace WifiMusicSync.iTunes
             return result;
         }
 
-        public Playlist GetPlaylistByName(string name)
+        public IPlaylist GetPlaylistByName(string name)
         {
             foreach (var playlist in Playlists)
             {
@@ -52,7 +52,7 @@ namespace WifiMusicSync.iTunes
             return null;
         }
 
-        public Track GetTrack(string playlistLine)
+        public ITrack GetTrack(string playlistLine)
         {
             if (lookupTable.ContainsKey(playlistLine))
             {

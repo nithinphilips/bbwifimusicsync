@@ -6,7 +6,7 @@ namespace iTunesExport.Parser
     /// <summary>
     /// Represents an individual audio track from the iTunes library.
     /// </summary>
-    public class Track
+    public class Track : ITrack
     {
         public Track(
             int id, string name, string artist, string albumArtist,

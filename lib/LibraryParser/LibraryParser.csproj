@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IPlaylist.cs" />
+    <Compile Include="ITrack.cs" />
     <Compile Include="LibraryParser.cs" />
     <Compile Include="Playlist.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

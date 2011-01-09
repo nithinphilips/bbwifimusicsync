@@ -6,7 +6,7 @@ namespace iTunesExport.Parser
     /// <summary>
     /// Represents an individual playlist from the iTunes library.
     /// </summary>
-    public class Playlist
+    public class Playlist : IPlaylist
     {
 
         protected Playlist()
@@ -14,7 +14,7 @@ namespace iTunesExport.Parser
 
         }
 
-        public Playlist(int id, string name, bool folder, IEnumerable<Track> tracks)
+        public Playlist(int id, string name, bool folder, IEnumerable<ITrack> tracks)
         {
             this.Id = id;
             this.Name = name;
@@ -40,7 +40,7 @@ namespace iTunesExport.Parser
         /// <summary>
         /// An array of the Tracks that appear within this playlist.
         /// </summary>
-        public IEnumerable<Track> Tracks { get; protected set; }
+        public IEnumerable<ITrack> Tracks { get; protected set; }
 
         public override string ToString()
         {

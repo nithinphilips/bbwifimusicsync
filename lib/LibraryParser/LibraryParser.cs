@@ -16,8 +16,8 @@ namespace iTunesExport.Parser
     {
         private string _originalMusicFolder = null;
         private string _musicFolder = null;
-        private Dictionary<int, Track> _tracks = null;
-        private Dictionary<int, Playlist> _playlists = null;
+        private Dictionary<int, ITrack> _tracks = null;
+        private Dictionary<int, IPlaylist> _playlists = null;
 
         #region Constructor
 
@@ -28,8 +28,8 @@ namespace iTunesExport.Parser
         /// of the LibraryParser.</param>
         public LibraryParser( string fileLocation )
         {
-            _tracks = new Dictionary<int, Track>();
-            _playlists = new Dictionary<int, Playlist>();
+            _tracks = new Dictionary<int, ITrack>();
+            _playlists = new Dictionary<int, IPlaylist>();
 
             parseLibrary( fileLocation );
         }
@@ -50,7 +50,7 @@ namespace iTunesExport.Parser
         /// An array of Playlist references, representing the playlists found in the current
         /// iTunes XML library.
         /// </summary>
-        public IEnumerable<Playlist> Playlists
+        public IEnumerable<IPlaylist> Playlists
         {
             get 
             {
@@ -322,9 +322,9 @@ namespace iTunesExport.Parser
         /// </summary>
         /// <param name="trackIds">The list of track IDs to be returned.</param>
         /// <returns>An array of Track references. If none are found, an empty array is returned.</returns>
-        private Track[] getTracks( List<int> trackIds )
+        private ITrack[] getTracks( List<int> trackIds )
         {
-            Track[] tracks = new Track[trackIds.Count];
+            ITrack[] tracks = new ITrack[trackIds.Count];
             int index = 0;
             foreach( int id in trackIds )
             {

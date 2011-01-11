@@ -37,6 +37,13 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="libQdownloader">
+      <HintPath>..\..\Qdownloader-2\src\libQdownloader\bin\Debug\libQdownloader.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\log4net\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -58,8 +65,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Model\CopyProgressModel.cs" />
     <Compile Include="Model\DirectorySizeCalculator.cs" />
-    <Compile Include="Model\FileCopyActions.cs" />
     <Compile Include="Model\SyncSettings.cs" />
     <Compile Include="QuickZip\DirectoryExistsRule.cs" />
     <Compile Include="QuickZip\InvertSign.cs" />
@@ -67,10 +75,12 @@
     <Compile Include="QuickZip\SelectFolderTextBox.xaml.cs">
       <DependentUpon>SelectFolderTextBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Utilities\Common.cs" />
+    <Compile Include="Threading\FileCopier.cs" />
+    <Compile Include="Threading\FileCopyJob.cs" />
+    <Compile Include="Threading\FileCopyJobEventArgs.cs" />
+    <Compile Include="Threading\FileCopyManager.cs" />
     <Compile Include="Utilities\Converters.cs" />
     <Compile Include="Utilities\ReflectionControl.cs" />
-    <Compile Include="Utilities\Utility.cs" />
     <Page Include="Windows\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -79,6 +89,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Utilities\Utility.cs" />
     <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -138,6 +149,7 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

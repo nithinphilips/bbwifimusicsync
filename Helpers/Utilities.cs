@@ -72,6 +72,12 @@ namespace WifiMusicSync.Helpers
             return playlist;
         }
 
+        public static string ToBlackberryPath(string path)
+        {
+            string driveName = path.Substring(0, 2);
+            Uri uri = new Uri(path);
+            return uri.ToString().Replace(driveName, "SDCard");
+        }
 
         public static string EscapeString(string name)
         {

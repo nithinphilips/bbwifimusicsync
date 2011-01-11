@@ -14,6 +14,8 @@ using System.Windows.Shapes;
 using WifiSyncDesktopClient.Model;
 using LibQdownloader.Utilities;
 using WifiMusicSync.Helpers;
+using WifiSyncDesktopClient.Helpers;
+using WifiSyncDesktopClient.Threading;
 
 namespace WifiSyncDesktopClient
 {
@@ -22,60 +24,87 @@ namespace WifiSyncDesktopClient
     /// </summary>
     public partial class MainWindow : Window
     {
-        SyncSettings viewModel = new SyncSettings();
+        SyncSettings viewModelSync = new SyncSettings();
+        CopyProgressModel viewModelCopy = new CopyProgressModel();
+        FileCopyManager copyMan = new FileCopyManager();
+
+        public int Total { get; set; }
+        public int Current { get; set; }
 
         public MainWindow()
         {
             InitializeComponent();
-            viewModel.LoadPlaylists();
-            viewModel.Status = "Ready";
-            this.DataContext = viewModel;
+            viewModelSync.LoadPlaylists();
+            viewModelSync.Status = "Ready";
+            //viewModelSync.Path = @"H:\Blackberry\music";
+            this.DataContext = viewModelSync;
+
+            this.pnlProgress.DataContext = viewModelCopy;
+
+            copyMan.JobStarting += new EventHandler<LibQdownloader.Threading.JobEventArgs<FileCopyJob>>(copyMan_JobStarting);
+            copyMan.WorkCompleted += new EventHandler(copyMan_WorkCompleted);
+
+            this.Closing += new System.ComponentModel.CancelEventHandler(MainWindow_Closing);
         }
 
-        private void CommandBinding_Executed(object sender, ExecutedRoutedEventArgs e)
+        void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (viewModel.HasCapacityExceeded)
+            copyMan.Dispose();
+        }
+
+        void copyMan_WorkCompleted(object sender, EventArgs e)
+        {
+            viewModelSync.SaveAllM3uPlaylists();
+            viewModelSync.Status = "";
+            pnlFinished.Visibility = System.Windows.Visibility.Visible;
+            pnlProgress.Visibility = System.Windows.Visibility.Collapsed;
+            this.SizeToContent = System.Windows.SizeToContent.Height;
+        }
+
+        void copyMan_JobStarting(object sender, LibQdownloader.Threading.JobEventArgs<FileCopyJob> e)
+        {
+            Current++;
+            viewModelCopy.From = e.Job.Source;
+            viewModelCopy.To = e.Job.Destination;
+            viewModelCopy.Size = e.Job.Size;
+            viewModelSync.Status = "Copying " + System.IO.Path.GetFileNameWithoutExtension(e.Job.Source);
+            viewModelCopy.Percentage = (int)(Common.CalculatePercent(Current, Total) + 0.5f); // Ceiling
+        }
+
+        private void sync_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (viewModelSync.HasCapacityExceeded)
             {
-                MessageBox.Show(string.Format("Current selection exceeds drive capacity by {0}", Common.ToReadableSize(-viewModel.RemainingCapacity)));
+                MessageBox.Show(string.Format("Current selection exceeds drive capacity by {0}", Common.ToReadableSize(-viewModelSync.RemainingCapacity)));
             }
             else
             {
-                foreach (var item in viewModel.SelectedPlaylists)
-                {
-                    string playlistPath = System.IO.Path.Combine(viewModel.Path, item.Playlist.GetSafeName() + ".m3u");
-                    string root = System.IO.Path.Combine(viewModel.Path, "Songs");
-
-                    string tRoot = TransformPath(root);
-
-                    List<string> playlist = new List<string>();
-                    foreach (var track in item.Playlist.Tracks)
-                    {
-                        playlist.Add(track.GetPlaylistLine(tRoot));
-                        //Console.WriteLine(track.GetPlaylistLine(root, System.IO.Path.DirectorySeparatorChar));
-                    }
-                    WifiMusicSync.Helpers.Utilities.SavePlaylist(playlist, playlistPath);
-                }
+                List<FileCopyJob> jobs = new List<FileCopyJob>(viewModelSync.GetSelectedTracksUniqueAsFileCopyJobs());
+                Total = jobs.Count;
+                copyMan.Enqueue(jobs);
+                pnlProgress.Visibility = System.Windows.Visibility.Visible;
+                pnlSelection.Visibility = System.Windows.Visibility.Collapsed;
+                this.SizeToContent = System.Windows.SizeToContent.Height;
             }
         }
 
-        private string TransformPath(string path)
-        {
-            string driveName = path.Substring(0, 2);
-            Uri uri = new Uri(path);
-            return uri.ToString().Replace(driveName, "SDCard");
-        }
 
-        private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        private void sync_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
             e.CanExecute = true;
-            if (string.IsNullOrWhiteSpace(viewModel.Path))
+            if (string.IsNullOrWhiteSpace(viewModelSync.Path))
             {
                 e.CanExecute = false;
             }
-            else if(viewModel.SelectedTracksSize <= 0)
+            else if(viewModelSync.SelectedTracksSize <= 0)
             {
                 e.CanExecute = false;
             }
+        }
+
+        private void close_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

@@ -7,15 +7,16 @@ using System.IO;
 using WifiMusicSync.Helpers;
 using iTunesExport.Parser;
 using LibQdownloader.Utilities;
+using WifiSyncDesktopClient.Helpers;
 
 namespace WifiSyncDesktopClient.Model
 {
-    public class PlaylistInfo
+    public class PlaylistInfo : INotifyPropertyChanged
     {
         public string Name { get; set; }
 
-        bool _checked;
-        public bool Checked
+        bool? _checked = false;
+        public bool? Checked
         {
             get
             {
@@ -24,6 +25,7 @@ namespace WifiSyncDesktopClient.Model
             set
             {
                 _checked = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("Checked"));
                 if(Settings != null) Settings.CalulatePlaylistSize();
             }
         }
@@ -31,56 +33,78 @@ namespace WifiSyncDesktopClient.Model
         public SyncSettings Settings { get; set; }
         public IPlaylist Playlist { get; set; }
 
+        bool existsAtDestination = false;
+        public bool ExistsAtDestination
+        {
+            get
+            {
+                return existsAtDestination;
+            }
+            set
+            {
+                this.existsAtDestination = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("ExistsAtDestination"));
+            }
+        }
 
         public override string ToString()
         {
-            return string.Format("[{0}] {1}", Checked ? "X" : " ", Name);
+            return string.Format("[{0}] {1}", Checked.Value ? "X" : " ", Name);
         }
+
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
     }
 
     public class SyncSettings : INotifyPropertyChanged
     {
-        FileSystemWatcher watcher;
         XmliTunesLibraryManager xmlLibraryManager = new XmliTunesLibraryManager();
 
         public IEnumerable<PlaylistInfo> Playlists { get; set; }
+        public long SelectedTracksSize { get; set; }
+
+        public IEnumerable<PlaylistInfo> GetSelectedPlaylists()
+        {
+            return from p in Playlists
+                   where (!p.Checked.HasValue) || (p.Checked.HasValue && p.Checked.Value == true) 
+                   select p;
+            
+        }
 
         public void LoadPlaylists()
         {
             var playlistSelector = from t in xmlLibraryManager.Library.Playlists
-                         select new PlaylistInfo
-                         {
-                            Name = string.Format("{0} ({1} tracks)", t.Name, t.Tracks.Count()),
-                            Checked = false,
-                            Playlist = t,
-                            Settings = this
-                         };
+                                   select new PlaylistInfo
+                                   {
+                                       Name = string.Format("{0} ({1} tracks)", t.Name, t.Tracks.Count()),
+                                       Checked = false,
+                                       Playlist = t,
+                                       Settings = this
+                                   };
             Playlists = new List<PlaylistInfo>(playlistSelector);
         }
 
-        public IEnumerable<PlaylistInfo> SelectedPlaylists
-        {
-            get
-            {
-                return from p in Playlists
-                       where p.Checked
-                       select p;
-            }
-        }
+        
 
         public void CalulatePlaylistSize()
         {
+            if (string.IsNullOrWhiteSpace(Path)) return;
+
             long totalTrackSize = 0;
             HashSet<int> uniqueTracks = new HashSet<int>();
+            string root = System.IO.Path.Combine(this.Path, "Songs");
 
-            foreach (var playlist in SelectedPlaylists)
+            foreach (var playlist in GetSelectedPlaylists())
             {
                 foreach (var track in playlist.Playlist.Tracks)
                 {
                     // Use the hash set to make sure we tally the track size only once.
                     if (!uniqueTracks.Contains(track.Id))
                     {
-                        totalTrackSize += track.Size;
+                        string targetPath = track.GetPlaylistLine(root, System.IO.Path.DirectorySeparatorChar);
+                        if (!File.Exists(targetPath))
+                        {
+                            totalTrackSize += track.Size;
+                        }
                         uniqueTracks.Add(track.Id);
                     }
                 }
@@ -89,11 +113,6 @@ namespace WifiSyncDesktopClient.Model
             CalculateCapacity();
         }
 
-        public long SelectedTracksSize
-        {
-            get;
-            set;
-        }
         
 
         public float ImageSizePercentage
@@ -128,7 +147,10 @@ namespace WifiSyncDesktopClient.Model
                 if (value != path)
                 {
                     path = value;
+
+                    this.CheckExistingPlaylists();
                     CalculateCapacity();
+                    CalulatePlaylistSize();
                     PropertyChanged(this, new PropertyChangedEventArgs("Path"));
                 }
             }
@@ -143,7 +165,7 @@ namespace WifiSyncDesktopClient.Model
                 this.Size = (di.TotalSize - di.AvailableFreeSpace) + SelectedTracksSize;
                 if (SelectedTracksSize == 0)
                 {
-                    Status = "Select one or more playlists";
+                    Status = "No songs to copy";
                 }else
                 {
                     Status = string.Format("Capacity: {0}, Free: {1}, Required: {2}", Common.ToReadableSize(Capacity), Common.ToReadableSize(di.AvailableFreeSpace), Common.ToReadableSize(SelectedTracksSize));
@@ -212,74 +234,6 @@ namespace WifiSyncDesktopClient.Model
             {
                 return capacity - size;
             }
-        }
-
-        public void WatchFileSystem()
-        {
-            if (watcher != null) watcher.Dispose();
-            if (!string.IsNullOrEmpty(Path))
-            {
-                watcher = new FileSystemWatcher(System.IO.Path.GetDirectoryName(Path));
-                watcher.IncludeSubdirectories = true;
-                watcher.NotifyFilter =
-                      NotifyFilters.Attributes
-                    | NotifyFilters.CreationTime
-                    | NotifyFilters.DirectoryName
-                    | NotifyFilters.FileName
-                    | NotifyFilters.LastAccess
-                    | NotifyFilters.LastWrite
-                    | NotifyFilters.Security
-                    | NotifyFilters.Size;
-                watcher.Changed += watcher_Changed;
-                watcher.Deleted += watcher_Changed;
-                watcher.Created += watcher_Changed;
-                watcher.Renamed += watcher_Renamed;
-                watcher.EnableRaisingEvents = true;
-            }
-        }
-
-
-
-        void watcher_Changed(object sender, FileSystemEventArgs e)
-        {
-            if ((e.ChangeType == WatcherChangeTypes.Deleted) && (this.Path.Equals(e.FullPath, StringComparison.OrdinalIgnoreCase)))
-            {
-                // The Folder we're watching was deleted. We're gonna move up the directory tree, but not read it!
-                // May be notify user in the future
-                string newPath = Path;
-
-                while (true)
-                {
-                    newPath = System.IO.Path.GetDirectoryName(newPath);
-                    if (Directory.Exists(newPath)
-                     || string.IsNullOrEmpty(newPath)) // GetDirectoryName("C:\\") == ""
-                    {
-                        this.Path = newPath;
-                        break;
-                    }
-                }
-
-            }
-
-            Update();
-        }
-
-        void watcher_Renamed(object sender, RenamedEventArgs e)
-        {
-            // No need to update
-            //Console.WriteLine("{0}: {1} to {2}", e.ChangeType, e.OldFullPath, e.FullPath);
-            if (this.Path.Equals(e.OldFullPath, StringComparison.OrdinalIgnoreCase))
-            {
-                // The folder we're watching has changed.
-                this.Path = e.FullPath;
-            }
-        }
-
-        public void Update()
-        {
-            Size = 0;
-            if (!string.IsNullOrEmpty(Path)) // By default the Path is empty. Just leave size as 0
-                Size = DirectorySizeCalculator.CalculateSize(Path);
         }
 
         public event PropertyChangedEventHandler PropertyChanged = delegate { };

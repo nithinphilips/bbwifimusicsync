@@ -22,6 +22,8 @@ namespace QDownloader.Utilities
         /// </summary>
         public static string ShortenPath(string path, int maxLength)
         {
+            if (string.IsNullOrWhiteSpace(path)) return path;
+
             StringBuilder sb = new StringBuilder();
             PathCompactPathEx(sb, path, maxLength, 0);
             return sb.ToString();
@@ -32,6 +34,8 @@ namespace QDownloader.Utilities
         /// </summary>
         public static string ShortenPath(string path)
         {
+            if (string.IsNullOrWhiteSpace(path)) return path;
+
             const string pattern = @"^(\w+:|\\)(\\[^\\]+\\[^\\]+\\).*(\\[^\\]+\\[^\\]+)$";
             const string replacement = "$1$2...$3";
             if (Regex.IsMatch(path, pattern, RegexOptions.Singleline))
@@ -49,6 +53,8 @@ namespace QDownloader.Utilities
         /// </summary>
         public static string ShortenUrl(string path)
         {
+            if (string.IsNullOrWhiteSpace(path)) return path;
+
             // const string pattern = @"^(http|https|ftp|file)(://[^/]+/).*(/[^\n\r\\x00?].*)$";
             const string pattern = @"^(http|https|ftp|file)(://[^/]+/).*(/[^$\?].*)$";
             const string replacement = "$1$2...$3";

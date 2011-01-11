@@ -8,10 +8,15 @@ using System.Diagnostics;
 
 namespace WifiMusicSync.Helpers
 {
-    class Utilities
+    public class Utilities
     {
         const string NEWLINE = "\n";
 
+        /// <summary>
+        /// Calculates SHA1 hash of a string.
+        /// </summary>
+        /// <param name="str">The string to hash.</param>
+        /// <returns>Hash in hexadecimal string.</returns>
         public static string GetSHA1Hash(string str)
         {
             SHA1 sha1 = new SHA1CryptoServiceProvider();
@@ -25,6 +30,11 @@ namespace WifiMusicSync.Helpers
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Saves a playlist to a file.
+        /// </summary>
+        /// <param name="playlist">The playlist to save, as a string enumeration.</param>
+        /// <param name="path">The path to save the file to.</param>
         public static void SavePlaylist(IEnumerable<string> playlist, string path)
         {
             if (File.Exists(path)) File.Delete(path);
@@ -39,6 +49,11 @@ namespace WifiMusicSync.Helpers
             }
         }
 
+        /// <summary>
+        /// Loads a playlist from a file.
+        /// </summary>
+        /// <param name="path">The path of the playlist file.</param>
+        /// <returns>The loaded playlist as a List.</returns>
         public static List<string> LoadPlaylist(string path)
         {
             List<string> playlist = new List<string>();

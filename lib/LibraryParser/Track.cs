@@ -10,7 +10,7 @@ namespace iTunesExport.Parser
     {
         public Track(
             int id, string name, string artist, string albumArtist,
-            string album, string genre, int year, int trackTime,  string location, bool inLibrary, bool disabled)
+            string album, string genre, int year, int size, int trackTime, string location, bool inLibrary, bool disabled)
         {
             this.Id = id;
             this.Name = name ?? "";
@@ -19,6 +19,7 @@ namespace iTunesExport.Parser
             this.Album = album ?? "";
             this.Genre = genre ?? "";
             this.Year = year;
+            this.Size = size;
             this.TrackTime = trackTime;
             this.Location = location;
             this.InLibrary = inLibrary;
@@ -70,6 +71,11 @@ namespace iTunesExport.Parser
         /// The year of this track.
         /// </summary>
         public int Year { get; private set; }
+
+        /// <summary>
+        /// The size of the track in bytes
+        /// </summary>
+        public int Size { get; private set; }
 
         /// <summary>
         /// The duration of the track, in milliseconds.

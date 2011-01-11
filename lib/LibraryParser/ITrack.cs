@@ -16,5 +16,6 @@ namespace iTunesExport.Parser
         string Name { get; }
         int TrackTime { get; }
         int Year { get; }
+        int Size { get; }
     }
 }

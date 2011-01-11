@@ -147,6 +147,7 @@ namespace iTunesExport.Parser
             string album = null;
             string genre = null;
             int year = -1;
+            int size = 0;
 
 
             string currentValue;
@@ -193,6 +194,16 @@ namespace iTunesExport.Parser
                     if (nodeIterator.MoveNext())
                     {
                         if (!int.TryParse(nodeIterator.Current.Value, out year))
+                        {
+                            Debug.WriteLine("Error parsing integer value: " + nodeIterator.Current.Value);
+                        }
+                    }
+                }
+                else if (currentValue.Equals("Size"))
+                {
+                    if (nodeIterator.MoveNext())
+                    {
+                        if (!int.TryParse(nodeIterator.Current.Value, out size))
                         {
                             Debug.WriteLine("Error parsing integer value: " + nodeIterator.Current.Value);
                         }
@@ -249,7 +260,7 @@ namespace iTunesExport.Parser
 
             if (id != -1 && name != null && location != null && location.Length > 0)
             {
-                _tracks.Add(id, new Track(id, name, artist, albumArtist, album, genre, year, tracktime, location, inLibrary, disabled));
+                _tracks.Add(id, new Track(id, name, artist, albumArtist, album, genre, year, size, tracktime, location, inLibrary, disabled));
             }
         }
 

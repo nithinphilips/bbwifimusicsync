@@ -1,0 +1,79 @@
+﻿<Window x:Class="WifiSyncDesktopClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:quickzip="clr-namespace:QuickZip.Controls"
+        xmlns:converters="clr-namespace:QDownloader.Utilities"    
+        xmlns:rules="clr-namespace:QuickZip.Tools"
+        xmlns:controls="clr-namespace:ImageBuildHelper.Controls"
+        WindowStartupLocation="CenterScreen"
+        Title="WiFi Music Sync" Height="600" Width="500">
+    <Window.Resources>
+        <converters:TransferredRateConverter x:Key="friendlySizeConverter" />
+        <converters:BooleanStyleConverter x:Key="boolToStyleConverter" />
+        <converters:EnumBooleanConverter x:Key="enumBoolConverter" />
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="NextPage" CanExecute="CommandBinding_CanExecute" Executed="CommandBinding_Executed" />
+    </Window.CommandBindings>
+    <DockPanel LastChildFill="True">
+        
+        <!-- Title Block -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <StackPanel.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#FF9AA0AE" Offset="0" />
+                    <GradientStop Color="#FF000000" Offset="1" />
+                </LinearGradientBrush>
+            </StackPanel.Background>
+            
+            <controls:ReflectionControl Margin="5,17,0,-2" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+                <TextBlock Padding="0" Margin="0, -5, 0, 0" FontSize="22" Foreground="White" FontWeight="SemiBold" Text="WiFi Music Sync" />
+            </controls:ReflectionControl>
+        </StackPanel>
+
+        <StatusBar DockPanel.Dock="Bottom">
+            <TextBlock Text="{Binding Path=Status}" />
+        </StatusBar>
+
+        <DockPanel>
+
+            <StackPanel Margin="0,0,0,5" DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Command="NextPage">Sync</Button>
+            </StackPanel>
+            
+            <ProgressBar x:Name="imageSizeBar" Margin="5" DockPanel.Dock="Bottom" MinHeight="20" 
+                             Value="{Binding Path=ImageSizePercentage,Mode=OneWay}" 
+                             Style="{Binding Path=HasCapacityExceeded,Mode=OneWay,Converter={StaticResource boolToStyleConverter}}" />
+
+            <Grid Margin="5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Label Grid.Row="0" Margin="0, 5">Where would you like to store your music?</Label>
+                <quickzip:SelectFolderTextBox  Grid.Row="1" x:Name="pathText" Margin="0,3,3,3">
+                    <quickzip:SelectFolderTextBox.Text>
+                        <Binding Path="Path" UpdateSourceTrigger="PropertyChanged" >
+                            <Binding.ValidationRules>
+                                <rules:DirectoryExistsRule />
+                            </Binding.ValidationRules>
+                        </Binding>
+                    </quickzip:SelectFolderTextBox.Text>
+                </quickzip:SelectFolderTextBox>
+
+                <Label Grid.Row="2" Margin="0, 5">Choose Playlists to Sync</Label>
+                <ListBox  Grid.Row="3" ItemsSource="{Binding Path=Playlists}">
+                    <ListBox.ItemTemplate>
+                        <HierarchicalDataTemplate>
+                            <CheckBox Content="{Binding Name}" IsChecked="{Binding Checked}" />
+                        </HierarchicalDataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                
+            </Grid>
+        </DockPanel>
+    </DockPanel>
+</Window>

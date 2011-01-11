@@ -38,9 +38,16 @@ namespace WifiMusicSync.Model
             sb.AppendLine("Actions: ");
             foreach (var item in Actions)
             {
-                sb.AppendFormat("    {0}\n", item);
+                sb.AppendFormat(" < {0}\n", item);
             }
             return sb.ToString();
+        }
+
+        public enum SyncResponseError
+        {
+            None = 0,
+            RequiredParameterMissing = 10,
+            PlaylistNotFound = 100
         }
     }
 }

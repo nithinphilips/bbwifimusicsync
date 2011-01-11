@@ -5,7 +5,7 @@
     <Setting Name="Port" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">9000</Value>
     </Setting>
-    <Setting Name="UseItunesCom" Type="System.Boolean" Scope="User">
+    <Setting Name="OneWaySync" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

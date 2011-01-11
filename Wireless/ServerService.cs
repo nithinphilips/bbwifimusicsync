@@ -11,50 +11,27 @@ using System.Diagnostics;
 using WifiMusicSync.Helpers;
 using WifiMusicSync.iTunes;
 using iTunesExport.Parser;
+using log4net;
+using WifiMusicSync.Properties;
 
 namespace WifiMusicSync.Wireless
 {
     public class ServerService : KayakService
     {
+
+        private static readonly ILog log = LogManager.GetLogger("WifiMusicSync.Server");
+
         static Dictionary<string, string> songDb = new Dictionary<string, string>();
         static Dictionary<string, string> playlistDb = new Dictionary<string, string>();
+
+        static XmliTunesLibraryManager xmlLibraryManager = new XmliTunesLibraryManager();
 
         [Path("/")]
         [Path("/hello")]
         public object SayHello()
         {
+            log.Info("Saying hello");
             return new { message = "Greetings from Wonderfalls" };
-        }
-
-        [Path("/test")]
-        public object Test()
-        {
-            return new PlaylistRequest
-            {
-                PlaylistDevicePath = "file:///SDCard/BlackBerry/music/Media Sync/Playlists/aa13ee3a6953da19/Stare at Ceiling.m3u",
-                PlaylistData = new string[] { 
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Iron%20%26%20Wine/The%20Shepherd's%20Dog/12%20-%20Flightless%20Bird,%20American%20Mouth.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Band%20of%20Horses/Cease%20to%20Begin/03%20-%20No%20One's%20Gonna%20Love%20You.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/The%20Kooks/Konk/01%20-%20See%20The%20Sun.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Compilations/Indie%20Rock%20Playlist_%20March%202008/118%20-%20Young%20Folks.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/The%20Kooks/Konk/02%20-%20Always%20Where%20I%20Need%20To%20Be.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Various%20Artists/Blalock's%20Indie_Rock%20Playlist_%20March%20(2010)/031%20-%20The%20Morning%20Benders%20-%20Excuses.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Various%20Artists/Blalock's%20Indie_Rock%20Playlist_%20November%20(2009)/053%20-%20Thao%20%26%20The%20Get%20Down%20Stay%20Down%20-%20Know%20Better%20Learn%20Faster.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Various%20Artists/Blalock's%20Indie_Rock%20Playlist_%20January%20(2010)/087%20-%20Beach%20House%20-%20Take%20Care.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/She%20%26%20Him/Volume%20Two/07%20-%20Gonna%20Get%20Along%20Without%20You%20Now.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Various%20Artists/Blalock's%20Indie_Rock%20Playlist_%20December%20(2009)/038%20-%20Surfer%20Blood%20-%20Floating%20Vibes.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Various%20Artists/Blalock's%20Indie_Rock%20Playlist_%20December%20(2009)/011%20-%20Oh,%20Mountain%20-%20Bear's%20Beat.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Belle%20%26%20Sebastian/The%20Boy%20with%20the%20Arab%20Strap/02%20-%20Sleep%20the%20Clock%20Around.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Belle%20%26%20Sebastian/Belle%20%26%20Sebastian%20Write%20About%20Love/04%20-%20I%20Want%20the%20World%20to%20Stop.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Belle%20%26%20Sebastian/Belle%20%26%20Sebastian%20Write%20About%20Love/02%20-%20Come%20on%20Sister.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Explosions%20In%20The%20Sky/The%20Earth%20Is%20Not%20a%20Cold%20Dead%20Place/05%20-%20Your%20Hand%20In%20Mine.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Ray%20LaMontagne/Trouble/03%20-%20Hold%20You%20In%20My%20Arms.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Thao%20With%20The%20Get%20Down%20Stay%20Down/Know%20Better%20Learn%20Faster/02%20-%20Cool%20Yourself.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Thao%20With%20The%20Get%20Down%20Stay%20Down/Know%20Better%20Learn%20Faster/03%20-%20When%20We%20Swam.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Belle%20%26%20Sebastian/The%20Life%20Pursuit/02%20-%20Another%20Sunny%20Day.mp3",
-                   "file:///SDCard/BlackBerry/music/Media%20Sync/Various%20Artists/Fantastic%20Mr.%20Fox/03%20-%20Mr%20Fox%20in%20the%20Fields.mp3"    
-                }
-            };
         }
 
         [Path("/songs/{id}")]
@@ -62,12 +39,12 @@ namespace WifiMusicSync.Wireless
         {
             if (songDb.ContainsKey(id))
             {
-                Console.WriteLine("Sending file: " + songDb[id]);
+                log.Info("Sending file: " + songDb[id]);
                 return new FileInfo(songDb[id]);
             }
             else
             {
-                Console.WriteLine("File Not Found: " + id);
+                log.Warn("File Not Found: " + id);
                 Response.SetStatusToNotFound();
                 return null;
             }
@@ -78,152 +55,181 @@ namespace WifiMusicSync.Wireless
         {
             if (playlistDb.ContainsKey(id))
             {
+                log.Info("Sending playlist: " + playlistDb[id]);
                 return new FileInfo(playlistDb[id]);
             }
             else
             {
+                log.Warn("Playlist Not Found: " + id);
                 Response.SetStatusToNotFound();
                 return null;
             }
         }
 
+        [Path("/getplaylists")]
+        public object GetPlaylists()
+        {
+            log.Info("Listing playlists");
+
+            // Note: t.Tracks.Count() causes the entire library to be enumerated and
+            //       when using COM this will take f-o-r-e-v-e-r. So load the XML, no 
+            //       matter what. It only takes ~4 seconds for a reasonably large library (23K ct.)
+            //       Plus, it caches!
+            var trackEnumerator = from t in xmlLibraryManager.Library.Playlists
+                                  select new { t.Name, TrackCount = t.Tracks.Count() };
+
+            return new { Tracks = trackEnumerator };
+        }
+        
+
         [Verb("POST")]
         [Verb("PUT")]
         [Path("/query")]
-        public object Query([RequestBody]PlaylistRequest t)
+        public object Query([RequestBody]PlaylistRequest request)
         {
-            t.CheckValidate();
-
-            Console.WriteLine("Received Data:");
-            Console.WriteLine("---------------------------------------------");
-            Console.WriteLine(t);
-            Console.WriteLine("---------------------------------------------");
-
-
-            string deviceIdSha1 = Utilities.GetSHA1Hash(t.DeviceId ?? "");
-            string playlistName = Path.GetFileNameWithoutExtension(t.PlaylistDevicePath);
-            string playlistId = Utilities.GetSHA1Hash(t.PlaylistDevicePath ?? "");
-
-            Directory.CreateDirectory(deviceIdSha1);
-            string playlistPath = Path.Combine(deviceIdSha1, playlistId);
-
             songDb.Clear();
             playlistDb.Clear();
 
-            List<string> reconciledPlaylist;
+            SyncResponse errorResponse = request.CheckValidate();
+            if (errorResponse != null) return errorResponse;
 
-            // Read and sort the playlists
-            Console.Write("Loading Phone Playlist...");
-            List<string> devicePlaylist = new List<string>();
-            foreach (var item in t.PlaylistData)
+            using (log4net.ThreadContext.Stacks["NDC"].Push("Client " + request.DeviceId))
             {
-                devicePlaylist.Add(Utilities.UnEscapeString(item));
-            }
-            Console.WriteLine("Done");
+                log.Info("Client " + request.DeviceId + " connected.");
+                log.Info("Received Data:" + Environment.NewLine + request.ToString());
 
-            Console.Write("Loading iTunes Library ({0})...", playlistName);
-            List<string> desktopPlaylist;
-            long aTick = DateTime.Now.Ticks;
-            // TODO: Keep the libary around and only read it if the file has actually changed.
-            ComiTunesLibrary library = new ComiTunesLibrary();
-            long bTick = DateTime.Now.Ticks;
-            IPlaylist playlist = library.GetFirstPlaylistByName(playlistName);
-            
-            if (playlist != null)
-            {
-                desktopPlaylist = library.GeneratePlaylist(playlist, t.DeviceMediaRoot);
-            }
-            else
-            {
-                Console.WriteLine("Fail. Playlist ({0}) does not exist", playlistName);
-                return new SyncResponse { ErrorMessage = "Playlist does not exist", Error = 100 };
+                string playlistName = Path.GetFileNameWithoutExtension(request.PlaylistDevicePath);
+                // Uniquely identifies the device. Generated on the client side on first run and persisted.
+                string deviceIdSha1 = Utilities.GetSHA1Hash(request.DeviceId ?? "");
+                // Hash of the playlist, so we can always find the right playlist
+                string playlistId = Utilities.GetSHA1Hash(request.PlaylistDevicePath ?? "");
 
-            }
-            Console.WriteLine("Done (Took {0}ms)", (int)new TimeSpan(bTick - aTick).TotalMilliseconds);
+                Directory.CreateDirectory(deviceIdSha1);
+                string playlistPath = Path.Combine(deviceIdSha1, playlistId);
 
-            IEnumerable<SyncAction> desktopChanges = null; // changes that were made on the DESKTOP. Apply to DEVICE.
-            IEnumerable<SyncAction> deviceChanges = null;  // changes that were made on the DEVICE. Apply to DESKTOP.
+                List<string> reconciledPlaylist;
 
-
-            // Read and sort the playlists
-            if (File.Exists(playlistPath))
-            {
-                // TODO: Read iTunes XML for headless operation.
-                Console.Write("Loading reference playlist {0}...", playlistPath);
-                List<string> referencePlaylist = Utilities.LoadPlaylist(playlistPath);
-                Console.WriteLine("Done");
-
-
-                desktopChanges = DiffHandler.Diff(desktopPlaylist, referencePlaylist);
-                deviceChanges = DiffHandler.Diff(devicePlaylist, referencePlaylist);
-
-                reconciledPlaylist = new List<string>(desktopPlaylist);
-                foreach (var change in deviceChanges)
+                // Read and sort the playlists
+                log.Info("Loading Phone Playlist...");
+                List<string> devicePlaylist = new List<string>();
+                foreach (var item in request.PlaylistData)
                 {
-                    // TODO: Find tracks that are already in the iTunes library and were added to the playlist on the phone.
-                    if (change.Type == SyncType.Remove)
+                    devicePlaylist.Add(Utilities.UnEscapeString(item));
+                }
+
+                log.InfoFormat("Loading iTunes Library ({0})...", playlistName);
+                List<string> desktopPlaylist;
+                iTunesLibrary library;
+
+                // TODO: Keep the libary around and only read it if the file has actually changed.
+                if (Settings.Default.OneWaySync)
+                    library = xmlLibraryManager.Library;
+                else
+                    library = new ComiTunesLibrary();
+
+
+                log.InfoFormat("iTunes library (via {0}) loaded.", Settings.Default.OneWaySync ? "XML" : "COM");
+                
+
+                IPlaylist playlist = library.GetFirstPlaylistByName(playlistName);
+                if (playlist != null)
+                {
+                    desktopPlaylist = library.GeneratePlaylist(playlist, request.DeviceMediaRoot);
+                }
+                else
+                {
+                    log.WarnFormat("Fail. Playlist ({0}) does not exist", playlistName);
+                    return new SyncResponse { ErrorMessage = "Playlist does not exist", Error = (int)SyncResponse.SyncResponseError.PlaylistNotFound };
+                }
+                
+
+                IEnumerable<SyncAction> desktopChanges = null; // changes that were made on the DESKTOP. Apply to DEVICE.
+                IEnumerable<SyncAction> deviceChanges = null;  // changes that were made on the DEVICE. Apply to DESKTOP.
+
+
+                // Read and sort the playlists
+                if (!Settings.Default.OneWaySync && File.Exists(playlistPath))
+                {
+                    // TODO: Read iTunes XML for headless operation.
+                    log.InfoFormat("Loading reference playlist {0}...", playlistPath);
+                    List<string> referencePlaylist = Utilities.LoadPlaylist(playlistPath);
+
+                    desktopChanges = DiffHandler.Diff(desktopPlaylist, referencePlaylist);
+                    deviceChanges = DiffHandler.Diff(devicePlaylist, referencePlaylist);
+
+                    reconciledPlaylist = new List<string>(desktopPlaylist);
+
+                    // Pick REMOVE changes, get associated tracks, and then exclude null ones.
+                    var tracksToDelete = (from change in deviceChanges
+                                          where change.Type == SyncType.Remove
+                                          select library.GetTrack(change.DeviceLocation)).TakeWhile(t => t != null);
+
+
+
+                    // Pick ADD changes
+                    var tracksToAdd = from change in deviceChanges
+                                      where change.Type == SyncType.Add
+                                      select change.DeviceLocation;
+
+                    ComiTunesLibrary comLibrary = library as ComiTunesLibrary;
+                    using (log4net.ThreadContext.Stacks["NDC"].Push("Removing iTrack"))
                     {
-                       reconciledPlaylist.Remove(change.DeviceLocation);
-                       ITrack track = library.GetTrack(change.DeviceLocation);
-                       if (track != null)
-                       {
-                           // TODO: Generate the actions and run them asynchronously.
-                           library.RemoveTrack(playlist, track);
-                           Console.WriteLine("{0} {1} from iTunes Playlist", change.Type, track.Location);
-                       }
-                       else
-                       {
-                           Console.WriteLine("WARNING: Asked to delete non existent iTunes track: {0}", change.DeviceLocation);
-                       }
+                        foreach (var track in comLibrary.RemoveTracks(playlist, tracksToDelete))
+                        {
+                            reconciledPlaylist.Remove(track.GetPlaylistLine(request.DeviceMediaRoot));
+                            log.Info(track.Location);
+                        }
                     }
-                    else if (change.Type == SyncType.Add)
+
+                    using (log4net.ThreadContext.Stacks["NDC"].Push("Adding iTrack"))
                     {
-                        // This is a long and costly action and at worst case take proportionally long as (s * a) s = SearchPlaylistCount, a = ActionCount
-                        // Possible improvements: Pool all ADDs together and Call AddTrack only once.
-                        library.AddTrack(playlist, change.DeviceLocation, "All Music", t.DeviceMediaRoot);
-                        Console.WriteLine("{0} {1} to iTunes Playlist", change.Type, change.DeviceLocation);
+                        foreach (var deviceLocation in comLibrary.AddTracks(playlist, tracksToAdd, "All Music", request.DeviceMediaRoot))
+                        {
+                            reconciledPlaylist.Add(deviceLocation);
+                            log.Info(deviceLocation);
+                        }
+                    }
+
+                }
+                else
+                {
+                    desktopChanges = DiffHandler.Diff(desktopPlaylist, devicePlaylist);
+                    reconciledPlaylist = desktopPlaylist;
+                }
+
+                // Init SongsDB
+                foreach (var change in desktopChanges)
+                {
+                    if (change.Type == SyncType.Add)
+                    {
+                        string id = Utilities.GetSHA1Hash(change.DeviceLocation);
+                        change.TrackPath = "/songs/" + id;
+                        // Remember songs, we we can serve them when client requests
+                        songDb.Add(id, library.GetTrack(change.DeviceLocation).Location);
                     }
                 }
-            }
-            else
-            {
-                desktopChanges = DiffHandler.Diff(desktopPlaylist, devicePlaylist);
-                reconciledPlaylist = desktopPlaylist; 
-            }
 
-            // Init SongsDB
-            foreach (var change in desktopChanges)
-            {
-                if (change.Type == SyncType.Add)
+                string playlistKey = Utilities.GetSHA1Hash(playlistPath);
+                Utilities.SavePlaylist(reconciledPlaylist, playlistPath);
+                playlistDb.Add(playlistKey, playlistPath);
+
+                SyncResponse syncResponse = new SyncResponse();
+                syncResponse.PlaylistServerPath = "/playlists/" + playlistKey;
+                syncResponse.PlaylistDevicePath = request.PlaylistDevicePath; ;
+                syncResponse.Actions = desktopChanges.ToArray();
+
+                foreach (var item in syncResponse.Actions)
                 {
-                    string id = Utilities.GetSHA1Hash(change.DeviceLocation);
-                    change.TrackPath = "/songs/" + id;
-                    // Remember songs, we we can serve them when client requests
-                    songDb.Add(id, library.GetTrack(change.DeviceLocation).Location);
+                    item.DeviceLocation = Utilities.UnEscapeString(item.DeviceLocation);
+                    Debug.Assert(item.DeviceLocation.StartsWith("file"));
                 }
+
+                log.Info("Sending Data:" + Environment.NewLine + syncResponse.ToString());
+
+                //GC.Collect();
+
+                return syncResponse;
             }
-
-            string playlistKey = Utilities.GetSHA1Hash(playlistPath);
-            Utilities.SavePlaylist(reconciledPlaylist, playlistPath);
-            playlistDb.Add(playlistKey, playlistPath);
-
-            SyncResponse syncResponse = new SyncResponse();
-            syncResponse.PlaylistServerPath = "/playlists/" + playlistKey;
-            syncResponse.PlaylistDevicePath = t.PlaylistDevicePath; ;
-            syncResponse.Actions = desktopChanges.ToArray();
-
-            foreach (var item in syncResponse.Actions)
-            {
-                item.DeviceLocation = Utilities.UnEscapeString(item.DeviceLocation);
-                Debug.Assert(item.DeviceLocation.StartsWith("file"));
-            }
-
-            Console.WriteLine("Sending Data:");
-            Console.WriteLine("---------------------------------------------");
-            Console.WriteLine(syncResponse);
-            Console.WriteLine("---------------------------------------------");
-
-            return syncResponse;
         }
     }
 }

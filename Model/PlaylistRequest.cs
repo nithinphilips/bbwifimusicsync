@@ -2,45 +2,87 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using WifiMusicSync.Helpers;
 
 namespace WifiMusicSync.Model
 {
     public class PlaylistRequest
     {
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(typeof(PlaylistRequest).Name);
+
+
         public string DeviceId { get; set; }
         public string PlaylistDevicePath { get; set; }
         public string DeviceMediaRoot { get; set; }
         public string[] PlaylistData { get; set; }
 
-        public void CheckValidate()
+        public SyncResponse CheckValidate()
         {
+            SyncResponse errorResponse = null;
+            errorResponse = Check(DeviceId, "DeviceId");
+            if (errorResponse != null) return errorResponse;
+
+            errorResponse = Check(PlaylistDevicePath, "PlaylistDevicePath");
+            if (errorResponse != null) return errorResponse;
+
+            errorResponse = Check(DeviceMediaRoot, "DeviceMediaRoot");
+            if (errorResponse != null) return errorResponse;
+            
+
             RemoveEmptyLinesFromPlaylistData();
             PlaylistDevicePath = PlaylistDevicePath.Trim();
             DeviceMediaRoot = DeviceMediaRoot.Trim();
             if (!DeviceMediaRoot.EndsWith("/")) DeviceMediaRoot = DeviceMediaRoot + "/";
+
+            // If user edits the playlist on the phone, the bb media app will replace 
+            // special characters with their escaped equivalents. Escape those.
+            for (int i = 0; i < PlaylistData.Length; i++)
+            {
+                PlaylistData[i] = Utilities.UnEscapeString(PlaylistData[i]);
+            }
+
+            return null;
+        }
+
+        private SyncResponse Check(string parameter, string paramterName)
+        {
+            if (string.IsNullOrWhiteSpace(parameter))
+            {
+                log.Warn("Required parameter is missing or empty: " + paramterName);
+                return new SyncResponse { ErrorMessage = "Required parameter is missing or empty: " + paramterName, Error = (int)SyncResponse.SyncResponseError.RequiredParameterMissing };
+            }
+            return null;
         }
 
         public void RemoveEmptyLinesFromPlaylistData()
         {
-            List<string> result = new List<string>(PlaylistData.Length);
-            foreach (var item in PlaylistData)
+            if ((PlaylistData != null) && (PlaylistData.Length > 0))
             {
-                if (!string.IsNullOrWhiteSpace(item))
+                List<string> result = new List<string>(PlaylistData.Length);
+                foreach (var item in PlaylistData)
                 {
-                    result.Add(item.Trim());
+                    if (!string.IsNullOrWhiteSpace(item))
+                    {
+                        result.Add(item.Trim());
+                    }
                 }
+                PlaylistData = result.ToArray();
             }
-            PlaylistData = result.ToArray();
+            else
+            {
+                log.Debug("Playlist data is empty");
+            }
         }
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
+            sb.AppendLine("DeviceId: " + DeviceId);
             sb.AppendLine("PlaylistDevicePath: " + PlaylistDevicePath);
             sb.AppendLine("DeviceMediaRoot: " + DeviceMediaRoot);
             foreach (var item in PlaylistData)
             {
-                sb.AppendLine("    " + item);
+                sb.AppendLine(" > " + item);
             }
             return sb.ToString();
         }

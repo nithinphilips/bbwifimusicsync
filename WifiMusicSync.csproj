@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>lib\log4net\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.CoreEx, Version=1.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -49,6 +52,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Kayak\lib\rx3.5\System.Reactive.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Threading, Version=1.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Kayak\lib\rx3.5\System.Threading.dll</HintPath>
@@ -63,6 +67,7 @@
     <Compile Include="Helpers\DiffHandler.cs" />
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\IITTrackEnumerator.cs" />
+    <Compile Include="Helpers\XmliTunesLibraryManager.cs" />
     <Compile Include="iTunes\ComiTunesLibrary.cs" />
     <Compile Include="iTunes\iTunesLibrary.cs" />
     <Compile Include="iTunes\XmliTunesLibrary.cs" />
@@ -106,13 +111,12 @@
       <Project>{AC3FD357-F5F8-47C2-9843-F6991F0DD539}</Project>
       <Name>LibraryParser</Name>
     </ProjectReference>
-    <ProjectReference Include="lib\taglib-sharp\taglib-sharp.csproj">
-      <Project>{4CC18776-125E-4318-9D24-D60110AD9697}</Project>
-      <Name>taglib-sharp</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="log.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

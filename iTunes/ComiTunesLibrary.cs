@@ -22,8 +22,16 @@ namespace WifiMusicSync.iTunes
             Playlists = GetPlaylists();
         }
 
-        public bool RemoveTrack(IPlaylist playlist, ITrack track)
+        /// <summary>
+        /// Remove some tracks from an iTunes playlist.
+        /// </summary>
+        /// <param name="playlist">The playlist to modify</param>
+        /// <param name="tracks">The tracks to remove from playlist.</param>
+        /// <returns>An enumeration of tracks that were successfully removed from playlist.</returns>
+        public IEnumerable<ITrack> RemoveTracks(IPlaylist playlist, IEnumerable<ITrack> tracks)
         {
+            List<ITrack> removedtracks = new List<ITrack>();
+
             IITPlaylist pls = playlistLookupTable[playlist];
 
             foreach (IITTrack item in pls.Tracks)
@@ -32,19 +40,37 @@ namespace WifiMusicSync.iTunes
                 {
                     IITFileOrCDTrack _item = (IITFileOrCDTrack)item;
 
-                    if (_item.Location == track.Location)
+                    foreach (var track in tracks)
                     {
-                        item.Delete();
-                        return true;
+                        if (_item.Location == track.Location)
+                        {
+                            removedtracks.Add(track);
+                            item.Delete();
+                            break;
+                        }    
                     }
                 }
             }
 
-            return false;
+            return removedtracks;
         }
 
-        public bool AddTrack(IPlaylist playlist, string playlistLine, string searchHint, string root)
+        /// <summary>
+        /// Adds some tracks to an iTunes playlist.
+        /// </summary>
+        /// <param name="playlist">The playlist to modify</param>
+        /// <param name="playlistLines">The tracks to add to iTunes as represented by their device location.</param>
+        /// <param name="searchHint">
+        /// A playlist folder to look in. This will reduce the search time.
+        /// This only works under the assumption that all music that can possibly be on the device are under this folder.
+        /// Use "Music" to search all songs.
+        /// </param>
+        /// <param name="root">The root device path used to generate device location. This should be the same root used to generate "playlistLines"</param>
+        /// <returns>An enumeration of all songs that were successfully added to the playlist.</returns>
+        public IEnumerable<string> AddTracks(IPlaylist playlist, IEnumerable<string> playlistLines, string searchHint, string root)
         {
+            List<string> addedTracks = new List<string>();
+
             IPlaylist hintPlaylist = this.GetFirstPlaylistByName(searchHint);
             
             if (hintPlaylist != null)
@@ -57,19 +83,30 @@ namespace WifiMusicSync.iTunes
                     if (iTrack is IITFileOrCDTrack)
                     {
                         IITFileOrCDTrack _iTrack = iTrack as IITFileOrCDTrack;
-                        if (_iTrack.GetPlaylistLine(root) == playlistLine)
+                        foreach (var playlistLine in playlistLines)
                         {
-                            targetPlaylist.AddTrack(_iTrack);
-                            return true;
+                            if (_iTrack.GetPlaylistLine(root) == playlistLine)
+                            {
+                                targetPlaylist.AddTrack(_iTrack);
+                                addedTracks.Add(playlistLine);
+                                break; // Avoid 
+                            }    
                         }
                     }
                 }
             }
 
-            return false;
+            return addedTracks;
         }
 
-        public IEnumerable<IPlaylist> GetPlaylists()
+        /// <summary>
+        /// Gets all playlists that are present in iTunes library.
+        /// </summary>
+        /// <remarks>
+        /// The playlist will also be indexed in playlistLookupTable with IPlaylist as key and IITPlaylist as value for easy retrieval of iTunes COM objects.
+        /// </remarks>
+        /// <returns>An enumeration of all playlists in iTunes. </returns>
+        protected IEnumerable<IPlaylist> GetPlaylists()
         {
             List<IPlaylist> playlists = new List<IPlaylist>();
             IITSource library = app.Sources.get_ItemByName("Library");

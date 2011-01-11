@@ -10,11 +10,15 @@ using Kayak.Framework;
 using Kayak;
 using WifiMusicSync.Properties;
 using WifiMusicSync.iTunes;
+using log4net.Config;
+using log4net;
 
 namespace WifiMusicSync
 {
     public sealed class Program
     {
+        private static readonly ILog log = LogManager.GetLogger("WifiMusicSync");
+
         static void Main(string[] args)
         {
             /* NOTE: This info is out-of-date
@@ -60,13 +64,16 @@ namespace WifiMusicSync
              * 11. Hopefully music player will auto update.
              */
 
+            XmlConfigurator.Configure(new FileInfo("log.config"));
+
             var server = new KayakServer(new System.Net.IPEndPoint(0, Settings.Default.Port));
             var behavior = new KayakFrameworkBehavior();
             behavior.JsonMapper.SetOutputConversion<int>((i, w) => w.Write(i.ToString()));
 
             var framework = server.UseFramework();
 
-            Console.WriteLine("WifiMusicSync listening on " + server.ListenEndPoint);
+            log.Info("Now: " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToLongTimeString());
+            log.Info("WifiMusicSync listening on " + server.ListenEndPoint);
             Console.ReadLine();
 
             // unsubscribe from server (close the listening socket)

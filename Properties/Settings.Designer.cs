@@ -38,12 +38,12 @@ namespace WifiMusicSync.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool UseItunesCom {
+        public bool OneWaySync {
             get {
-                return ((bool)(this["UseItunesCom"]));
+                return ((bool)(this["OneWaySync"]));
             }
             set {
-                this["UseItunesCom"] = value;
+                this["OneWaySync"] = value;
             }
         }
     }

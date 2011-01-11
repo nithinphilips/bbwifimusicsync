@@ -91,7 +91,7 @@ namespace WifiSyncDesktopClient.Model
 
             long totalTrackSize = 0;
             HashSet<int> uniqueTracks = new HashSet<int>();
-            string root = System.IO.Path.Combine(this.Path, "Songs");
+            string root = this.Path;
 
             foreach (var playlist in GetSelectedPlaylists())
             {
@@ -100,7 +100,7 @@ namespace WifiSyncDesktopClient.Model
                     // Use the hash set to make sure we tally the track size only once.
                     if (!uniqueTracks.Contains(track.Id))
                     {
-                        string targetPath = track.GetPlaylistLine(root, System.IO.Path.DirectorySeparatorChar);
+                        string targetPath = track.GetPlaylistLine(root, System.IO.Path.DirectorySeparatorChar, false);
                         if (!File.Exists(targetPath))
                         {
                             totalTrackSize += track.Size;

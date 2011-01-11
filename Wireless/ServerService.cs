@@ -66,6 +66,22 @@ namespace WifiMusicSync.Wireless
             }
         }
 
+        [Path("/getdata")]
+        public PlaylistRequest GetData(string name)
+        {
+            PlaylistRequest data = new PlaylistRequest();
+            data.DeviceId = System.Guid.NewGuid().ToString("N");
+            data.DeviceMediaRoot = "file:///SDCard/Blackberry/music/WiFiSync";
+            data.PlaylistDevicePath = "file:///SDCard/Blackberry/music/WiFiSync/" + name + ".m3u";
+            IPlaylist pls = xmlLibraryManager.Library.GetFirstPlaylistByName(name);
+            if(pls != null){
+                data.PlaylistData = (from t in pls.Tracks
+                                     select t.GetPlaylistLine(data.DeviceMediaRoot)).ToArray();
+            }
+
+            return data;
+        }
+
         [Path("/getplaylists")]
         public object GetPlaylists()
         {
@@ -111,11 +127,7 @@ namespace WifiMusicSync.Wireless
 
                 // Read and sort the playlists
                 log.Info("Loading Phone Playlist...");
-                List<string> devicePlaylist = new List<string>();
-                foreach (var item in request.PlaylistData)
-                {
-                    devicePlaylist.Add(Utilities.UnEscapeString(item));
-                }
+                List<string> devicePlaylist = new List<string>(request.PlaylistData);
 
                 log.InfoFormat("Loading iTunes Library ({0})...", playlistName);
                 List<string> desktopPlaylist;

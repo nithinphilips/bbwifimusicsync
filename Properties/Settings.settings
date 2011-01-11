@@ -6,7 +6,7 @@
       <Value Profile="(Default)">9000</Value>
     </Setting>
     <Setting Name="OneWaySync" Type="System.Boolean" Scope="User">
-      <Value Profile="(Default)">False</Value>
+      <Value Profile="(Default)">True</Value>
     </Setting>
   </Settings>
 </SettingsFile>

@@ -34,13 +34,6 @@ namespace WifiMusicSync.Model
             DeviceMediaRoot = DeviceMediaRoot.Trim();
             if (!DeviceMediaRoot.EndsWith("/")) DeviceMediaRoot = DeviceMediaRoot + "/";
 
-            // If user edits the playlist on the phone, the bb media app will replace 
-            // special characters with their escaped equivalents. Escape those.
-            for (int i = 0; i < PlaylistData.Length; i++)
-            {
-                PlaylistData[i] = Utilities.UnEscapeString(PlaylistData[i]);
-            }
-
             return null;
         }
 

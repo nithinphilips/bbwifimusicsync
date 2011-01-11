@@ -84,7 +84,6 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="Properties\Settings.cs" />
-    <Compile Include="Wired\Synchronizer.cs" />
     <Compile Include="Wireless\ServerService.cs" />
   </ItemGroup>
   <ItemGroup>

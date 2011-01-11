@@ -18,14 +18,13 @@ namespace WifiMusicSync.Helpers
 
         public static string GetPlaylistLine(this ITrack track, string root)
         {
-            return GetPlaylistLine(track, root, '/');
+            return GetPlaylistLine(track, root, '/', true);
         }
 
-        public static string GetPlaylistLine(this ITrack track, string root, char directorySeparatorChar)
+        public static string GetPlaylistLine(this ITrack track, string root, char directorySeparatorChar, bool escapeString)
         {
-            string playlistStr;
-
             string separator = (root[root.Length - 1] == directorySeparatorChar) ? "" : directorySeparatorChar.ToString();
+            string playlistStr = "Songs" + directorySeparatorChar.ToString();
 
             bool isCompilation = (!string.IsNullOrEmpty(track.AlbumArtist) && (track.AlbumArtist.Trim() != track.Artist.Trim()));
 
@@ -33,11 +32,22 @@ namespace WifiMusicSync.Helpers
 
             if (isCompilation) { artist = "Compilations"; }
 
-            playlistStr = string.Format("{1}{0}{2}{0}{3}",
-                     directorySeparatorChar,
-                     Utilities.MakeFileNameSafe(artist),
-                     Utilities.MakeFileNameSafe(track.Album),
-                     Path.GetFileName(track.Location));
+            if (escapeString)
+            {
+                playlistStr += string.Format("{1}{0}{2}{0}{3}",
+                         directorySeparatorChar,
+                         Utilities.EscapeString(Utilities.MakeFileNameSafe(artist)),
+                         Utilities.EscapeString(Utilities.MakeFileNameSafe(track.Album)),
+                         Utilities.EscapeString(Path.GetFileName(track.Location)));
+            }
+            else
+            {
+                playlistStr += string.Format("{1}{0}{2}{0}{3}",
+                         directorySeparatorChar,
+                         Utilities.MakeFileNameSafe(artist),
+                         Utilities.MakeFileNameSafe(track.Album),
+                         Path.GetFileName(track.Location));
+            }
 
             return root + separator + playlistStr;
         }
@@ -49,7 +59,13 @@ namespace WifiMusicSync.Helpers
 
         public static string GetPlaylistLine(this IITFileOrCDTrack track, string root)
         {
-            string playlistStr;
+            return GetPlaylistLine(track, root, '/', true);
+        }
+
+        public static string GetPlaylistLine(this IITFileOrCDTrack track, string root, char directorySeparatorChar, bool escapeString)
+        {
+            string separator = (root[root.Length - 1] == directorySeparatorChar) ? "" : directorySeparatorChar.ToString();
+            string playlistStr = "Songs" + directorySeparatorChar.ToString();
 
             bool isCompilation = (!string.IsNullOrEmpty(track.AlbumArtist) && (track.AlbumArtist.Trim() != track.Artist.Trim()));
 
@@ -57,12 +73,24 @@ namespace WifiMusicSync.Helpers
 
             if (isCompilation) { artist = "Compilations"; }
 
-            playlistStr = string.Format("{0}/{1}/{2}",
-                     Utilities.MakeFileNameSafe(artist),
-                     Utilities.MakeFileNameSafe(track.Album),
-                     Path.GetFileName(track.Location));
+            if (escapeString)
+            {
+                playlistStr += string.Format("{1}{0}{2}{0}{3}",
+                         directorySeparatorChar,
+                         Utilities.EscapeString(Utilities.MakeFileNameSafe(artist)),
+                         Utilities.EscapeString(Utilities.MakeFileNameSafe(track.Album)),
+                         Utilities.EscapeString(Path.GetFileName(track.Location)));
+            }
+            else
+            {
+                playlistStr += string.Format("{1}{0}{2}{0}{3}",
+                         directorySeparatorChar,
+                         Utilities.MakeFileNameSafe(artist),
+                         Utilities.MakeFileNameSafe(track.Album),
+                         Path.GetFileName(track.Location));
+            }
 
-            return root + playlistStr;
+            return root + separator + playlistStr;
         }
 
         public static ITrack ToTrack(this IITFileOrCDTrack track)

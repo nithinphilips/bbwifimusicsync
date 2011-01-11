@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Enumeration;
 import java.util.Vector;
 
 import javax.microedition.io.Connector;
@@ -22,11 +23,10 @@ import com.nithinphilips.wifimusicsync.model.SyncAction;
 import com.nithinphilips.wifimusicsync.model.SyncResponse;
 
 import net.rim.device.api.ui.MenuItem;
+import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.ui.component.Dialog;
+import net.rim.device.api.ui.component.LabelField;
 import net.rim.device.api.ui.component.StandardTitleBar;
-import net.rim.device.api.ui.component.progressindicator.ProgressIndicatorController;
-import net.rim.device.api.ui.component.progressindicator.ProgressIndicatorModel;
-import net.rim.device.api.ui.component.progressindicator.ProgressIndicatorView;
 import net.rim.device.api.ui.container.MainScreen;
 
 
@@ -35,12 +35,9 @@ public class WifiMusicSyncScreen extends MainScreen {
 	// ProgressView: http://docs.blackberry.com/en/developers/deliverables/17971/Indicate_progress_1210003_11.jsp
 	// Please Wait Screen: http://supportforums.blackberry.com/t5/Java-Development/Sample-quot-Please-Wait-quot-screen-part-1/ta-p/493808
 	
+	static String CLIENT_ID = "93a83cb36e87e65aL";
 	
-	static ProgressIndicatorView view;
-	static ProgressIndicatorController controller;
-	static ProgressIndicatorModel model;
-	
-	static String CLIENT_ID = "93a83cb36e87e65aL"; 
+	static LabelField statusField;
 	
 	public WifiMusicSyncScreen() {
 		super(NO_VERTICAL_SCROLL);
@@ -51,36 +48,24 @@ public class WifiMusicSyncScreen extends MainScreen {
 		_titleBar.addNotifications();
 		this.setTitle(_titleBar);
 		
-//		view = new ProgressIndicatorView(0);
-//		controller = new ProgressIndicatorController();
-//		model = new ProgressIndicatorModel(50, 100, 0);
-//
-//
-//		model.setController(controller);
-//        view.setModel(model);
-//        controller.setModel(model);
-//        view.setController(controller);        
-//        controller.setView(view);
-//        view.setLabel("Percent completion");
-//		
-//		add(view);
+		statusField = new LabelField("Ready.");
+		
 
 		MenuItem menuItemSync = new MenuItem("Sync", 100000, 100) {
 			public void run() {
 				Thread t = new Thread() {
 					public void run() {
-						//String file = "file:///store/home/user/Stare at Ceiling.m3u";
-						String file = "file:///SDCard/Blackberry/music/WiFiSync/Test.m3u";
 						String root = "file:///SDCard/Blackberry/music/WiFiSync";
 						
-						//String file = "file:///SDCard/Test.m3u";
-						//String root = "file:///SDCard/Blackberry/music/";
-
-						//String file = "file:///store/home/user/WiFiSync/Test.m3u";
-						//String root = "file:///store/home/user/";
 						try {
-							syncPlaylist("http://192.168.0.104:9000", root, file);
+							Enumeration playlists = findPlaylists(root);
 							
+							if(playlists != null){
+								while (playlists.hasMoreElements()) {
+									String playlist = (String) playlists.nextElement();
+									syncPlaylist("http://192.168.0.104:9000", root, playlist);	
+								}
+							}
 						} catch (Throwable t){
 							
 						}
@@ -105,6 +90,28 @@ public class WifiMusicSyncScreen extends MainScreen {
 		};
 		
 		addMenuItem(menuItemSync);
+	}
+	
+	static Enumeration findPlaylists(String root) throws IOException
+	{
+		FileConnection fileConnection = null;
+		try{
+			fileConnection = (FileConnection) Connector.open(root, Connector.READ);
+			if(fileConnection.exists() && fileConnection.isDirectory())
+			{
+				return fileConnection.list("*.m3u", false);
+			}else{
+				return null;
+			}
+		}finally {
+			if (fileConnection != null) {
+				try {
+					fileConnection.close();
+				} catch (Exception error) {
+					/* log error */
+				}
+			}
+		}
 	}
 	
 	static void syncPlaylist(String serverUrl, String root, String playlist)
@@ -184,9 +191,13 @@ public class WifiMusicSyncScreen extends MainScreen {
 		downloadFile(url, fileName, false);
 	}
 	
-	static void downloadFile(String url, String fileName, boolean forceOverwrite) throws IOException
+	static void downloadFile(final String url, final String fileName, boolean forceOverwrite) throws IOException
 	{
-		Dialog.alert("Downloading: " + fileName + " from: " + url);
+		UiApplication.getUiApplication().invokeLater(new Runnable() {
+			public void run() {
+				statusField.setText("Downloading: " + fileName + " from: " + url);
+			}
+		});
 		
 		HttpConnection httpConnection = null;
 		FileConnection fileConnection = null;
@@ -211,18 +222,21 @@ public class WifiMusicSyncScreen extends MainScreen {
 					}else{
 						try{
 							long contentLength = Long.parseLong(httpConnection.getHeaderField("Content-Length"));
-							Dialog.alert("Sever: " + Long.toString(contentLength) + " Client: " + Long.toString(fileConnection.fileSize()));
+							//Dialog.alert("Sever: " + Long.toString(contentLength) + " Client: " + Long.toString(fileConnection.fileSize()));
 							if(contentLength != fileConnection.fileSize()){
 								fileConnection.delete();		
 							}else{
 								// Same file. No skip download
 								httpConnection.close();
-								Dialog.alert("Skip download.");
+								UiApplication.getUiApplication().invokeLater(new Runnable() {
+									public void run() {
+										statusField.setText("Skip download");
+									}
+								});
 								return;
 							}
 						}catch(Exception ex){
 							// Delete the file, to be safe
-							Dialog.alert("Exception while .");
 							if (fileConnection.exists()) fileConnection.delete();
 						}
 					}	
@@ -245,7 +259,11 @@ public class WifiMusicSyncScreen extends MainScreen {
 				
 				fileOutStream.flush();
 
-				Dialog.alert("Done: " + fileName);
+				UiApplication.getUiApplication().invokeLater(new Runnable() {
+					public void run() {
+						statusField.setText("Done: " + fileName);
+					}
+				});
 			}
 		} finally {
 			try {

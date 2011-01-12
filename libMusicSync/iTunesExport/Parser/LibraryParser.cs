@@ -1,5 +1,7 @@
+// Part of iTunes Export Project <https://sourceforge.net/projects/itunesexport/>
+// Modified by Nithin Philips <nithin@nithinphilips.com>
+
 using System;
-using System.Collections;
 using System.IO;
 using System.Web;
 using System.Xml;
@@ -7,7 +9,7 @@ using System.Xml.XPath;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace iTunesExport.Parser
+namespace libMusicSync.iTunesExport.Parser
 {
     /// <summary>
     /// Handles the parsing duties for the iTunes XML library.
@@ -31,7 +33,7 @@ namespace iTunesExport.Parser
             _tracks = new Dictionary<int, ITrack>();
             _playlists = new Dictionary<int, IPlaylist>();
 
-            parseLibrary( fileLocation );
+            ParseLibrary( fileLocation );
         }
 
         #endregion
@@ -69,16 +71,15 @@ namespace iTunesExport.Parser
         /// <returns>A string containing the path the default iTunes XML library location.</returns>
         public static string GetDefaultLibraryLocation()
         {
-            string mymusicDataPath =
-                Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
-            return mymusicDataPath + "\\iTunes\\iTunes Music Library.xml";
+            string mymusicDataPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+            return Path.Combine(mymusicDataPath, "iTunes", "iTunes Music Library.xml");
         }
 
         #endregion
 
         #region Private Parse Methods
 
-        private void parseLibrary( string fileLocation )
+        private void ParseLibrary( string fileLocation )
         {
             StreamReader stream = new StreamReader(fileLocation, System.Text.Encoding.GetEncoding("utf-8"));
             XmlTextReader xmlReader = new XmlTextReader(stream);
@@ -95,12 +96,12 @@ namespace iTunesExport.Parser
                 {
                     if( nodeIterator.MoveNext() )
                     {
-                        /// Parse out the location of the music folder used by the active library.
+                        // Parse out the location of the music folder used by the active library.
                         _originalMusicFolder = nodeIterator.Current.Value;
                         _musicFolder = _originalMusicFolder.Replace( "file://localhost/", String.Empty );
 
-                        /// Fix to check for UNC paths, which don't have a drive letter and need the additional
-                        /// slash at the front. Thanks to Chris Jenkins for finding this one.
+                        // Fix to check for UNC paths, which don't have a drive letter and need the additional
+                        // slash at the front. Thanks to Chris Jenkins for finding this one.
                         if (_musicFolder.StartsWith("/"))
                             _musicFolder = string.Format("/{0}", _musicFolder);
 
@@ -112,28 +113,28 @@ namespace iTunesExport.Parser
             }
 
 
-            /// Can't move on if we don't know where the music is stored.
+            // Can't move on if we don't know where the music is stored.
             if (_musicFolder == null)
                 throw new Exception("Unable to parse Music Library element from iTunes Music Library");
 
-            /// This query gets us down to the point in the library that contains individual track details.
+            // This query gets us down to the point in the library that contains individual track details.
             nodeIterator = xPathNavigator.Select( "/plist/dict/dict/dict" );
             while( nodeIterator.MoveNext() )
             {
-                /// Parse the track details, wherein a Track reference will be added to _tracks.
-                parseTrack( nodeIterator.Current.SelectChildren( XPathNodeType.All ) );
+                // Parse the track details, wherein a Track reference will be added to _tracks.
+                ParseTrack( nodeIterator.Current.SelectChildren( XPathNodeType.All ) );
             }
 
-            /// After tracks, we're looking at the playlists that are listed in the library.
+            // After tracks, we're looking at the playlists that are listed in the library.
             nodeIterator = xPathNavigator.Select ("/plist/dict/array/dict");
             while( nodeIterator.MoveNext() )
             {
-                /// Parse the playlist details wherein a Playlist reference will be added to _playlists.
-                parsePlaylist( nodeIterator.Current.SelectChildren( XPathNodeType.All ) );
+                // Parse the playlist details wherein a Playlist reference will be added to _playlists.
+                ParsePlaylist( nodeIterator.Current.SelectChildren( XPathNodeType.All ) );
             }
         }
 
-        private void parseTrack( XPathNodeIterator nodeIterator )
+        private void ParseTrack( XPathNodeIterator nodeIterator )
         {
             int id = -1;
             string name = null;
@@ -233,10 +234,10 @@ namespace iTunesExport.Parser
                         {
                             location = location.Replace( "file://localhost/", String.Empty );
                             
-                            /// The _originalMusicFolder will have already been cleaned up to deal with 
-                            /// UNC paths. If we're dealing with tracks in other locations, we need to look
-                            /// for UNC again and clean it up. We know it's UNC if there's a slash at the front
-                            /// even after stripping off the localhost string above.
+                            // The _originalMusicFolder will have already been cleaned up to deal with 
+                            // UNC paths. If we're dealing with tracks in other locations, we need to look
+                            // for UNC again and clean it up. We know it's UNC if there's a slash at the front
+                            // even after stripping off the localhost string above.
                             if (location.StartsWith("/"))
                                 location = string.Format("/{0}", location);
                         }
@@ -264,7 +265,7 @@ namespace iTunesExport.Parser
             }
         }
 
-        private void parsePlaylist( XPathNodeIterator nodeIterator )
+        private void ParsePlaylist( XPathNodeIterator nodeIterator )
         {
             int id = -1;
             string name = null;
@@ -324,7 +325,7 @@ namespace iTunesExport.Parser
 
             if( id != -1 && name != null && tracks.Count > 0 )
             {
-                _playlists.Add( id, new Playlist( id, name, folder, getTracks( tracks ) ) );
+                _playlists.Add( id, new Playlist( id, name, folder, GetTracks( tracks ) ) );
             }
         }
 
@@ -333,7 +334,7 @@ namespace iTunesExport.Parser
         /// </summary>
         /// <param name="trackIds">The list of track IDs to be returned.</param>
         /// <returns>An array of Track references. If none are found, an empty array is returned.</returns>
-        private ITrack[] getTracks( List<int> trackIds )
+        private ITrack[] GetTracks( List<int> trackIds )
         {
             ITrack[] tracks = new ITrack[trackIds.Count];
             int index = 0;

@@ -1,17 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using WifiMusicSync.iTunes;
-using System.IO;
-using System.Web;
+﻿/**********************************************************************
+ * WifiMusicSync
+ * Copyright (C) 2011 Nithin Philips
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **********************************************************************/
+
+using System;
+using libMusicSync.iTunes;
 using System.Runtime.Caching;
 
-namespace WifiMusicSync.Helpers
+namespace libMusicSync.Helpers
 {
-    public class XmliTunesLibraryManager
+    public class CachedXmliTunesLibrary
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(typeof(XmliTunesLibraryManager).Name);
+        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(typeof(CachedXmliTunesLibrary).Name);
 
         ObjectCache cache = MemoryCache.Default;
         const string CACHE_KEY = "XmliTunesLibrary";
@@ -19,12 +33,12 @@ namespace WifiMusicSync.Helpers
         string libraryPath;
         
 
-        public XmliTunesLibraryManager()
+        public CachedXmliTunesLibrary()
             :this(iTunesExport.Parser.LibraryParser.GetDefaultLibraryLocation())
         {
         }
 
-        public XmliTunesLibraryManager(string libraryPath)
+        public CachedXmliTunesLibrary(string libraryPath)
         {
             this.libraryPath = libraryPath;
         }
@@ -49,10 +63,10 @@ namespace WifiMusicSync.Helpers
                     policy.SlidingExpiration = new TimeSpan(0, 5, 0); // Keep cache for 5 mins.
                     policy.ChangeMonitors.Add(new HostFileChangeMonitor(new string[] { libraryPath }));
                     policy.RemovedCallback = delegate(CacheEntryRemovedArguments arg)
-                    {
-                        log.InfoFormat("Evicted {0} from cache (Reason: {1})", arg.CacheItem.Key, arg.RemovedReason);
-                        GC.Collect(); // Iffy?
-                    };
+                                                 {
+                                                     log.InfoFormat("Evicted {0} from cache (Reason: {1})", arg.CacheItem.Key, arg.RemovedReason);
+                                                     GC.Collect(); // Iffy?
+                                                 };
                     cache.Set(CACHE_KEY, library, policy);
 
                     log.InfoFormat("Library loaded and cached in {0}ms", (int)new TimeSpan(bTick - aTick).TotalMilliseconds);

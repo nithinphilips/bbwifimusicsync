@@ -1,23 +1,41 @@
-﻿using System;
+﻿/**********************************************************************
+ * WifiMusicSync
+ * Copyright (C) 2011 Nithin Philips
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **********************************************************************/
+
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.IO;
 using System.Security.Cryptography;
 using System.Diagnostics;
 
-namespace WifiMusicSync.Helpers
+namespace libMusicSync.Helpers
 {
-    public class Utilities
+    public static class Helper
     {
-        const string NEWLINE = "\n";
+        private const string NEWLINE = "\n";
 
         /// <summary>
         /// Calculates SHA1 hash of a string.
         /// </summary>
         /// <param name="str">The string to hash.</param>
         /// <returns>Hash in hexadecimal string.</returns>
-        public static string GetSHA1Hash(string str)
+        public static string GetSha1Hash(string str)
         {
             SHA1 sha1 = new SHA1CryptoServiceProvider();
             byte[] retVal = sha1.ComputeHash(UTF8Encoding.UTF8.GetBytes(str));
@@ -72,6 +90,11 @@ namespace WifiMusicSync.Helpers
             return playlist;
         }
 
+        /// <summary>
+        /// Converts a standard windows path to a Blackberry path.
+        /// </summary>
+        /// <param name="path">The path to convert (eg. C:\Folder\File.txt)</param>
+        /// <returns>The converted path (eg: file:///SDCard/Folder/File.txt)</returns>
         public static string ToBlackberryPath(string path)
         {
             string driveName = path.Substring(0, 2);

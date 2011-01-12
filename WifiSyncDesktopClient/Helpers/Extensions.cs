@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using libMusicSync.Extensions;
+using libMusicSync.Helpers;
+using libMusicSync.iTunesExport.Parser;
 using WifiSyncDesktopClient.Model;
-using iTunesExport.Parser;
-using WifiMusicSync.Helpers;
+using libMusicSync.Helpers;
 using WifiSyncDesktopClient.Threading;
 using LibQdownloader.Utilities;
 using System.IO;
@@ -84,7 +86,7 @@ namespace WifiSyncDesktopClient.Helpers
                 string playlistPath = System.IO.Path.Combine(s.Path, item.Playlist.GetSafeName() + ".m3u");
                 string root = System.IO.Path.Combine(s.Path, "Songs");
 
-                string tRoot = Utilities.ToBlackberryPath(root);
+                string tRoot = Helper.ToBlackberryPath(root);
 
                 List<string> playlist = new List<string>();
                 foreach (var track in item.Playlist.Tracks)
@@ -92,7 +94,7 @@ namespace WifiSyncDesktopClient.Helpers
                     playlist.Add(track.GetPlaylistLine(tRoot));
                     //Console.WriteLine(track.GetPlaylistLine(root, ));
                 }
-                WifiMusicSync.Helpers.Utilities.SavePlaylist(playlist, playlistPath);
+                Helper.SavePlaylist(playlist, playlistPath);
             }
         }
     }

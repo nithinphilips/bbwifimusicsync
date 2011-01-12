@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.ComponentModel;
 using System.IO;
-using WifiMusicSync.Helpers;
-using iTunesExport.Parser;
+using libMusicSync.Extensions;
+using libMusicSync.Helpers;
+using libMusicSync.iTunesExport.Parser;
 using LibQdownloader.Utilities;
 using WifiSyncDesktopClient.Helpers;
 
@@ -57,7 +58,7 @@ namespace WifiSyncDesktopClient.Model
 
     public class SyncSettings : INotifyPropertyChanged
     {
-        XmliTunesLibraryManager xmlLibraryManager = new XmliTunesLibraryManager();
+        CachedXmliTunesLibrary cachedXmlLibrary = new CachedXmliTunesLibrary();
 
         public IEnumerable<PlaylistInfo> Playlists { get; set; }
         public long SelectedTracksSize { get; set; }
@@ -72,7 +73,7 @@ namespace WifiSyncDesktopClient.Model
 
         public void LoadPlaylists()
         {
-            var playlistSelector = from t in xmlLibraryManager.Library.Playlists
+            var playlistSelector = from t in cachedXmlLibrary.Library.Playlists
                                    select new PlaylistInfo
                                    {
                                        Name = string.Format("{0} ({1} tracks)", t.Name, t.Tracks.Count()),

@@ -1,4 +1,4 @@
-﻿<Window x:Class="WifiSyncDesktopClient.MainWindow"
+﻿<Window x:Class="WifiSyncDesktopClient.Windows.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:quickzip="clr-namespace:QuickZip.Controls"

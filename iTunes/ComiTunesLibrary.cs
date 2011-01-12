@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using iTunesExport.Parser;
 using iTunesLib;
+using libMusicSync.iTunes;
+using libMusicSync.iTunesExport.Parser;
+using WifiMusicSync.Extensions;
 using WifiMusicSync.Helpers;
-using System.IO;
 
 namespace WifiMusicSync.iTunes
 {
@@ -34,21 +34,16 @@ namespace WifiMusicSync.iTunes
 
             IITPlaylist pls = playlistLookupTable[playlist];
 
-            foreach (IITTrack item in pls.Tracks)
+            foreach (IITTrack iTunesTrack in pls.Tracks)
             {
-                if (item is IITFileOrCDTrack)
-                {
-                    IITFileOrCDTrack _item = (IITFileOrCDTrack)item;
+                if (!(iTunesTrack is IITFileOrCDTrack)) continue;
+                IITFileOrCDTrack _item = (IITFileOrCDTrack)iTunesTrack;
 
-                    foreach (var track in tracks)
-                    {
-                        if (_item.Location == track.Location)
-                        {
-                            removedtracks.Add(track);
-                            item.Delete();
-                            break;
-                        }    
-                    }
+                foreach (var track in tracks.Where(track => track.Location == _item.Location))
+                {
+                    removedtracks.Add(track);
+                    iTunesTrack.Delete();
+                    break;
                 }
             }
 
@@ -78,20 +73,15 @@ namespace WifiMusicSync.iTunes
                 IITPlaylist searchPlaylist = playlistLookupTable[hintPlaylist];
                 IITUserPlaylist targetPlaylist = playlistLookupTable[playlist] as IITUserPlaylist;
 
-                foreach (IITTrack iTrack in searchPlaylist.Tracks)
+                //TODO Changed to linq statements, need testing to verify.
+                foreach (IITFileOrCDTrack itunesTrack in searchPlaylist.Tracks.OfType<IITFileOrCDTrack>())
                 {
-                    if (iTrack is IITFileOrCDTrack)
+                    foreach (var playlistLine in
+                        playlistLines.Where(playlistLine => playlistLine == itunesTrack.GetPlaylistLine(root)))
                     {
-                        IITFileOrCDTrack _iTrack = iTrack as IITFileOrCDTrack;
-                        foreach (var playlistLine in playlistLines)
-                        {
-                            if (_iTrack.GetPlaylistLine(root) == playlistLine)
-                            {
-                                targetPlaylist.AddTrack(_iTrack);
-                                addedTracks.Add(playlistLine);
-                                break; // Avoid 
-                            }    
-                        }
+                        targetPlaylist.AddTrack(itunesTrack);
+                        addedTracks.Add(playlistLine);
+                        break; // Avoid 
                     }
                 }
             }
@@ -109,7 +99,7 @@ namespace WifiMusicSync.iTunes
         protected IEnumerable<IPlaylist> GetPlaylists()
         {
             List<IPlaylist> playlists = new List<IPlaylist>();
-            IITSource library = app.Sources.get_ItemByName("Library");
+            IITSource library = app.Sources.ItemByName["Library"];
 
             foreach (IITPlaylist item in library.Playlists)
             {

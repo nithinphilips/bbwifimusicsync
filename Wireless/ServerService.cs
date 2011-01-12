@@ -6,11 +6,14 @@ using Kayak;
 using Kayak.Framework;
 using iTunesLib;
 using System.IO;
+using libMusicSync.Extensions;
+using libMusicSync.Helpers;
+using libMusicSync.iTunes;
+using libMusicSync.iTunesExport.Parser;
 using WifiMusicSync.Model;
 using System.Diagnostics;
 using WifiMusicSync.Helpers;
 using WifiMusicSync.iTunes;
-using iTunesExport.Parser;
 using log4net;
 using WifiMusicSync.Properties;
 
@@ -24,7 +27,7 @@ namespace WifiMusicSync.Wireless
         static Dictionary<string, string> songDb = new Dictionary<string, string>();
         static Dictionary<string, string> playlistDb = new Dictionary<string, string>();
 
-        static XmliTunesLibraryManager xmlLibraryManager = new XmliTunesLibraryManager();
+        static CachedXmliTunesLibrary cachedXmlLibrary = new CachedXmliTunesLibrary();
 
         [Path("/")]
         [Path("/hello")]
@@ -73,7 +76,7 @@ namespace WifiMusicSync.Wireless
             data.DeviceId = System.Guid.NewGuid().ToString("N");
             data.DeviceMediaRoot = "file:///SDCard/Blackberry/music/WiFiSync";
             data.PlaylistDevicePath = "file:///SDCard/Blackberry/music/WiFiSync/" + name + ".m3u";
-            IPlaylist pls = xmlLibraryManager.Library.GetFirstPlaylistByName(name);
+            IPlaylist pls = cachedXmlLibrary.Library.GetFirstPlaylistByName(name);
             if(pls != null){
                 data.PlaylistData = (from t in pls.Tracks
                                      select t.GetPlaylistLine(data.DeviceMediaRoot)).ToArray();
@@ -91,7 +94,7 @@ namespace WifiMusicSync.Wireless
             //       when using COM this will take f-o-r-e-v-e-r. So load the XML, no 
             //       matter what. It only takes ~4 seconds for a reasonably large library (23K ct.)
             //       Plus, it caches!
-            var trackEnumerator = from t in xmlLibraryManager.Library.Playlists
+            var trackEnumerator = from t in cachedXmlLibrary.Library.Playlists
                                   select new { t.Name, TrackCount = t.Tracks.Count() };
 
             return new { Tracks = trackEnumerator };
@@ -116,9 +119,9 @@ namespace WifiMusicSync.Wireless
 
                 string playlistName = Path.GetFileNameWithoutExtension(request.PlaylistDevicePath);
                 // Uniquely identifies the device. Generated on the client side on first run and persisted.
-                string deviceIdSha1 = Utilities.GetSHA1Hash(request.DeviceId ?? "");
+                string deviceIdSha1 = Helper.GetSha1Hash(request.DeviceId ?? "");
                 // Hash of the playlist, so we can always find the right playlist
-                string playlistId = Utilities.GetSHA1Hash(request.PlaylistDevicePath ?? "");
+                string playlistId = Helper.GetSha1Hash(request.PlaylistDevicePath ?? "");
 
                 Directory.CreateDirectory(deviceIdSha1);
                 string playlistPath = Path.Combine(deviceIdSha1, playlistId);
@@ -135,7 +138,7 @@ namespace WifiMusicSync.Wireless
 
                 // TODO: Keep the libary around and only read it if the file has actually changed.
                 if (Settings.Default.OneWaySync)
-                    library = xmlLibraryManager.Library;
+                    library = cachedXmlLibrary.Library;
                 else
                     library = new ComiTunesLibrary();
 
@@ -164,7 +167,7 @@ namespace WifiMusicSync.Wireless
                 {
                     // TODO: Read iTunes XML for headless operation.
                     log.InfoFormat("Loading reference playlist {0}...", playlistPath);
-                    List<string> referencePlaylist = Utilities.LoadPlaylist(playlistPath);
+                    List<string> referencePlaylist = Helper.LoadPlaylist(playlistPath);
 
                     desktopChanges = DiffHandler.Diff(desktopPlaylist, referencePlaylist);
                     deviceChanges = DiffHandler.Diff(devicePlaylist, referencePlaylist);
@@ -214,15 +217,15 @@ namespace WifiMusicSync.Wireless
                 {
                     if (change.Type == SyncType.Add)
                     {
-                        string id = Utilities.GetSHA1Hash(change.DeviceLocation);
+                        string id = Helper.GetSha1Hash(change.DeviceLocation);
                         change.TrackPath = "/songs/" + id;
                         // Remember songs, we we can serve them when client requests
                         songDb.Add(id, library.GetTrack(change.DeviceLocation).Location);
                     }
                 }
 
-                string playlistKey = Utilities.GetSHA1Hash(playlistPath);
-                Utilities.SavePlaylist(reconciledPlaylist, playlistPath);
+                string playlistKey = Helper.GetSha1Hash(playlistPath);
+                Helper.SavePlaylist(reconciledPlaylist, playlistPath);
                 playlistDb.Add(playlistKey, playlistPath);
 
                 SyncResponse syncResponse = new SyncResponse();
@@ -232,7 +235,7 @@ namespace WifiMusicSync.Wireless
 
                 foreach (var item in syncResponse.Actions)
                 {
-                    item.DeviceLocation = Utilities.UnEscapeString(item.DeviceLocation);
+                    item.DeviceLocation = Helper.UnEscapeString(item.DeviceLocation);
                     Debug.Assert(item.DeviceLocation.StartsWith("file"));
                 }
 

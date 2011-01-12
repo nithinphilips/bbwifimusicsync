@@ -1,6 +1,7 @@
-﻿using System;
+﻿// Part of iTunes Export Project <https://sourceforge.net/projects/itunesexport/>
+// Modified by Nithin Philips <nithin@nithinphilips.com>
 
-namespace iTunesExport.Parser
+namespace libMusicSync.iTunesExport.Parser
 {
     public interface ITrack
     {

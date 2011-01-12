@@ -1,7 +1,9 @@
-﻿using System;
+﻿// Part of iTunes Export Project <https://sourceforge.net/projects/itunesexport/>
+// Modified by Nithin Philips <nithin@nithinphilips.com>
+
 using System.Collections.Generic;
 
-namespace iTunesExport.Parser
+namespace libMusicSync.iTunesExport.Parser
 {
     public interface IPlaylist
     {

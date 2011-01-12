@@ -1,7 +1,9 @@
-using System;
+// Part of iTunes Export Project <https://sourceforge.net/projects/itunesexport/>
+// Modified by Nithin Philips <nithin@nithinphilips.com>
+
 using System.IO;
 
-namespace iTunesExport.Parser
+namespace libMusicSync.iTunesExport.Parser
 {
     /// <summary>
     /// Represents an individual audio track from the iTunes library.

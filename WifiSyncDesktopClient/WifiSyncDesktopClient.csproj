@@ -129,13 +129,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\lib\LibraryParser\LibraryParser.csproj">
-      <Project>{AC3FD357-F5F8-47C2-9843-F6991F0DD539}</Project>
-      <Name>LibraryParser</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\WifiMusicSync.csproj">
-      <Project>{A67A3E5F-A42B-450C-B464-6A352CF42AFC}</Project>
-      <Name>WifiMusicSync</Name>
+    <ProjectReference Include="..\libMusicSync\libMusicSync.csproj">
+      <Project>{6C493CFA-1770-4F86-8D67-261837C732AC}</Project>
+      <Name>libMusicSync</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

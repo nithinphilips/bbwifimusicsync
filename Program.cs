@@ -1,23 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/**********************************************************************
+ * WifiMusicSync
+ * Copyright (C) 2011 Nithin Philips <nithin@nithinphilips.com>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **********************************************************************/
+
+using System;
 using System.IO;
-using System.Diagnostics;
-using iTunesLib;
-using System.Security.Cryptography;
 using Kayak.Framework;
 using Kayak;
-using WifiMusicSync.Properties;
-using WifiMusicSync.iTunes;
 using log4net.Config;
 using log4net;
+using WifiSyncServer.Properties;
 
-namespace WifiMusicSync
+namespace WifiSyncServer
 {
     public sealed class Program
     {
-        private static readonly ILog log = LogManager.GetLogger("WifiMusicSync");
+        private static readonly ILog log = LogManager.GetLogger("WifiSyncServer");
 
         static void Main(string[] args)
         {
@@ -73,7 +85,7 @@ namespace WifiMusicSync
             var framework = server.UseFramework();
 
             log.Info("Now: " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToLongTimeString());
-            log.Info("WifiMusicSync listening on " + server.ListenEndPoint);
+            log.Info("Wifi Sync Server listening on " + server.ListenEndPoint);
             Console.ReadLine();
 
             // unsubscribe from server (close the listening socket)

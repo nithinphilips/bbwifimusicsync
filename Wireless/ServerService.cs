@@ -1,23 +1,40 @@
-﻿using System;
+﻿/**********************************************************************
+ * WifiMusicSync
+ * Copyright (C) 2011 Nithin Philips <nithin@nithinphilips.com>
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ **********************************************************************/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Kayak;
 using Kayak.Framework;
-using iTunesLib;
 using System.IO;
 using libMusicSync.Extensions;
 using libMusicSync.Helpers;
 using libMusicSync.iTunes;
 using libMusicSync.iTunesExport.Parser;
-using WifiMusicSync.Model;
 using System.Diagnostics;
-using WifiMusicSync.Helpers;
-using WifiMusicSync.iTunes;
 using log4net;
-using WifiMusicSync.Properties;
+using WifiSyncServer.Helpers;
+using WifiSyncServer.iTunes;
+using WifiSyncServer.Model;
+using WifiSyncServer.Properties;
 
-namespace WifiMusicSync.Wireless
+namespace WifiSyncServer.Wireless
 {
     public class ServerService : KayakService
     {
@@ -72,10 +89,13 @@ namespace WifiMusicSync.Wireless
         [Path("/getdata")]
         public PlaylistRequest GetData(string name)
         {
-            PlaylistRequest data = new PlaylistRequest();
-            data.DeviceId = System.Guid.NewGuid().ToString("N");
-            data.DeviceMediaRoot = "file:///SDCard/Blackberry/music/WiFiSync";
-            data.PlaylistDevicePath = "file:///SDCard/Blackberry/music/WiFiSync/" + name + ".m3u";
+            PlaylistRequest data = new PlaylistRequest
+                                       {
+                                           DeviceId = System.Guid.NewGuid().ToString("N"),
+                                           DeviceMediaRoot = "file:///SDCard/Blackberry/music/WiFiSync",
+                                           PlaylistDevicePath =
+                                               "file:///SDCard/Blackberry/music/WiFiSync/" + name + ".m3u"
+                                       };
             IPlaylist pls = cachedXmlLibrary.Library.GetFirstPlaylistByName(name);
             if(pls != null){
                 data.PlaylistData = (from t in pls.Tracks

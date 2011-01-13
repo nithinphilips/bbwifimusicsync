@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("libMusicSync")]
-[assembly: AssemblyDescription("A library that provides ")]
+[assembly: AssemblyDescription("A library that provides common methods for Wifi Music Sync")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Nithin Philips")]
 [assembly: AssemblyProduct("Wifi Music Sync")]

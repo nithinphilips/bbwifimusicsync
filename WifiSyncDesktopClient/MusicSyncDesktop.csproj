@@ -8,8 +8,8 @@
     <ProjectGuid>{2C9C1C44-E819-4557-B9A0-3300A96ABE92}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>WifiSyncDesktopClient</RootNamespace>
-    <AssemblyName>WifiSyncDesktopClient</AssemblyName>
+    <RootNamespace>WifiSyncDesktop</RootNamespace>
+    <AssemblyName>WifiSyncDesktop</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>

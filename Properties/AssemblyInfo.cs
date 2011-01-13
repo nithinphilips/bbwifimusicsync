@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Wifi Sync Server")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A server that, along with a client Blackberry app, allows wireless iTunes music syncing.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Nithin Philips")]
 [assembly: AssemblyProduct("Wifi Music Sync")]

@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
-using WifiSyncDesktopClient.Model;
+using WifiSyncDesktop.Helpers;
+using WifiSyncDesktop.Model;
 using LibQdownloader.Utilities;
-using WifiSyncDesktopClient.Helpers;
 using WifiSyncDesktopClient.Threading;
 
 namespace WifiSyncDesktopClient.Windows

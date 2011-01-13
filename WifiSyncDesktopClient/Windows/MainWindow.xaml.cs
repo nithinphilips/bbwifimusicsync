@@ -7,6 +7,7 @@ using WifiSyncDesktop.Helpers;
 using WifiSyncDesktop.Model;
 using LibQdownloader.Utilities;
 using WifiSyncDesktopClient.Threading;
+using WifiSyncDesktop.Properties;
 
 namespace WifiSyncDesktopClient.Windows
 {
@@ -27,7 +28,8 @@ namespace WifiSyncDesktopClient.Windows
             InitializeComponent();
             viewModelSync.LoadPlaylists();
             viewModelSync.Status = "Ready";
-            //viewModelSync.Path = @"H:\Blackberry\music";
+            viewModelSync.Path = Settings.Default.LastPath;
+
             this.DataContext = viewModelSync;
 
             this.pnlProgress.DataContext = viewModelCopy;
@@ -38,10 +40,6 @@ namespace WifiSyncDesktopClient.Windows
             this.Closing += new System.ComponentModel.CancelEventHandler(MainWindow_Closing);
         }
 
-        void MainWindow_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            Console.WriteLine(e.PropertyName);
-        }
 
         void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
@@ -72,30 +70,22 @@ namespace WifiSyncDesktopClient.Windows
             if (viewModelSync.HasCapacityExceeded)
             {
                 MessageBox.Show(string.Format("Current selection exceeds drive capacity by {0}", Common.ToReadableSize(-viewModelSync.RemainingCapacity)));
+                return;
             }
-            else
-            {
-                List<FileCopyJob> jobs = new List<FileCopyJob>(viewModelSync.GetSelectedTracksUniqueAsFileCopyJobs());
-                Total = jobs.Count;
-                copyMan.Enqueue(jobs);
-                pnlProgress.Visibility = System.Windows.Visibility.Visible;
-                pnlSelection.Visibility = System.Windows.Visibility.Collapsed;
-                this.SizeToContent = System.Windows.SizeToContent.Height;
-            }
+
+            viewModelSync.Path = Settings.Default.LastPath;
+            List<FileCopyJob> jobs = new List<FileCopyJob>(viewModelSync.GetSelectedTracksUniqueAsFileCopyJobs());
+            Total = jobs.Count;
+            copyMan.Enqueue(jobs);
+            pnlProgress.Visibility = Visibility.Visible;
+            pnlSelection.Visibility = Visibility.Collapsed;
+            this.SizeToContent = SizeToContent.Height;
         }
 
 
         private void sync_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = true;
-            if (string.IsNullOrWhiteSpace(viewModelSync.Path))
-            {
-                e.CanExecute = false;
-            }
-            else if(viewModelSync.SelectedTracksSize <= 0)
-            {
-                e.CanExecute = false;
-            }
+            e.CanExecute = (!string.IsNullOrWhiteSpace(viewModelSync.Path)) && (viewModelSync.SelectedTracksSize > 0);
         }
 
         private void close_Executed(object sender, ExecutedRoutedEventArgs e)

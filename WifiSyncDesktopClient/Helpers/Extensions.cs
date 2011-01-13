@@ -71,6 +71,9 @@ namespace WifiSyncDesktop.Helpers
             }
         }
 
+        /// <summary>
+        /// Look for any (matching) existing playlists in Path and sets the Checked property of the associated playlist.
+        /// </summary>
         public static void CheckExistingPlaylists(this SyncSettings s)
         {
             if (!string.IsNullOrWhiteSpace(s.Path) && Directory.Exists(s.Path))

@@ -73,6 +73,7 @@
     <Compile Include="Model\SyncSettings.cs" />
     <Compile Include="QuickZip\DirectoryExistsRule.cs" />
     <Compile Include="QuickZip\InvertSign.cs" />
+    <Compile Include="QuickZip\PathNotEmptyRule.cs" />
     <Compile Include="QuickZip\Resources\BoolToVisibilty.cs" />
     <Compile Include="QuickZip\SelectFolderTextBox.xaml.cs">
       <DependentUpon>SelectFolderTextBox.xaml</DependentUpon>

@@ -24,17 +24,16 @@ using System.ComponentModel;
 using System.IO;
 using libMusicSync.Extensions;
 using libMusicSync.Helpers;
+using libMusicSync.iTunesExport.Parser;
 using LibQdownloader.Utilities;
 using WifiSyncDesktop.Helpers;
 
 namespace WifiSyncDesktop.Model
 {
+    [NotifyPropertyChanged]
     public class SyncSettings : INotifyPropertyChanged
     {
         CachedXmliTunesLibrary cachedXmlLibrary = new CachedXmliTunesLibrary();
-
-        public IEnumerable<PlaylistInfo> Playlists { get; set; }
-        public long SelectedTracksSize { get; set; }
 
         public IEnumerable<PlaylistInfo> GetSelectedPlaylists()
         {
@@ -68,33 +67,76 @@ namespace WifiSyncDesktop.Model
 
         public void CalculatePlaylistSize()
         {
-            if (string.IsNullOrWhiteSpace(Path)) return;
-
             long totalTrackSize = 0;
+            
+            // Use the hash set to make sure we tally the track size only once.
             HashSet<int> uniqueTracks = new HashSet<int>();
-            string root = this.Path;
-
-            foreach (var playlist in GetSelectedPlaylists())
+           
+            foreach (var track in GetSelectedPlaylists().SelectMany(playlist => playlist.Playlist.Tracks))
             {
-                foreach (var track in playlist.Playlist.Tracks)
-                {
-                    // Use the hash set to make sure we tally the track size only once.
-                    if (!uniqueTracks.Contains(track.Id))
-                    {
-                        string targetPath = track.GetPlaylistLine(root, System.IO.Path.DirectorySeparatorChar, false);
-                        if (!File.Exists(targetPath))
-                        {
-                            totalTrackSize += track.Size;
-                        }
-                        uniqueTracks.Add(track.Id);
-                    }
-                }
+                if(uniqueTracks.Contains(track.Id)) continue; // Skip duplicates
+
+                if (!DoesTrackExistAtDestination(track))
+                    totalTrackSize += track.Size;
+                 
+                uniqueTracks.Add(track.Id);
             }
             SelectedTracksSize = totalTrackSize;
-            CalculateCapacity();
+
+
+            if (string.IsNullOrWhiteSpace(Path) || Path.Length < 1)
+            {
+                Capacity = totalTrackSize;
+                Size = totalTrackSize;
+                Status = string.Format("Required Space: {0}", Common.ToReadableSize(Size));
+            }
+            else
+            {
+                DriveInfo di = new DriveInfo(_path.Substring(0, 1));
+                this.Capacity = di.TotalSize;
+
+                this.Size = (di.TotalSize - di.AvailableFreeSpace) + totalTrackSize;
+                Status = totalTrackSize == 0 ? "No songs to copy" : string.Format("Capacity: {0}, Free: {1}, Required: {2}", Common.ToReadableSize(Capacity), Common.ToReadableSize(di.AvailableFreeSpace), Common.ToReadableSize(totalTrackSize));
+            }
+
+            // These props are calculated on demand
+            OnPropertyChanged("RemainingCapacity");
+            OnPropertyChanged("ImageSizePercentage");
+            OnPropertyChanged("HasCapacityExceeded");
+        }
+
+        bool DoesTrackExistAtDestination(ITrack track)
+        {
+            if (string.IsNullOrWhiteSpace(Path) || Path.Length < 1)
+                return false;
+
+            return File.Exists(track.GetPlaylistLine(this.Path, System.IO.Path.DirectorySeparatorChar, false));
         }
 
         
+        public IEnumerable<PlaylistInfo> Playlists { get; set; }
+        public string Status { get; set; }
+        public long Size { get; set; }
+        public long Capacity { get; set; }
+        public long SelectedTracksSize { get; set; }
+        
+        string _path;
+        public string Path
+        {
+            get
+            {
+                return _path;
+            }
+            set
+            {
+                if (value != _path)
+                {
+                    _path = value;
+                    this.CheckExistingPlaylists();
+                    CalculatePlaylistSize();
+                }
+            }
+        }
 
         public float ImageSizePercentage
         {
@@ -107,113 +149,22 @@ namespace WifiSyncDesktop.Model
             }
         }
 
+        public long RemainingCapacity
+        {
+            get { return Capacity - Size; }
+        }
+
         public bool HasCapacityExceeded
         {
             get { return Size > Capacity; }
         }
 
-
-        string path;
-        public string Path
+        private void OnPropertyChanged(string name)
         {
-            get
-            {
-                return path;
-            }
-            set
-            {
-                if (value != path)
-                {
-                    path = value;
-
-                    this.CheckExistingPlaylists();
-                    CalculateCapacity();
-                    CalculatePlaylistSize();
-                    PropertyChanged(this, new PropertyChangedEventArgs("Path"));
-                }
-            }
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
         }
 
-        private void CalculateCapacity()
-        {
-            if (!string.IsNullOrWhiteSpace(path) && path.Length > 1)
-            {
-                DriveInfo di = new DriveInfo(path.Substring(0, 1));
-                this.Capacity = di.TotalSize;
-                this.Size = (di.TotalSize - di.AvailableFreeSpace) + SelectedTracksSize;
-                if (SelectedTracksSize == 0)
-                {
-                    Status = "No songs to copy";
-                }else
-                {
-                    Status = string.Format("Capacity: {0}, Free: {1}, Required: {2}", Common.ToReadableSize(Capacity), Common.ToReadableSize(di.AvailableFreeSpace), Common.ToReadableSize(SelectedTracksSize));
-                }
-            }
-        }
-
-        string status;
-        public string Status
-        {
-            get
-            {
-                return status;
-            }
-            set
-            {
-                status = value;
-                PropertyChanged(this, new PropertyChangedEventArgs("Status"));
-            }
-        }
-
-        long size;
-        public long Size
-        {
-            get
-            {
-                return size;
-            }
-            set
-            {
-                if (value != size)
-                {
-                    size = value;
-                    PropertyChanged(this, new PropertyChangedEventArgs("Size"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("RemainingCapacity"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("ImageSizePercentage"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("HasCapacityExceeded"));
-                }
-            }
-        }
-
-
-        long capacity;
-        public long Capacity
-        {
-            get
-            {
-                return capacity;
-            }
-            set
-            {
-                if (value != capacity)
-                {
-                    capacity = value;
-                    PropertyChanged(this, new PropertyChangedEventArgs("Capacity"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("RemainingCapacity"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("ImageSizePercentage"));
-                    PropertyChanged(this, new PropertyChangedEventArgs("HasCapacityExceeded"));
-                }
-            }
-        }
-
-        public long RemainingCapacity
-        {
-            get
-            {
-                return capacity - size;
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

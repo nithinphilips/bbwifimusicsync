@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WifiSyncServer", "WifiSyncServer\WifiSyncServer.csproj", "{A67A3E5F-A42B-450C-B464-6A352CF42AFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kayak", "Kayak\Kayak\Kayak.csproj", "{79DDD0CE-6F79-4212-A972-8618AD6E405F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kayak", "lib\Kayak\Kayak\Kayak.csproj", "{79DDD0CE-6F79-4212-A972-8618AD6E405F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KayakExamples", "Kayak\KayakExamples\KayakExamples.csproj", "{33318990-37F5-4B9D-B3F9-19E7736EE1DC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KayakExamples", "lib\Kayak\KayakExamples\KayakExamples.csproj", "{33318990-37F5-4B9D-B3F9-19E7736EE1DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kayak.Framework", "Kayak\Kayak.Framework\Kayak.Framework.csproj", "{88EB6BDB-6585-4CA3-87BE-11F7262B95DF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kayak.Framework", "lib\Kayak\Kayak.Framework\Kayak.Framework.csproj", "{88EB6BDB-6585-4CA3-87BE-11F7262B95DF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kayak", "Kayak", "{C5A6834A-90B9-40EF-86F1-0008CE508725}"
 EndProject

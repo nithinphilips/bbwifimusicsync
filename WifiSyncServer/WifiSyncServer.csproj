@@ -36,26 +36,26 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
-      <HintPath>lib\log4net\log4net.dll</HintPath>
+      <HintPath>..\lib\log4net\log4net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.CoreEx, Version=1.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Kayak\lib\rx3.5\System.CoreEx.dll</HintPath>
+      <HintPath>..\lib\Kayak\lib\rx3.5\System.CoreEx.dll</HintPath>
     </Reference>
     <Reference Include="System.Observable, Version=1.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Kayak\lib\rx3.5\System.Observable.dll</HintPath>
+      <HintPath>..\lib\Kayak\lib\rx3.5\System.Observable.dll</HintPath>
     </Reference>
     <Reference Include="System.Reactive, Version=1.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Kayak\lib\rx3.5\System.Reactive.dll</HintPath>
+      <HintPath>..\lib\Kayak\lib\rx3.5\System.Reactive.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Threading, Version=1.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Kayak\lib\rx3.5\System.Threading.dll</HintPath>
+      <HintPath>..\lib\Kayak\lib\rx3.5\System.Threading.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -93,24 +93,22 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="Kayak\Kayak.Framework\Kayak.Framework.csproj">
+    <ProjectReference Include="..\lib\Kayak\Kayak.Framework\Kayak.Framework.csproj">
       <Project>{88EB6BDB-6585-4CA3-87BE-11F7262B95DF}</Project>
       <Name>Kayak.Framework</Name>
     </ProjectReference>
-    <ProjectReference Include="Kayak\Kayak\Kayak.csproj">
+    <ProjectReference Include="..\lib\Kayak\Kayak\Kayak.csproj">
       <Project>{79DDD0CE-6F79-4212-A972-8618AD6E405F}</Project>
       <Name>Kayak %28Kayak\Kayak%29</Name>
     </ProjectReference>
-    <ProjectReference Include="libMusicSync\libMusicSync.csproj">
+    <ProjectReference Include="..\libMusicSync\libMusicSync.csproj">
       <Project>{6C493CFA-1770-4F86-8D67-261837C732AC}</Project>
       <Name>libMusicSync</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="log.config">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <None Include="log.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

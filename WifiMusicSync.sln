@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WifiSyncServer", "WifiSyncServer.csproj", "{A67A3E5F-A42B-450C-B464-6A352CF42AFC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WifiSyncServer", "WifiSyncServer\WifiSyncServer.csproj", "{A67A3E5F-A42B-450C-B464-6A352CF42AFC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kayak", "Kayak\Kayak\Kayak.csproj", "{79DDD0CE-6F79-4212-A972-8618AD6E405F}"
 EndProject

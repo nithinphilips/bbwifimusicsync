@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Kayak.Framework", "Kayak\Ka
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Kayak", "Kayak", "{C5A6834A-90B9-40EF-86F1-0008CE508725}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicSyncDesktop", "WifiSyncDesktopClient\MusicSyncDesktop.csproj", "{2C9C1C44-E819-4557-B9A0-3300A96ABE92}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicSyncDesktop", "MusicSyncDesktop\MusicSyncDesktop.csproj", "{2C9C1C44-E819-4557-B9A0-3300A96ABE92}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libMusicSync", "libMusicSync\libMusicSync.csproj", "{6C493CFA-1770-4F86-8D67-261837C732AC}"
 EndProject

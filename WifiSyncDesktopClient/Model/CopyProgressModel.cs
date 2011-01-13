@@ -1,36 +1,14 @@
 ﻿using System.ComponentModel;
+using WifiSyncDesktop.Helpers;
 
 namespace WifiSyncDesktop.Model
 {
-    public class CopyProgressModel : INotifyPropertyChanged
+    [NotifyPropertyChanged]
+    public class CopyProgressModel
     {
-        string from, to, size;
-        int percentage;
-
-        public string From 
-        {
-            get { return from; }
-            set { from = value; PropertyChanged(this, new PropertyChangedEventArgs("From")); }
-        }
-
-        public string To
-        {
-            get { return to; }
-            set { to = value; PropertyChanged(this, new PropertyChangedEventArgs("To")); }
-        }
-
-        public string Size
-        {
-            get { return size; }
-            set { size = value; PropertyChanged(this, new PropertyChangedEventArgs("Size")); }
-        }
-
-        public int Percentage
-        {
-            get { return percentage; }
-            set { percentage = value; PropertyChanged(this, new PropertyChangedEventArgs("Percentage")); }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public string From { get; set; }
+        public string To { get; set; }
+        public string Size { get; set; }
+        public int Percentage { get; set; }
     }
 }

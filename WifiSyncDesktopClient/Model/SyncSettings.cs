@@ -17,62 +17,18 @@
  *
  **********************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
 using System.IO;
 using libMusicSync.Extensions;
 using libMusicSync.Helpers;
-using libMusicSync.iTunesExport.Parser;
 using LibQdownloader.Utilities;
 using WifiSyncDesktop.Helpers;
 
 namespace WifiSyncDesktop.Model
 {
-    public class PlaylistInfo : INotifyPropertyChanged
-    {
-        public string Name { get; set; }
-
-        bool? _checked = false;
-        public bool? Checked
-        {
-            get
-            {
-                return _checked;
-            }
-            set
-            {
-                _checked = value;
-                PropertyChanged(this, new PropertyChangedEventArgs("Checked"));
-                if(Settings != null) Settings.CalulatePlaylistSize();
-            }
-        }
-
-        public SyncSettings Settings { get; set; }
-        public IPlaylist Playlist { get; set; }
-
-        bool existsAtDestination = false;
-        public bool ExistsAtDestination
-        {
-            get
-            {
-                return existsAtDestination;
-            }
-            set
-            {
-                this.existsAtDestination = value;
-                PropertyChanged(this, new PropertyChangedEventArgs("ExistsAtDestination"));
-            }
-        }
-
-        public override string ToString()
-        {
-            return string.Format("[{0}] {1}", Checked.Value ? "X" : " ", Name);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
-    }
-
     public class SyncSettings : INotifyPropertyChanged
     {
         CachedXmliTunesLibrary cachedXmlLibrary = new CachedXmliTunesLibrary();
@@ -85,25 +41,32 @@ namespace WifiSyncDesktop.Model
             return from p in Playlists
                    where (!p.Checked.HasValue) || (p.Checked.HasValue && p.Checked.Value == true) 
                    select p;
-            
-        }
+        } 
 
         public void LoadPlaylists()
         {
-            var playlistSelector = from t in cachedXmlLibrary.Library.Playlists
-                                   select new PlaylistInfo
-                                              {
-                                                  Name = string.Format("{0} ({1} tracks)", t.Name, t.Tracks.Count()),
-                                                  Checked = false,
-                                                  Playlist = t,
-                                                  Settings = this
-                                              };
-            Playlists = new List<PlaylistInfo>(playlistSelector);
+            List<PlaylistInfo> result = new List<PlaylistInfo>();
+            foreach (var playlist in cachedXmlLibrary.Library.Playlists)
+            {
+                PlaylistInfo playlistInfo = new PlaylistInfo
+                {
+                    Name = string.Format("{0} ({1} tracks)", playlist.Name, playlist.Tracks.Count()),
+                    Checked = false,
+                    Playlist = playlist,
+                };
+                // Monitor status so we can update ourselves.
+                ((INotifyPropertyChanged)playlistInfo).PropertyChanged += new PropertyChangedEventHandler(SyncSettings_PropertyChanged);
+                result.Add(playlistInfo);
+            }
+            Playlists = result;
         }
 
-        
+        void SyncSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == "Checked") CalculatePlaylistSize();
+        }
 
-        public void CalulatePlaylistSize()
+        public void CalculatePlaylistSize()
         {
             if (string.IsNullOrWhiteSpace(Path)) return;
 
@@ -138,18 +101,15 @@ namespace WifiSyncDesktop.Model
             get
             {
                 if (Size > Capacity)
-                    return LibQdownloader.Utilities.Common.CalculatePercent(Capacity, Size);
+                    return Common.CalculatePercent(Capacity, Size);
                 else
-                    return LibQdownloader.Utilities.Common.CalculatePercent(Size, Capacity);
+                    return Common.CalculatePercent(Size, Capacity);
             }
         }
 
         public bool HasCapacityExceeded
         {
-            get
-            {
-                return Size > Capacity;
-            }
+            get { return Size > Capacity; }
         }
 
 
@@ -168,7 +128,7 @@ namespace WifiSyncDesktop.Model
 
                     this.CheckExistingPlaylists();
                     CalculateCapacity();
-                    CalulatePlaylistSize();
+                    CalculatePlaylistSize();
                     PropertyChanged(this, new PropertyChangedEventArgs("Path"));
                 }
             }

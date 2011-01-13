@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using WifiSyncDesktop.Helpers;
@@ -35,6 +36,11 @@ namespace WifiSyncDesktopClient.Windows
             copyMan.WorkCompleted += new EventHandler(copyMan_WorkCompleted);
 
             this.Closing += new System.ComponentModel.CancelEventHandler(MainWindow_Closing);
+        }
+
+        void MainWindow_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            Console.WriteLine(e.PropertyName);
         }
 
         void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)

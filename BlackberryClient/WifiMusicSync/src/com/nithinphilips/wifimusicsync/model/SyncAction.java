@@ -25,12 +25,12 @@ public class SyncAction {
 		return trackPath;
 	}
 	
-	public static SyncAction fromJson(JSONObject json, String serverUrl) throws JSONException{
+	public static SyncAction fromJson(JSONObject json, UrlBuilder server) throws JSONException{
 		SyncAction result = new SyncAction();
 
 		if(json.getString("Type").compareTo("Add") == 0){
 			result.type = SyncAction.ADD;
-			result.trackPath = serverUrl + json.getString("TrackPath");
+			result.trackPath = server.getFullUrl(json.getString("TrackPath"));
 		}else if(json.getString("Type").compareTo("Remove") == 0){
 			result.type = SyncAction.REMOVE;
 		}

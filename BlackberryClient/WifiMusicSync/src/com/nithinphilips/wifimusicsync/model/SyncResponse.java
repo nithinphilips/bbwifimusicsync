@@ -40,7 +40,7 @@ public class SyncResponse {
 		return actions;
 	}
 
-	public static SyncResponse fromJson(JSONObject json, String serverUrl) throws JSONException{
+	public static SyncResponse fromJson(JSONObject json, UrlBuilder server) throws JSONException{
     	SyncResponse response = new SyncResponse();
     	
     	response.serverId = json.getString("ServerId");
@@ -49,13 +49,13 @@ public class SyncResponse {
     		// An error happened. No data.
     		response.errorMessage = json.getString("ErrorMessage");
     	}else{
-    		response.playlistServerPath = serverUrl + json.getString("PlaylistServerPath");
+    		response.playlistServerPath = server.getFullUrl(json.getString("PlaylistServerPath"));
     		response.playlistDevicePath = json.getString("PlaylistDevicePath");
     		
     		JSONArray actionsJson = json.getJSONArray("Actions");
     		SyncAction[] actions = new SyncAction[actionsJson.length()];
     		for (int i = 0; i < actions.length; i++) {
-    			actions[i] = SyncAction.fromJson(actionsJson.getJSONObject(i), serverUrl);
+    			actions[i] = SyncAction.fromJson(actionsJson.getJSONObject(i), server);
 			}
     		response.actions = actions;
     	}

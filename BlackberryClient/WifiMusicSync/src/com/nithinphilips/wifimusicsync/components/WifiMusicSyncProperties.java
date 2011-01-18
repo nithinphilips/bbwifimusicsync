@@ -84,11 +84,11 @@ public class WifiMusicSyncProperties implements Persistable
 	public void setServerPort(String serverPort) {
 		this.serverPort = serverPort;
 	}
-	
+	 
 	public String getServerUrl() {
 		return "http://" + serverIp + ":" + serverPort;
 	}
-
+ 
 	public String getClientId() {
 		return clientId;
 	}

@@ -1,8 +1,10 @@
 <Properties ModelVersion="1.1.2">
-  <General Title="Wifi Music Sync" Version="1.0.1" Vendor="Nithin Philips" Description=""/>
+  <General Title="Wifi Music Sync" Version="1.1.0" Vendor="Nithin Philips" Description="An Application to wirelessly Sync iTunes playlists."/>
   <Application Type="BlackBerry Application" MainMIDletName="" MainArgs="" HomeScreenPosition="0" StartupTier="7" IsSystemModule="false" IsAutostartup="false"/>
   <Resources hasTitleResource="false" TitleResourceBundleName="" TitleResourceBundleRelativePath="" TitleResourceBundleClassName="" TitleResourceBundleKey="" DescriptionId="">
-    <Icons/>
+    <Icons>
+      <Icon CanonicalFileName="res/refresh-reload-sync.png" IsFocus="false"/>
+    </Icons>
   </Resources>
   <Compile OutputCompilerMessages="true" ConvertImages="false" CreateWarningForNoExportedRoutine="true" CompressResources="false" AliasList="">
     <PreprocessorDefines/>

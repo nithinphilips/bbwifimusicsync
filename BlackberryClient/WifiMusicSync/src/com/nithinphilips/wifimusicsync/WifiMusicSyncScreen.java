@@ -115,7 +115,7 @@ public class WifiMusicSyncScreen extends MainScreen {
 				Vector items = new Vector();
 
 				// from <https://code.google.com/p/ultimate-gnome/> and Tango-Icon project
-				Image syncIcon = ImageFactory.createImage(Bitmap.getBitmapResource("refresh-reload-sync-icon.png"));
+				Image syncIcon = ImageFactory.createImage(Bitmap.getBitmapResource("refresh-reload-sync.png"));
 				items.addElement(new CommandItem(new StringProvider("Sync"), syncIcon, new net.rim.device.api.command.Command(syncCommand)));
 				
 //				Image optionsIcon = ImageFactory.createImage(Bitmap.getBitmapResource("preferences-system.png"));

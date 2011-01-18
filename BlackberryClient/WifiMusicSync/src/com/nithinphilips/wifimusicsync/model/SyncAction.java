@@ -5,15 +5,51 @@ import net.rim.blackberry.api.pdap.BlackBerryContactList.AddressTypes;
 import org.json.me.JSONException;
 import org.json.me.JSONObject;
 
+import com.nithinphilips.wifimusicsync.components.SyncActionChangedCallBack;
+
 public class SyncAction {
 	
 	public static final int NONE = 0;
 	public static final int ADD = 1;
 	public static final int REMOVE = 2;
 	
+	SyncActionChangedCallBack notifier;
+	
+	public SyncActionChangedCallBack getNotifier() {
+		return notifier;
+	}
+	public void setNotifier(SyncActionChangedCallBack notifier) {
+		this.notifier = notifier;
+	}
+
+
 	int type = NONE;
 	String deviceLocation;
+	
+	public void setType(int type) {
+		this.type = type;
+	}
+	public void setDeviceLocation(String deviceLocation) {
+		this.deviceLocation = deviceLocation;
+	}
+	
+	public String getFileName(){
+		int index = deviceLocation == null ? -1 : deviceLocation.lastIndexOf('/');
+		
+		if(index >= 0){
+			return deviceLocation.substring(index + 1);
+		}else{
+			return deviceLocation;
+		}
+	}
+	
+	public void setTrackUrl(String trackUrl) {
+		this.trackPath = trackUrl;
+	}
+	
+
 	String trackPath;
+	String status = "Queued";
 
 	public int getType() {
 		return type;
@@ -50,5 +86,14 @@ public class SyncAction {
 		sb.append("\"");
 		return sb.toString();
 		
+	}
+	
+	public String getStatus() {		
+		return status;
+	}
+	
+	public void setStatus(String status) {
+		this.status = status;
+		if(notifier != null) notifier.changed(this);
 	}
 }

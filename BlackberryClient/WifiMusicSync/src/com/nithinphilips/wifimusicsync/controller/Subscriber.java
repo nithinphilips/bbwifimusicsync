@@ -40,7 +40,9 @@ public class Subscriber {
 	 * @throws IOException
 	 */
 	public PlaylistInfo[] getPlaylists() throws JSONException, IOException{
-		String s_response = new String(JsonHttpHelper.httpGet((server.getPlaylistsUrl())));
+		byte[] httpBytes = JsonHttpHelper.httpGet((server.getPlaylistsUrl()));
+		String s_response = null;
+		if(httpBytes != null) s_response = new String(httpBytes);
 
 		if ((s_response == null) || (s_response.compareTo("") == 0)) {
 			log("Error: No response from server.");
@@ -57,14 +59,8 @@ public class Subscriber {
 
 	public void updateSubscription() throws JSONException, IOException {
 
-		String mediaRoot;
-		if (rootPath.endsWith("/"))
-			mediaRoot = rootPath;
-		else
-			mediaRoot = rootPath + "/";
-
 		Vector playlists = new Vector();
-		Enumeration files = findPlaylists(mediaRoot);
+		Enumeration files = findPlaylists(rootPath);
 		
 		if(files != null){
 			while (files.hasMoreElements()) {
@@ -75,7 +71,7 @@ public class Subscriber {
 
 		Subscription subscription = new Subscription();
 		subscription.setDeviceId(clientId);
-		subscription.setDeviceMediaRoot(mediaRoot);
+		subscription.setDeviceMediaRoot(rootPath);
 		subscription.setPlaylists(playlists);
 
 		String s_response = JsonHttpHelper.executeCommand(server.getSubscribe(), subscription.toJsonObject().toString());
@@ -97,8 +93,7 @@ public class Subscriber {
 	}
 
 	private void log(String message) {
-		// TODO Auto-generated method stub
-		Dialog.alert(message);
+		
 	}
 
 	public static Enumeration findPlaylists(String root) throws IOException {

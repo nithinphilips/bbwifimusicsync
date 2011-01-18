@@ -33,24 +33,17 @@ public class PlaylistDownloader {
 		this.clientId = clientId;
 	}
 
-	public void syncPlaylist() throws JSONException, IOException{
-		syncPlaylist(server, rootPath, playlistPath);
-	}
-	
-	void syncPlaylist(UrlBuilder server, String root, String playlist)
-			throws JSONException, IOException {
-
-		String mediaRoot;
-		if (root.endsWith("/"))
-			mediaRoot = root;
-		else
-			mediaRoot = root + "/";
-
+	SyncResponse response;
+	public SyncResponse getResponse() throws IOException, JSONException
+	{
+		
+		this.response = null;
+		
 		PlaylistRequest playlistRequest = new PlaylistRequest();
-		playlistRequest.setDeviceId(clientId);
-		playlistRequest.setPlaylistDevicePath(playlist);
-		playlistRequest.setDeviceMediaRoot(mediaRoot);
-		playlistRequest.loadPlaylistData(playlist);
+		playlistRequest.setDeviceId(this.clientId);
+		playlistRequest.setPlaylistDevicePath(this.playlistPath);
+		playlistRequest.setDeviceMediaRoot(this.rootPath);
+		playlistRequest.loadPlaylistData(this.playlistPath);
 
 		String s_response = JsonHttpHelper.executeCommand(server.getQueryUrl(),
 				playlistRequest.toJsonObject().toString());
@@ -58,20 +51,27 @@ public class PlaylistDownloader {
 		if ((s_response == null) || (s_response.compareTo("") == 0)) {
 			log("Error: No response from server.");
 		} else {
-			SyncResponse response = SyncResponse.fromJson(new JSONObject(
-					s_response), server);
+			SyncResponse response = SyncResponse.fromJson(new JSONObject(s_response), server);
 
 			if (response.getError() == SyncResponse.ERROR_NONE) {
-				// exec actions
-				executeActions(response.getActions());
-
-				// update playlist
-				downloadFile(response.getPlaylistServerUrl(), response
-						.getPlaylistDevicePath(), true);
+				this.response = response;
 			} else {
 				log("Server Error " + response.getErrorMessage());
 			}
 		}
+		
+		return this.response;
+	}
+	
+	public void handleResponse() throws JSONException, IOException{
+		if(this.response == null) getResponse(); // Try once
+		if(this.response == null) return;		// Some error
+		
+		// exec actions
+		executeActions(response.getActions());
+
+		// update playlist
+		downloadFile(response.getPlaylistServerUrl(), response.getPlaylistDevicePath(), true);
 	}
 
 	public static void executeActions(SyncAction[] actions) throws JSONException, IOException {
@@ -80,11 +80,14 @@ public class PlaylistDownloader {
 				log("Add " + actions[i].getTrackUrl() + " "
 						+ actions[i].getDeviceLocation());
 				createDirectoryTree(actions[i].getDeviceLocation());
-				downloadFile(actions[i].getTrackUrl(), actions[i]
-						.getDeviceLocation());
+				actions[i].setStatus("Downloading...");
+				downloadFile(actions[i].getTrackUrl(), actions[i].getDeviceLocation());
+				actions[i].setStatus("Completed");
 			} else if (actions[i].getType() == SyncAction.REMOVE) {
 				log("Delete " + actions[i].getDeviceLocation());
+				actions[i].setStatus("Deleting...");
 				deleteFile(actions[i].getDeviceLocation());
+				actions[i].setStatus("Completed");
 				// TODO: Delete empty directory trees too
 			}
 		}

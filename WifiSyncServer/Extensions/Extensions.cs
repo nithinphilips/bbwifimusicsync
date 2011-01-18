@@ -68,34 +68,17 @@ namespace WifiSyncServer.Extensions
             return new Track(track.trackID, track.Name, track.Artist, track.AlbumArtist, track.Album, track.Genre, track.Year, track.Size, track.Duration, track.Location, false, !track.Enabled);
         }
 
-        public static void Log(this PlaylistRequest t, log4net.ILog logger)
+
+        /// <summary>
+        /// Unescapes the DeviceLocation property of an array of SyncActions.
+        /// </summary>
+        /// <param name="actions">The actions to unescape.</param>
+        public static void UnEscapeAllDeviceLocations(this SyncAction[] actions)
         {
-
-            logger.Info("DeviceId: " + t.DeviceId);
-            logger.Info("PlaylistDevicePath: " + t.PlaylistDevicePath);
-            logger.Info("DeviceMediaRoot: " + t.DeviceMediaRoot);
-            foreach (var item in t.PlaylistData)
+            foreach (var item in actions)
             {
-                logger.Info("> " + item);
+                item.DeviceLocation = Helper.UnEscapeString(item.DeviceLocation);
             }
-        }
-
-        public static void Log(this SyncResponse s, log4net.ILog logger)
-        {
-            if (s.Error != 0)
-            {
-                logger.Info("Error: " + s.Error);
-                logger.Info("ErrorMessage: " + s.ErrorMessage);
-            }
-
-            logger.Info("ServerId: " + s.ServerId);
-            logger.Info("PlaylistServerPath: " + s.PlaylistServerPath);
-            logger.Info("PlaylistDevicePath: " + s.PlaylistDevicePath);
-            foreach (var item in s.Actions)
-            {
-                logger.InfoFormat("> " + item);
-            }
-            
         }
     }
 }

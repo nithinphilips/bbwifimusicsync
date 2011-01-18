@@ -1,6 +1,6 @@
 ﻿/**********************************************************************
  * WifiMusicSync
- * Copyright (C) 2011 Nithin Philips
+ * Copyright (C) 2011 Nithin Philips <nithin@nithinphilips.com>
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,49 +18,41 @@
  **********************************************************************/
 
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using libMusicSync.Helpers;
 
 namespace WifiSyncServer.Model
 {
-    public class PlaylistRequest
+    public class PlaylistRequest : Request
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(typeof(PlaylistRequest).Name);
-
-
-        public string DeviceId { get; set; }
         public string PlaylistDevicePath { get; set; }
-        public string DeviceMediaRoot { get; set; }
         public string[] PlaylistData { get; set; }
 
-        public SyncResponse CheckValidate()
+        /// <summary>
+        /// Gets a hash of the PlaylistDevicePath that can used as key for storing data.
+        /// </summary>
+        public string SafePlaylistDevicePath
         {
-            SyncResponse errorResponse = null;
-            errorResponse = Check(DeviceId, "DeviceId");
-            if (errorResponse != null) return errorResponse;
+            get { return Helper.GetSha1Hash(PlaylistDevicePath ?? ""); }
+        }
 
-            errorResponse = Check(PlaylistDevicePath, "PlaylistDevicePath");
-            if (errorResponse != null) return errorResponse;
+        public override bool CheckValidate(out Response errorResponse)
+        {
 
-            errorResponse = Check(DeviceMediaRoot, "DeviceMediaRoot");
-            if (errorResponse != null) return errorResponse;
-            
+            if(!CheckDeviceId(out errorResponse) ||
+               !CheckDeviceMediaRoot(out errorResponse) ||
+               !CheckNullOrWhiteSpace(PlaylistDevicePath, "PlaylistDevicePath", out errorResponse))
+            {
+                return false;
+            }
 
             RemoveEmptyLinesFromPlaylistData();
             PlaylistDevicePath = PlaylistDevicePath.Trim();
             DeviceMediaRoot = DeviceMediaRoot.Trim();
             if (!DeviceMediaRoot.EndsWith("/")) DeviceMediaRoot = DeviceMediaRoot + "/";
 
-            return null;
-        }
-
-        private SyncResponse Check(string parameter, string paramterName)
-        {
-            if (string.IsNullOrWhiteSpace(parameter))
-            {
-                log.Warn("Required parameter is missing or empty: " + paramterName);
-                return new SyncResponse { ErrorMessage = "Required parameter is missing or empty: " + paramterName, Error = (int)SyncResponse.SyncResponseError.RequiredParameterMissing };
-            }
-            return null;
+            return true;
         }
 
         public void RemoveEmptyLinesFromPlaylistData()
@@ -68,18 +60,8 @@ namespace WifiSyncServer.Model
             if ((PlaylistData != null) && (PlaylistData.Length > 0))
             {
                 List<string> result = new List<string>(PlaylistData.Length);
-                foreach (var item in PlaylistData)
-                {
-                    if (!string.IsNullOrWhiteSpace(item))
-                    {
-                        result.Add(item.Trim());
-                    }
-                }
+                result.AddRange(from item in PlaylistData where !string.IsNullOrWhiteSpace(item) select item.Trim());
                 PlaylistData = result.ToArray();
-            }
-            else
-            {
-                log.Debug("Playlist data is empty");
             }
         }
 

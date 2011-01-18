@@ -27,44 +27,41 @@ using libMusicSync.Extensions;
 using libMusicSync.Helpers;
 using libMusicSync.iTunes;
 using libMusicSync.iTunesExport.Parser;
-using System.Diagnostics;
 using log4net;
 using WifiSyncServer.Helpers;
 using WifiSyncServer.iTunes;
 using WifiSyncServer.Model;
 using WifiSyncServer.Properties;
+using WifiSyncServer.Extensions;
 
 namespace WifiSyncServer.Wireless
 {
     public class ServerService : KayakService
     {
-
-        private static readonly ILog log = LogManager.GetLogger("WifiMusicSync.Server");
-
-        static Dictionary<string, string> songDb = new Dictionary<string, string>();
-        static Dictionary<string, string> playlistDb = new Dictionary<string, string>();
-
-        static CachedXmliTunesLibrary cachedXmlLibrary = new CachedXmliTunesLibrary();
+        private static readonly ILog Log = LogManager.GetLogger("WifiMusicSync.Server");
+        static readonly Dictionary<string, string> SongDb = new Dictionary<string, string>();
+        static readonly Dictionary<string, string> PlaylistDb = new Dictionary<string, string>();
+        static readonly CachedXmliTunesLibrary CachedXmlLibrary = new CachedXmliTunesLibrary();
 
         [Path("/")]
         [Path("/hello")]
         public object SayHello()
         {
-            log.Info("Saying hello");
-            return new { message = "Greetings from Wonderfalls" };
+            Log.Info("Saying hello");
+            return new { Message = "Greetings from Wonderfalls" };
         }
 
         [Path("/songs/{id}")]
         public FileInfo GetSong(string id)
         {
-            if (songDb.ContainsKey(id))
+            if (SongDb.ContainsKey(id))
             {
-                log.Info("Sending file: " + songDb[id]);
-                return new FileInfo(songDb[id]);
+                Log.Info("Sending file: " + SongDb[id]);
+                return new FileInfo(SongDb[id]);
             }
             else
             {
-                log.Warn("File Not Found: " + id);
+                Log.Warn("File Not Found: " + id);
                 Response.SetStatusToNotFound();
                 return null;
             }
@@ -73,30 +70,32 @@ namespace WifiSyncServer.Wireless
         [Path("/playlists/{id}")]
         public FileInfo GetPlaylist(string id)
         {
-            if (playlistDb.ContainsKey(id))
+            if (PlaylistDb.ContainsKey(id))
             {
-                log.Info("Sending playlist: " + playlistDb[id]);
-                return new FileInfo(playlistDb[id]);
+                Log.Info("Sending playlist: " + PlaylistDb[id]);
+                return new FileInfo(PlaylistDb[id]);
             }
             else
             {
-                log.Warn("Playlist Not Found: " + id);
+                Log.Warn("Playlist Not Found: " + id);
                 Response.SetStatusToNotFound();
                 return null;
             }
         }
 
+#if DEBUG
         [Path("/getdata")]
         public PlaylistRequest GetData(string name)
         {
+            Log.Info("Generating test data for playlist " + name);
             PlaylistRequest data = new PlaylistRequest
                                        {
-                                           DeviceId = System.Guid.NewGuid().ToString("N"),
+                                           DeviceId = Guid.NewGuid().ToString("N"),
                                            DeviceMediaRoot = "file:///SDCard/Blackberry/music/WiFiSync",
                                            PlaylistDevicePath =
                                                "file:///SDCard/Blackberry/music/WiFiSync/" + name + ".m3u"
                                        };
-            IPlaylist pls = cachedXmlLibrary.Library.GetFirstPlaylistByName(name);
+            IPlaylist pls = CachedXmlLibrary.Library.GetFirstPlaylistByName(name);
             if(pls != null){
                 data.PlaylistData = (from t in pls.Tracks
                                      select t.GetPlaylistLine(data.DeviceMediaRoot)).ToArray();
@@ -104,66 +103,92 @@ namespace WifiSyncServer.Wireless
 
             return data;
         }
+#endif
 
         [Path("/getplaylists")]
         public object GetPlaylists()
         {
-            log.Info("Listing playlists");
+            Log.Info("Listing playlists");
 
             // Note: t.Tracks.Count() causes the entire library to be enumerated and
             //       when using COM this will take f-o-r-e-v-e-r. So load the XML, no 
             //       matter what. It only takes ~4 seconds for a reasonably large library (23K ct.)
             //       Plus, it caches!
-            var trackEnumerator = from t in cachedXmlLibrary.Library.Playlists
-                                  select new { t.Name, TrackCount = t.Tracks.Count() };
+            var playlistEnumerator = from playlist in CachedXmlLibrary.Library.Playlists
+                                  select new { 
+                                      DisplayName = playlist.Name,  
+                                      Name = playlist.GetSafeName(), 
+                                      TrackCount = playlist.Tracks.Count() 
+                                  };
 
-            return new { Tracks = trackEnumerator };
+            return new { Playlists = playlistEnumerator };
+        }
+
+        [Verb("POST")]
+        [Verb("PUT")]
+        [Path("/subscribe")]
+        public Response Subscribe([RequestBody]Subscription s)
+        {
+            Log.Info("Updating subscription");
+
+            // Check for errors
+            Response errorResponse;
+            if (!s.CheckValidate(out errorResponse)) return errorResponse;
+
+            // Get garbage tracks list
+            SubscriptionManager man = new SubscriptionManager(s.SafeDeviceId); // Current subscription
+            SyncAction[] actions = man.GetGarbageActions(CachedXmlLibrary.Library, s);
+            actions.UnEscapeAllDeviceLocations();
+
+            Log.Info("Saving subscription to disk.");
+            SubscriptionManager.SaveToDisk(s);
+
+            SyncResponse response = new SyncResponse { Actions = actions };
+            Log.Debug("Sending cleanup data:" + Environment.NewLine + response.ToString());
+            return response;
         }
         
 
         [Verb("POST")]
         [Verb("PUT")]
         [Path("/query")]
-        public object Query([RequestBody]PlaylistRequest request)
+        public Response Query([RequestBody]PlaylistRequest request)
         {
-            songDb.Clear();
-            playlistDb.Clear();
+            SongDb.Clear();
+            PlaylistDb.Clear();
 
-            SyncResponse errorResponse = request.CheckValidate();
-            if (errorResponse != null) return errorResponse;
+            Response errorResponse;
+            if (!request.CheckValidate(out errorResponse)) return errorResponse;
 
             using (log4net.ThreadContext.Stacks["NDC"].Push("Client " + request.DeviceId))
             {
-                log.Info("Client " + request.DeviceId + " connected.");
-                log.Info("Received Data:" + Environment.NewLine + request.ToString());
+                Log.Info("Client " + request.DeviceId + " connected.");
+                Log.Debug("Received Data:" + Environment.NewLine + request.ToString());
 
                 string playlistName = Path.GetFileNameWithoutExtension(request.PlaylistDevicePath);
-                // Uniquely identifies the device. Generated on the client side on first run and persisted.
-                string deviceIdSha1 = Helper.GetSha1Hash(request.DeviceId ?? "");
-                // Hash of the playlist, so we can always find the right playlist
-                string playlistId = Helper.GetSha1Hash(request.PlaylistDevicePath ?? "");
+                SubscriptionManager subManager = new SubscriptionManager(request.SafeDeviceId);
 
-                Directory.CreateDirectory(deviceIdSha1);
-                string playlistPath = Path.Combine(deviceIdSha1, playlistId);
+                Directory.CreateDirectory(request.SafeDeviceId);
+                string playlistPath = Path.Combine(request.SafeDeviceId, request.SafePlaylistDevicePath);
 
                 List<string> reconciledPlaylist;
 
                 // Read and sort the playlists
-                log.Info("Loading Phone Playlist...");
+                Log.Info("Loading Phone Playlist...");
                 List<string> devicePlaylist = new List<string>(request.PlaylistData);
 
-                log.InfoFormat("Loading iTunes Library ({0})...", playlistName);
+                Log.InfoFormat("Loading iTunes Library ({0})...", playlistName);
                 List<string> desktopPlaylist;
                 iTunesLibrary library;
 
-                // TODO: Keep the libary around and only read it if the file has actually changed.
+                // TODO: If iTunes is already running, connect to it via COM so we can add remove etc.
                 if (Settings.Default.OneWaySync)
-                    library = cachedXmlLibrary.Library;
+                    library = CachedXmlLibrary.Library;
                 else
                     library = new ComiTunesLibrary();
 
 
-                log.InfoFormat("iTunes library (via {0}) loaded.", Settings.Default.OneWaySync ? "XML" : "COM");
+                Log.InfoFormat("iTunes library (via {0}) loaded.", Settings.Default.OneWaySync ? "XML" : "COM");
                 
 
                 IPlaylist playlist = library.GetFirstPlaylistByName(playlistName);
@@ -173,36 +198,34 @@ namespace WifiSyncServer.Wireless
                 }
                 else
                 {
-                    log.WarnFormat("Fail. Playlist ({0}) does not exist", playlistName);
+                    Log.WarnFormat("Fail. Playlist ({0}) does not exist", playlistName);
                     return new SyncResponse { ErrorMessage = "Playlist does not exist", Error = (int)SyncResponse.SyncResponseError.PlaylistNotFound };
                 }
                 
 
-                IEnumerable<SyncAction> desktopChanges = null; // changes that were made on the DESKTOP. Apply to DEVICE.
-                IEnumerable<SyncAction> deviceChanges = null;  // changes that were made on the DEVICE. Apply to DESKTOP.
+                IEnumerable<SyncAction> changesOnDesktop = null; // changes that were made on the DESKTOP. Apply to DEVICE.
 
 
                 // Read and sort the playlists
                 if (!Settings.Default.OneWaySync && File.Exists(playlistPath))
                 {
-                    // TODO: Read iTunes XML for headless operation.
-                    log.InfoFormat("Loading reference playlist {0}...", playlistPath);
+                    Log.InfoFormat("Loading reference playlist {0}...", playlistPath);
                     List<string> referencePlaylist = Helper.LoadPlaylist(playlistPath);
 
-                    desktopChanges = DiffHandler.Diff(desktopPlaylist, referencePlaylist);
-                    deviceChanges = DiffHandler.Diff(devicePlaylist, referencePlaylist);
+                    changesOnDesktop = DiffHandler.Diff(desktopPlaylist, referencePlaylist);
+                    IEnumerable<SyncAction> changesOnDevice = DiffHandler.Diff(devicePlaylist, referencePlaylist);  // changes that were made on the DEVICE. Apply to DESKTOP.
 
                     reconciledPlaylist = new List<string>(desktopPlaylist);
 
                     // Pick REMOVE changes, get associated tracks, and then exclude null ones.
-                    var tracksToDelete = (from change in deviceChanges
+                    var tracksToDelete = (from change in changesOnDevice
                                           where change.Type == SyncType.Remove
                                           select library.GetTrack(change.DeviceLocation)).TakeWhile(t => t != null);
 
 
 
                     // Pick ADD changes
-                    var tracksToAdd = from change in deviceChanges
+                    var tracksToAdd = from change in changesOnDevice
                                       where change.Type == SyncType.Add
                                       select change.DeviceLocation;
 
@@ -212,7 +235,7 @@ namespace WifiSyncServer.Wireless
                         foreach (var track in comLibrary.RemoveTracks(playlist, tracksToDelete))
                         {
                             reconciledPlaylist.Remove(track.GetPlaylistLine(request.DeviceMediaRoot));
-                            log.Info(track.Location);
+                            Log.Info(track.Location);
                         }
                     }
 
@@ -221,47 +244,43 @@ namespace WifiSyncServer.Wireless
                         foreach (var deviceLocation in comLibrary.AddTracks(playlist, tracksToAdd, "All Music", request.DeviceMediaRoot))
                         {
                             reconciledPlaylist.Add(deviceLocation);
-                            log.Info(deviceLocation);
+                            Log.Info(deviceLocation);
                         }
                     }
 
                 }
                 else
                 {
-                    desktopChanges = DiffHandler.Diff(desktopPlaylist, devicePlaylist);
+                    changesOnDesktop = DiffHandler.Diff(desktopPlaylist, devicePlaylist);
                     reconciledPlaylist = desktopPlaylist;
                 }
 
-                // Init SongsDB
-                foreach (var change in desktopChanges)
+                // Make sure we don't delete any tracks still present by other playlists.
+                // Also, we have to use the xml library because COM is too slow.
+                changesOnDesktop = subManager.FixProposedDeletes(CachedXmlLibrary.Library, changesOnDesktop);
+
+                foreach (var change in changesOnDesktop)
                 {
-                    if (change.Type == SyncType.Add)
-                    {
-                        string id = Helper.GetSha1Hash(change.DeviceLocation);
-                        change.TrackPath = "/songs/" + id;
-                        // Remember songs, we we can serve them when client requests
-                        songDb.Add(id, library.GetTrack(change.DeviceLocation).Location);
-                    }
+                    if (change.Type != SyncType.Add) continue;
+
+                    // Remember songs, we we can serve them when client requests
+                    string id = Helper.GetSha1Hash(change.DeviceLocation);
+                    change.TrackPath = "/songs/" + id;
+                    SongDb.Add(id, library.GetTrack(change.DeviceLocation).Location);
                 }
 
                 string playlistKey = Helper.GetSha1Hash(playlistPath);
                 Helper.SavePlaylist(reconciledPlaylist, playlistPath);
-                playlistDb.Add(playlistKey, playlistPath);
+                PlaylistDb.Add(playlistKey, playlistPath);
 
-                SyncResponse syncResponse = new SyncResponse();
-                syncResponse.PlaylistServerPath = "/playlists/" + playlistKey;
-                syncResponse.PlaylistDevicePath = request.PlaylistDevicePath; ;
-                syncResponse.Actions = desktopChanges.ToArray();
-
-                foreach (var item in syncResponse.Actions)
-                {
-                    item.DeviceLocation = Helper.UnEscapeString(item.DeviceLocation);
-                    Debug.Assert(item.DeviceLocation.StartsWith("file"));
-                }
-
-                log.Info("Sending Data:" + Environment.NewLine + syncResponse.ToString());
-
-                //GC.Collect();
+                SyncResponse syncResponse = new SyncResponse
+                                                {
+                                                    PlaylistServerPath = "/playlists/" + playlistKey,
+                                                    PlaylistDevicePath = request.PlaylistDevicePath,
+                                                    Actions = changesOnDesktop.ToArray()
+                                                };
+                syncResponse.Actions.UnEscapeAllDeviceLocations();
+                Log.Debug("Sending Data:" + Environment.NewLine + syncResponse.ToString());
 
                 return syncResponse;
             }

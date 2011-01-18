@@ -1,6 +1,6 @@
 ﻿/**********************************************************************
  * WifiMusicSync
- * Copyright (C) 2011 Nithin Philips
+ * Copyright (C) 2011 Nithin Philips <nithin@nithinphilips.com>
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@ namespace WifiSyncServer.Helpers
     class DiffHandler
     {
         
-        public static IEnumerable<SyncAction> Diff(IEnumerable<string> A, IEnumerable<string> B)
+        public static IEnumerable<SyncAction> Diff(IEnumerable<string> a, IEnumerable<string> b)
         {
             List<SyncAction> result = new List<SyncAction>();
 
-            System.Collections.Generic.HashSet<string> setA = new HashSet<string>(A);
-            System.Collections.Generic.HashSet<string> setB = new HashSet<string>(B);
+            System.Collections.Generic.HashSet<string> setA = new HashSet<string>(a);
+            System.Collections.Generic.HashSet<string> setB = new HashSet<string>(b);
 
             // Let A = pc, B = phone
 
@@ -39,7 +39,6 @@ namespace WifiSyncServer.Helpers
             {
                 if (!setB.Contains(item))
                 {
-                    Debug.Assert(item.StartsWith("file"));
                     result.Add(new SyncAction { Type = SyncType.Add, DeviceLocation = item });
                 }
             }
@@ -48,7 +47,6 @@ namespace WifiSyncServer.Helpers
             {
                 if (!setA.Contains(item))
                 {
-                    Debug.Assert(item.StartsWith("file"));
                     result.Add(new SyncAction { Type = SyncType.Remove, DeviceLocation = item });
                 }
             }

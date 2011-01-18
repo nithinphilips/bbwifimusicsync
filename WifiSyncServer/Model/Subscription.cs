@@ -17,35 +17,28 @@
  *
  **********************************************************************/
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace WifiSyncServer.Model
 {
-    public class SyncResponse : Response
+    public class Subscription : Request
     {
-        public string PlaylistServerPath { get; set; }
-        public string PlaylistDevicePath { get; set; }
-        public SyncAction[] Actions { get; set; }
+        public string[] Playlists { get; set; }
 
-        public override string ToString()
+        public override bool CheckValidate(out Response errorResponse)
         {
-            StringBuilder sb = new StringBuilder();
-
-            if (Error != 0)
+            if (!CheckDeviceId(out errorResponse) ||
+              !CheckDeviceMediaRoot(out errorResponse))
             {
-                sb.AppendLine("Error: " + Error);
-                sb.AppendLine("ErrorMessage: " + ErrorMessage);
+                return false;
             }
 
-            sb.AppendLine("ServerId: " + ServerId);
-            sb.AppendLine("PlaylistServerPath: " + PlaylistServerPath);
-            sb.AppendLine("PlaylistDevicePath: " + PlaylistDevicePath);
-            sb.AppendLine("Actions: ");
-            foreach (var item in Actions)
-            {
-                sb.AppendFormat(" < {0}\n", item);
-            }
-            return sb.ToString();
+            DeviceMediaRoot = DeviceMediaRoot.Trim();
+            if (!DeviceMediaRoot.EndsWith("/")) DeviceMediaRoot = DeviceMediaRoot + "/";
+            return true;
         }
     }
 }

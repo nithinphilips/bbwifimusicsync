@@ -10,6 +10,7 @@ import java.util.Vector;
 import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 import javax.microedition.io.file.FileConnection;
+import javax.microedition.lcdui.Command;
 
 import org.json.me.JSONArray;
 import org.json.me.JSONException;
@@ -19,6 +20,7 @@ import com.fairview5.keepassbb2.common.ui.ProgressDialog;
 import com.nithinphilips.ByteBuffer;
 import com.nithinphilips.Debug;
 import com.nithinphilips.JsonHttpHelper;
+import com.nithinphilips.UiFactory;
 import com.nithinphilips.wifimusicsync.components.InputDialog;
 import com.nithinphilips.wifimusicsync.components.PlaylistSelectionDialog;
 import com.nithinphilips.wifimusicsync.components.ProgressListModel;
@@ -33,7 +35,13 @@ import com.nithinphilips.wifimusicsync.model.SyncAction;
 import com.nithinphilips.wifimusicsync.model.SyncResponse;
 import com.nithinphilips.wifimusicsync.model.UrlBuilder;
 
+import net.rim.device.api.command.CommandHandler;
+import net.rim.device.api.command.CommandMetadata;
+import net.rim.device.api.command.ReadOnlyCommandMetadata;
+import net.rim.device.api.system.Bitmap;
+import net.rim.device.api.ui.Color;
 import net.rim.device.api.ui.DrawStyle;
+import net.rim.device.api.ui.Field;
 import net.rim.device.api.ui.MenuItem;
 import net.rim.device.api.ui.TransitionContext;
 import net.rim.device.api.ui.Ui;
@@ -46,6 +54,14 @@ import net.rim.device.api.ui.component.RichTextField;
 import net.rim.device.api.ui.component.StandardTitleBar;
 import net.rim.device.api.ui.component.Status;
 import net.rim.device.api.ui.container.MainScreen;
+import net.rim.device.api.ui.container.VerticalFieldManager;
+import net.rim.device.api.ui.decor.BackgroundFactory;
+import net.rim.device.api.ui.image.Image;
+import net.rim.device.api.ui.image.ImageFactory;
+import net.rim.device.api.ui.menu.CommandItem;
+import net.rim.device.api.ui.menu.CommandItemProvider;
+import net.rim.device.api.ui.menu.DefaultContextMenuProvider;
+import net.rim.device.api.util.StringProvider;
 
 
 public class WifiMusicSyncScreen extends MainScreen {
@@ -59,6 +75,8 @@ public class WifiMusicSyncScreen extends MainScreen {
 	public WifiMusicSyncScreen() {
 		super(VERTICAL_SCROLL);
 		
+		((VerticalFieldManager) getMainManager()).setBackground(BackgroundFactory.createSolidBackground(Color.BLACK));
+		
 		StandardTitleBar _titleBar = new StandardTitleBar();
 		_titleBar.addTitle("Music Sync");
 		_titleBar.addNotifications();
@@ -71,46 +89,85 @@ public class WifiMusicSyncScreen extends MainScreen {
 		
 		add(myListView);
 		
-		MenuItem menuItemOptions = new MenuItem("Options", 100000, 100) {
-			public void run() {
+		setContextMenuProvider(new DefaultContextMenuProvider());
+		
+		final CommandHandler optionsCommand = new CommandHandler() {
+			public void execute(ReadOnlyCommandMetadata metadata, Object context) {
 				pushSettingsScreen();
 			}
 		};
 		
-		MenuItem menuItemMakePlaylist = new MenuItem("Add Playlist", 100000, 100) {
-			public void run(){
-				subscribe();
-			}
-		};
-		
-		
-		MenuItem menuItemSync = new MenuItem("Sync", 100000, 100) {
-			public void run() {
+		final CommandHandler syncCommand = new CommandHandler() {
+			public void execute(ReadOnlyCommandMetadata metadata, Object context) {
 				sync();
 			}
 		};
 		
-		MenuItem menuItemTest = new MenuItem("Test", 100000, 100) {
+		final CommandHandler subscribeCommand = new CommandHandler() {
+			public void execute(ReadOnlyCommandMetadata metadata, Object context) {
+				subscribe();
+			}
+		};
+		
+		CommandItemProvider provider = new CommandItemProvider() {
+			
+			public Vector getItems(Field field) {
+				Vector items = new Vector();
+
+				// from <https://code.google.com/p/ultimate-gnome/> and Tango-Icon project
+				Image syncIcon = ImageFactory.createImage(Bitmap.getBitmapResource("refresh-reload-sync-icon.png"));
+				items.addElement(new CommandItem(new StringProvider("Sync"), syncIcon, new net.rim.device.api.command.Command(syncCommand)));
+				
+//				Image optionsIcon = ImageFactory.createImage(Bitmap.getBitmapResource("preferences-system.png"));
+//				items.addElement(new CommandItem(new StringProvider("Options"), optionsIcon, new net.rim.device.api.command.Command(optionsCommand)));
+				
+				Image subscribeIcon = ImageFactory.createImage(Bitmap.getBitmapResource("emblem-new-star.png"));
+				items.addElement(new CommandItem(new StringProvider("Choose Playlists"), subscribeIcon, new net.rim.device.api.command.Command(subscribeCommand)));
+				
+				return items;
+			}
+			
+			public Object getContext(Field field) {
+				return field;
+			}
+		};
+		
+		this.setCommandItemProvider(provider);
+		
+		MenuItem menuItemSync = new MenuItem(new StringProvider("Sync"), 10000000, 100);
+		menuItemSync.setCommand(new  net.rim.device.api.command.Command(syncCommand));
+		
+		MenuItem menuItemMakePlaylist = new MenuItem(new StringProvider("Choose Playlists"), 100000, 100);
+		menuItemMakePlaylist.setCommand(new  net.rim.device.api.command.Command(subscribeCommand));
+				
+		MenuItem menuItemOptions = new MenuItem(new StringProvider("Options"), 100000, 100);
+		menuItemOptions.setCommand(new  net.rim.device.api.command.Command(optionsCommand));
+		
+		
+		
+		MenuItem menuItemTest = new MenuItem(new StringProvider("Test"), 10000, 100) {
 			public void run() {
 				Thread t = new Thread() {
 					public void run() {
 						final SyncAction addaction = new SyncAction();
 						final SyncAction remaction = new SyncAction();
 						
-						addaction.setDeviceLocation("file:///SDCard/test.mp3");
+						addaction.setDeviceLocation("file:///SDCard/add.mp3");
 						addaction.setType(SyncAction.ADD);
 						
-						remaction.setDeviceLocation("file:///SDCard/test2/test.mp3");
+						remaction.setDeviceLocation("file:///SDCard/test2/remove.mp3");
 						remaction.setType(SyncAction.REMOVE);
 						
 						addaction.setStatus("Queued");
 						remaction.setStatus("Queued");
 						
 						
+						
+						
 						UiApplication.getUiApplication().invokeLater(new Runnable() {
 							public void run() {
-								myListModel.insert(addaction, myListModel.size());
-								myListModel.insert(remaction, myListModel.size());
+								addaction.setIndex(myListModel.insert(addaction));
+								remaction.setIndex(myListModel.insert(remaction));
 							}
 						});
 						
@@ -120,10 +177,10 @@ public class WifiMusicSyncScreen extends MainScreen {
 			}
 		};
 		
+		addMenuItem(menuItemSync);
 		addMenuItem(menuItemOptions);
 		addMenuItem(menuItemMakePlaylist);
-		addMenuItem(menuItemSync);
-		addMenuItem(menuItemTest);
+		//addMenuItem(menuItemTest);
 	}
 	
 	void subscribe() {
@@ -225,7 +282,7 @@ public class WifiMusicSyncScreen extends MainScreen {
 										myListModel.erase();
 										
 										for (int i = 0; i < actions.length; i++) {
-											myListModel.insert(actions[i]);
+											actions[i].setIndex(myListModel.insert(actions[i]));
 										}
 									}
 								});
@@ -262,11 +319,11 @@ public class WifiMusicSyncScreen extends MainScreen {
         
 		transitionContextIn = new TransitionContext(TransitionContext.TRANSITION_SLIDE);
         transitionContextIn.setIntAttribute(TransitionContext.ATTR_DURATION, 250);
-        transitionContextIn.setIntAttribute(TransitionContext.ATTR_DIRECTION, TransitionContext.DIRECTION_LEFT);              
+        transitionContextIn.setIntAttribute(TransitionContext.ATTR_DIRECTION, TransitionContext.DIRECTION_UP);              
         
         transitionContextOut = new TransitionContext(TransitionContext.TRANSITION_SLIDE);
         transitionContextOut.setIntAttribute(TransitionContext.ATTR_DURATION, 250);
-        transitionContextOut.setIntAttribute(TransitionContext.ATTR_DIRECTION, TransitionContext.DIRECTION_RIGHT);                                                            
+        transitionContextOut.setIntAttribute(TransitionContext.ATTR_DIRECTION, TransitionContext.DIRECTION_DOWN);                                                            
         transitionContextOut.setIntAttribute(TransitionContext.ATTR_KIND, TransitionContext.KIND_OUT);                
                                                                     
         engine.setTransition(null, screen, UiEngineInstance.TRIGGER_PUSH, transitionContextIn);

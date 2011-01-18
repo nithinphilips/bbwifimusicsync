@@ -21,7 +21,7 @@ public class ProgressListModel implements ListFieldCallback, SyncActionChangedCa
   private Vector _data = new Vector();
   private ListField _view;
   private int _defaultRowHeight = Font.getDefault().getHeight() * 2 + 2;
-  private int _defaultRowWidth = _defaultRowHeight;
+  private int _defaultRowWidth = 0;
 
   /** constructor that saves a ref to the model's view - {@link ListField}, and binds this model to the view */
   public ProgressListModel (ListField list, Vector data) {
@@ -45,31 +45,57 @@ public class ProgressListModel implements ListFieldCallback, SyncActionChangedCa
   /** list row renderer */
   public void drawListRow(ListField list, Graphics g, int index, int y, int w) {
 
-	int text_X = 14;
-	  
-	SyncAction task = (SyncAction) _data.elementAt(index);
+	int text_X = 9;
 	
-	if(task.getType() == SyncAction.ADD){
-		g.setColor(0x004D8C54);
-		g.fillRect(0, y, text_X - 2, _defaultRowHeight);
-	}else if(task.getType() == SyncAction.REMOVE){
-		g.setColor(0x008A1C33);
-		g.fillRect(0, y, text_X - 2, _defaultRowHeight);
+	int indexColor = 0x00aaaaaa;
+	
+	if(list.getSelectedIndex() == index){
+		indexColor = 0x00dddddd;
 	}
 	
-	g.setColor(Color.BLACK);
+	
+	
+	SyncAction task = (SyncAction) _data.elementAt(index);
+	
+	g.setColor(indexColor);
+	g.setFont(Font.getDefault().derive(0, _defaultRowHeight + 5));
+	
+	String _indexStr = Integer.toString(task.getIndex() + 1);
+	if(_indexStr.length() <= 1) _indexStr = "0" + _indexStr;
+	int x_offset = g.drawText(_indexStr, text_X - 1, y - 4);
+
+	if(task.getType() == SyncAction.ADD){
+		g.setColor(0x0046F277);
+	}else{
+		g.setColor(0x00FC4747);
+	}
+	
+	g.fillRect(0, y, text_X - 2, _defaultRowHeight);
+
+	if(index == 0){
+		g.setColor(indexColor);
+	    g.drawLine(0, y , w, y);
+	}
+	
+	text_X += x_offset - 2;
+	
+	g.setColor(Color.WHITE);
     // draw the text /w ellipsis if it's too long...
-    g.drawText(task.getFileName(), text_X + 3, y, DrawStyle.LEADING | DrawStyle.ELLIPSIS,
-               w - _defaultRowWidth);
+	g.setFont(Font.getDefault());
+    g.drawText(task.getFileName(), text_X, y, DrawStyle.LEADING | DrawStyle.ELLIPSIS,
+               w);
     
     g.setColor(Color.GRAY);
-    g.setFont(Font.getDefault().derive(Font.ITALIC, Font.getDefault().getHeight() - 3));
+    g.setFont(Font.getDefault().derive(0, Font.getDefault().getHeight() - 3));
     
-    g.drawText(task.getStatus(), text_X + 3, y + Font.getDefault().getHeight() + 2, DrawStyle.LEADING | DrawStyle.ELLIPSIS,
-            w - _defaultRowWidth);
+    g.drawText(task.getStatus(), text_X, y + Font.getDefault().getHeight() + 2, DrawStyle.LEADING | DrawStyle.ELLIPSIS,
+            w);
 
     // draw the to the left of the text...
     //g.drawBitmap(0, y, _bitmap.getWidth(), _bitmap.getHeight(), _bitmap, 0, 0);
+    
+    g.setColor(indexColor);
+    g.drawLine(0, y + _defaultRowHeight - 1 , w, y + _defaultRowHeight - 1);
 
   }
 
@@ -92,15 +118,17 @@ public class ProgressListModel implements ListFieldCallback, SyncActionChangedCa
   // data manipulation methods...  not part of the interface
   //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-  public void insert(SyncAction toInsert) {
-	  insert(toInsert, this.size());
+  public int insert(SyncAction toInsert) {
+	  int index = this.size();
+	  insert(toInsert, index);
+	  return index;
   }
   
   /** mutator, which syncs model and view */
   public void insert(SyncAction toInsert, int index) {
     // update the model
     _data.addElement(toInsert);
-
+    
     // update the view
     _view.insert(index);
   }
@@ -135,8 +163,7 @@ public class ProgressListModel implements ListFieldCallback, SyncActionChangedCa
   }
 
   public void changed(SyncAction action) {
-		int index = _data.indexOf(action);
-		if(index >= 0) _view.invalidate(index);
-	}
+		modify(action, action.getIndex());
+  }
   
 }

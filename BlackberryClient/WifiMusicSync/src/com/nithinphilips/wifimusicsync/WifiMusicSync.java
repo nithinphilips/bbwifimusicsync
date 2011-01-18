@@ -1,13 +1,6 @@
 package com.nithinphilips.wifimusicsync;
 
-import java.io.IOException;
 import java.util.Vector;
-
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
-
-import com.nithinphilips.wifimusicsync.model.PlaylistRequest;
-import com.nithinphilips.wifimusicsync.model.SyncResponse;
 
 import net.rim.device.api.ui.UiApplication;
 
@@ -21,7 +14,7 @@ public final class WifiMusicSync extends UiApplication{
 		
 //		try {
 //			System.out.println("---------------------------------------------");
-//			SyncResponse response = SyncResponse.fromJson(new JSONObject("{\"Error\":0,\"ErrorMessage\":null,\"ServerId\":\"WiFiMusicSync 1.0\",\"PlaylistServerPath\":\"/playlists/df81e8fde0181a565e268ab3130a25720ec089c5\",\"PlaylistDevicePath\":\"file:///SDCard/Test.m3u\",\"Actions\":[{\"Type\":\"Add\",\"DeviceLocation\":\"file:///SDCard/Blackberry/music/WiFiSync/The A_Teens/Pop 'Til You Drop/01 - Floorfiller.mp3\",\"TrackPath\":\"/songs/8a6e93b78958ad17f52c0bb4c6d8025ad90e0d19\"},{\"Type\":\"Add\",\"DeviceLocation\":\"file:///SDCard/Blackberry/music/WiFiSync/Blitzen Trapper/Furr/03 - Furr.mp3\",\"TrackPath\":\"/songs/c84bde1dcd210e3d947a1c8dd9a837985f42a32e\"},{\"Type\":\"Add\",\"DeviceLocation\":\"file:///SDCard/Blackberry/music/WiFiSync/Tom Petty/Highway Companion/04 - Down South.mp3\",\"TrackPath\":\"/songs/998ea6c0156c96fd0546c24a5fad05625e605882\"}]}"), "http://192.168.0.104:9000");
+//			PlaylistListResponse response = PlaylistListResponse.fromJson(new JSONObject("{\"Tracks\":[{\"Name\":\"Library\",\"TrackCount\":23437},{\"Name\":\"Neethu\",\"TrackCount\":95}]}"));
 //			System.out.println(response.toString());
 //			System.out.println("---------------------------------------------");
 //		} catch (JSONException e) {

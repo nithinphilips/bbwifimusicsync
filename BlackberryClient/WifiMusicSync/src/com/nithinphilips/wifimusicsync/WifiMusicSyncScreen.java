@@ -18,10 +18,17 @@ import org.json.me.JSONObject;
 import com.nithinphilips.ByteBuffer;
 import com.nithinphilips.Debug;
 import com.nithinphilips.JsonHttpHelper;
+import com.nithinphilips.wifimusicsync.components.InputDialog;
+import com.nithinphilips.wifimusicsync.components.PlaylistSelectionDialog;
 import com.nithinphilips.wifimusicsync.controller.PlaylistDownloader;
+import com.nithinphilips.wifimusicsync.controller.Subscriber;
+import com.nithinphilips.wifimusicsync.model.PlaylistInfo;
+import com.nithinphilips.wifimusicsync.model.PlaylistListResponse;
 import com.nithinphilips.wifimusicsync.model.PlaylistRequest;
+import com.nithinphilips.wifimusicsync.model.Subscription;
 import com.nithinphilips.wifimusicsync.model.SyncAction;
 import com.nithinphilips.wifimusicsync.model.SyncResponse;
+import com.nithinphilips.wifimusicsync.model.UrlBuilder;
 
 import net.rim.device.api.ui.MenuItem;
 import net.rim.device.api.ui.UiApplication;
@@ -38,6 +45,8 @@ public class WifiMusicSyncScreen extends MainScreen {
 	// Please Wait Screen: http://supportforums.blackberry.com/t5/Java-Development/Sample-quot-Please-Wait-quot-screen-part-1/ta-p/493808
 	
 	static String CLIENT_ID = "93a83cb36e87e65aL";
+	String root = "file:///SDCard/Blackberry/music/WiFiSync/";
+	String serverUrl = "http://192.168.0.104:9000";
 	
 	RichTextField statusField;
 	
@@ -54,29 +63,67 @@ public class WifiMusicSyncScreen extends MainScreen {
 		
 		add(statusField);
 		
-
+		MenuItem menuItemMakePlaylist = new MenuItem("Add Playlist", 100000, 100) {
+			public void run(){
+				String choices[] = {"Ok","Cancel"}; 
+				int values[] = {Dialog.OK,Dialog.CANCEL}; 
+				final InputDialog diag = new InputDialog(); 
+				UiApplication.getUiApplication().invokeLater(
+						new Runnable() { 
+							public void run() { 
+								PlaylistInfo[] playlists;
+								try {
+									
+									Subscriber subscriber = new Subscriber(serverUrl, root, CLIENT_ID);
+									
+									playlists = subscriber.getPlaylists();
+								
+									if(playlists != null){ 
+										PlaylistSelectionDialog diag = new PlaylistSelectionDialog(playlists);
+										UiApplication.getUiApplication().pushModalScreen(diag); 
+										if(diag.getResult() == Dialog.OK) {
+											// 1. Add newly checked playlists
+											for (int i = 0; i < playlists.length; i++) {
+												if(playlists[i].isSelected())
+													playlists[i].createOnFileSystem(root);
+												else
+													playlists[i].deleteOnFileSystem(root);
+											}
+											
+											// 2. A. Delete unchecked playlists B. Cleanup unreferenced tracks
+											subscriber.updateSubscription();
+										}
+									}
+								} catch (JSONException e) {
+									log(e.toString());
+								} catch (IOException e) {
+									log(e.toString());
+								}
+				} }); 
+			}
+		};
+		
+		
 		MenuItem menuItemSync = new MenuItem("Sync", 100000, 100) {
 			public void run() {
 				Thread t = new Thread() {
 					public void run() {
-						String root = "file:///SDCard/Blackberry/music/WiFiSync/";
 						
 						try {
-							Enumeration playlists = findPlaylists(root);
+							Enumeration playlists = Subscriber.findPlaylists(root);
 							
 							if(playlists != null){
 								while (playlists.hasMoreElements()) {
 									String playlist = root + (String) playlists.nextElement();
-									log("------------------------");
-									log(playlist);
-									PlaylistDownloader downloader = 
-										new PlaylistDownloader(
-												"http://192.168.0.104:9000", 
+									//log(playlist);
+									PlaylistDownloader downloader =  new PlaylistDownloader(serverUrl, 
 												playlist, 
 												root, 
 												CLIENT_ID);
 									downloader.syncPlaylist();
 								}
+							}else{
+								log("No playlists found");
 							}
 //						} catch (Throwable t){
 //							
@@ -95,40 +142,20 @@ public class WifiMusicSyncScreen extends MainScreen {
 			}
 		};
 		
+		addMenuItem(menuItemMakePlaylist);
 		addMenuItem(menuItemSync);
 	}
 	
+	
+	
 	private void log(final String message)
 	{
-		//Dialog.alert(message);
 		UiApplication.getUiApplication().invokeLater(new Runnable() {
 			public void run() {
+				Dialog.alert(message);
 				statusField.setText(statusField.getText() + "\n" + message);
 			}
 		});
 	}
-	
-	Enumeration findPlaylists(String root) throws IOException
-	{
-		FileConnection fileConnection = null;
-		try{
-			fileConnection = (FileConnection) Connector.open(root, Connector.READ);
-			if(fileConnection.exists() && fileConnection.isDirectory())
-			{
-				return fileConnection.list("*.m3u", false);
-			}else{
-				return null;
-			}
-		}finally {
-			if (fileConnection != null) {
-				try {
-					fileConnection.close();
-				} catch (Exception error) {
-					/* log error */
-				}
-			}
-		}
-	}
-	
 	
 }

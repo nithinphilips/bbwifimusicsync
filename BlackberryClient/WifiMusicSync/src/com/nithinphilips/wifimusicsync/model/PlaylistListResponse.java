@@ -18,7 +18,7 @@ public class PlaylistListResponse {
 	}
 
 	public static PlaylistListResponse fromJson(JSONObject json) throws JSONException{
-		JSONArray tracks = json.getJSONArray("Tracks");
+		JSONArray tracks = json.getJSONArray("Playlists");
 		PlaylistInfo[] playlists = new PlaylistInfo[tracks.length()];
 		
 		for (int i = 0; i < playlists.length; i++) {
@@ -26,6 +26,15 @@ public class PlaylistListResponse {
 		}
 		
 		return new PlaylistListResponse(playlists);
+	}
+	
+	public String toString(){
+		StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < playlists.length; i++) {
+        	sb.append(playlists[i].toString());
+        	sb.append("\n");
+		}
+        return sb.toString();
 	}
 	
 }

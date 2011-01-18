@@ -26,6 +26,11 @@ public class UrlBuilder {
 		return serverRoot + "/query";
 	}
 	
+	public String getSubscribe()
+	{
+		return serverRoot + "/subscribe";
+	}
+	
 	public String getHelloUrl()
 	{
 		return serverRoot + "/hello";

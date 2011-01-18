@@ -74,7 +74,7 @@ public class PlaylistDownloader {
 		}
 	}
 
-	void executeActions(SyncAction[] actions) throws JSONException, IOException {
+	public static void executeActions(SyncAction[] actions) throws JSONException, IOException {
 		for (int i = 0; i < actions.length; i++) {
 			if (actions[i].getType() == SyncAction.ADD) {
 				log("Add " + actions[i].getTrackUrl() + " "
@@ -90,11 +90,11 @@ public class PlaylistDownloader {
 		}
 	}
 
-	private void log(String string) {
+	private static void log(String string) {
 
 	}
 
-	void deleteFile(String fileName) throws IOException {
+	static void deleteFile(String fileName) throws IOException {
 		FileConnection fileConnection = null;
 		try {
 			fileConnection = (FileConnection) Connector.open(fileName);
@@ -113,7 +113,7 @@ public class PlaylistDownloader {
 
 	static final int BUFFER_SIZE = 1024;
 
-	void createDirectoryTree(String fileName) throws IOException {
+	public static void createDirectoryTree(String fileName) throws IOException {
 		// Create directories
 		String[] segments = WifiMusicSync.getDirectories("file:///", fileName);
 		for (int i = 0; i < segments.length - 1; i++) {
@@ -122,14 +122,15 @@ public class PlaylistDownloader {
 					Connector.READ_WRITE);
 			if (!dir.exists())
 				dir.mkdir();
+			dir.close();
 		}
 	}
 
-	void downloadFile(String url, String fileName) throws IOException {
+	static void downloadFile(String url, String fileName) throws IOException {
 		downloadFile(url, fileName, false);
 	}
 
-	void downloadFile(final String url, final String fileName,
+	static void downloadFile(final String url, final String fileName,
 			boolean forceOverwrite) throws IOException {
 		log("Downloading: " + fileName + " from: " + url);
 

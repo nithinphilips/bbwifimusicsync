@@ -14,43 +14,27 @@ import org.json.me.JSONObject;
 import com.nithinphilips.ByteBuffer;
 import com.nithinphilips.wifimusicsync.WifiMusicSync;
 
-public class PlaylistRequest {
+public class PlaylistRequest extends Request {
 	
-	String DeviceId = null;
-	String PlaylistDevicePath = null;
-	String DeviceMediaRoot = null;
-    Vector PlaylistData = null;
+	
+	String playlistDevicePath = null;
+	
+    Vector playlistData = null;
     
     public String getPlaylistDevicePath() {
-		return PlaylistDevicePath;
+		return playlistDevicePath;
 	}
     
 	public void setPlaylistDevicePath(String playlistDevicePath) {
-		PlaylistDevicePath = playlistDevicePath;
-	}
-	
-	public String getDeviceId() {
-		return DeviceId;
-	}
-	
-	public void setDeviceId(String deviceId) {
-		DeviceId = deviceId;
-	}
-
-	public String getDeviceMediaRoot() {
-		return DeviceMediaRoot;
-	}
-	
-	public void setDeviceMediaRoot(String deviceMediaRoot) {
-		DeviceMediaRoot = deviceMediaRoot;
+		this.playlistDevicePath = playlistDevicePath;
 	}
 	
 	public Vector getPlaylistData() {
-		return PlaylistData;
+		return playlistData;
 	}
 	
 	public void setPlaylistData(Vector playlistData) {
-		PlaylistData = playlistData;
+		this.playlistData = playlistData;
 	}
 	
 	public void loadPlaylistData(String filePath) throws IOException{
@@ -71,19 +55,18 @@ public class PlaylistRequest {
 
 	public JSONObject toJsonObject() throws JSONException {
 		JSONObject plsJsonReq = new JSONObject();
-		plsJsonReq.put("DeviceId", DeviceId);
-		plsJsonReq.put("PlaylistDevicePath", PlaylistDevicePath);
-		plsJsonReq.put("DeviceMediaRoot", DeviceMediaRoot);
+		plsJsonReq.put("DeviceId", deviceId);
+		plsJsonReq.put("PlaylistDevicePath", playlistDevicePath);
+		plsJsonReq.put("DeviceMediaRoot", deviceMediaRoot);
 
-		if(PlaylistData != null){
-			JSONArray plsJsonData = new JSONArray(PlaylistData);
+		if(playlistData != null){
+			JSONArray plsJsonData = new JSONArray(playlistData);
 			plsJsonReq.put("PlaylistData", plsJsonData);
 		}else{
 			plsJsonReq.put("PlaylistData", new JSONArray());
 		}
 
 		return plsJsonReq;
-		
 	}
 	
 }

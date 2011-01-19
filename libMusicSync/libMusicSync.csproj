@@ -48,6 +48,7 @@
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Helpers\Helper.cs" />
     <Compile Include="Helpers\CachedXmliTunesLibrary.cs" />
+    <Compile Include="Helpers\SubscriptionManager.cs" />
     <Compile Include="iTunesExport\Parser\IPlaylist.cs" />
     <Compile Include="iTunesExport\Parser\ITrack.cs" />
     <Compile Include="iTunesExport\Parser\LibraryParser.cs" />
@@ -55,6 +56,10 @@
     <Compile Include="iTunesExport\Parser\Track.cs" />
     <Compile Include="iTunes\iTunesLibrary.cs" />
     <Compile Include="iTunes\XmliTunesLibrary.cs" />
+    <Compile Include="Model\SyncResponseError.cs" />
+    <Compile Include="Model\ISubscription.cs" />
+    <Compile Include="Model\SyncAction.cs" />
+    <Compile Include="Model\SyncType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

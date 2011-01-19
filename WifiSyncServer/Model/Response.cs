@@ -17,11 +17,6 @@
  *
  **********************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace WifiSyncServer.Model
 {
     public abstract class Response
@@ -37,12 +32,5 @@ namespace WifiSyncServer.Model
         public int Error { get; set; }
         public string ErrorMessage { get; set; }
         public string ServerId { get; set; }
-
-        public enum SyncResponseError
-        {
-            None = 0,
-            RequiredParameterMissing = 10,
-            PlaylistNotFound = 100
-        }
     }
 }

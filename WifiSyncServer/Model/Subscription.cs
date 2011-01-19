@@ -17,17 +17,16 @@
  *
  **********************************************************************/
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
+using System.Xml.Serialization;
+using libMusicSync.Model;
 
 namespace WifiSyncServer.Model
 {
-    public class Subscription : Request
+    public class Subscription : Request, ISubscription
     {
         public string[] Playlists { get; set; }
-
+ 
         public override bool CheckValidate(out Response errorResponse)
         {
             if (!CheckDeviceId(out errorResponse) ||
@@ -40,5 +39,31 @@ namespace WifiSyncServer.Model
             if (!DeviceMediaRoot.EndsWith("/")) DeviceMediaRoot = DeviceMediaRoot + "/";
             return true;
         }
+
+        public static Subscription Deserialize(string path)
+        {
+            XmlSerializer deserializer = new XmlSerializer(typeof(Subscription));
+            using (Stream s = File.OpenRead(path))
+            {
+                return deserializer.Deserialize(s) as Subscription;
+            }
+        }
+
+        public static void Serialize(Subscription obj, string path)
+        {
+            string dirName = System.IO.Path.GetDirectoryName(path);
+
+            if ((dirName != null) && !Directory.Exists(dirName))
+                Directory.CreateDirectory(dirName);
+            else if (File.Exists(path))
+                File.Delete(path);
+
+            XmlSerializer serializer = new XmlSerializer(typeof(Subscription));
+            using (Stream s = File.OpenWrite(path))
+            {
+                serializer.Serialize(s, obj);
+            }
+        }
+
     }
 }

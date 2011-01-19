@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using libMusicSync.Model;
 using WifiSyncServer.Model;
 
 namespace WifiSyncServer.Helpers

@@ -17,39 +17,28 @@
  *
  **********************************************************************/
 
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Xml.Serialization;
 using libMusicSync.iTunes;
 using libMusicSync.iTunesExport.Parser;
-using WifiSyncServer.Model;
+using libMusicSync.Model;
 using libMusicSync.Extensions;
 
-namespace WifiSyncServer.Helpers
+namespace libMusicSync.Helpers
 {
     public class SubscriptionManager
     {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
-        public string Path { get; private set; }
-        public Subscription Subscription { get; private set; }
+        public ISubscription Subscription { get; private set; }
 
         /// <summary>
-        /// Creates a new SubscriptionManager for the device with deviceId.
-        /// If a subscription exists, it is loaded from disk, otherwise it is created.
+        /// Creates a new Subscription Manager.
         /// </summary>
-        /// <param name="safeDeviceId">The ID of the device.</param>
-        public SubscriptionManager(string safeDeviceId)
+        /// <param name="subscription">The subscription to manage.</param>
+        public SubscriptionManager(ISubscription subscription)
         {
-            Path = GetPath(safeDeviceId);
-            Subscription = File.Exists(Path) ? Deserialize(Path) : null;
-        }
-
-        static string GetPath(String safeDeviceId)
-        {
-            return System.IO.Path.Combine(safeDeviceId, "Subscription.xml");
+            this.Subscription = subscription;
         }
 
         /// <summary>
@@ -114,7 +103,7 @@ namespace WifiSyncServer.Helpers
             );
         }
 
-        public SyncAction[] GetGarbageActions(iTunesLibrary library, Subscription newSubscription)
+        public SyncAction[] GetGarbageActions(iTunesLibrary library, ISubscription newSubscription)
         {
             return (from gTrack in GetGarbageTracks(library, newSubscription)
                     select new SyncAction {DeviceLocation = gTrack, Type = SyncType.Remove}).ToArray();
@@ -126,7 +115,7 @@ namespace WifiSyncServer.Helpers
         /// <param name="library">The libray that can be used to access tracks. (for iTunes, the XML library is preferred, COM access is slow for enumeration)</param>
         /// <param name="newSubscription">The new subscription request from the client.</param>
         /// <returns>A list of all tracks that will no longer be referred to by any playlists.</returns>
-        public IEnumerable<string> GetGarbageTracks(iTunesLibrary library, Subscription newSubscription)
+        public IEnumerable<string> GetGarbageTracks(iTunesLibrary library, ISubscription newSubscription)
         {
             // We don't have anything to compare to = nothing to clean up.
             if (Subscription == null) return new List<string>();
@@ -137,42 +126,6 @@ namespace WifiSyncServer.Helpers
             currentTracks.ExceptWith(newTracks);
 
             return currentTracks;
-        }
-
-        public void SaveToDisk()
-        {
-            if (Subscription != null) Serialize(Subscription, Path);
-        }
-
-        public static void SaveToDisk(Subscription subscription)
-        {
-            if (subscription != null) Serialize(subscription, GetPath(subscription.SafeDeviceId));
-        }
-
-
-        private static Subscription Deserialize(string path)
-        {
-            XmlSerializer deserializer = new XmlSerializer(typeof(Subscription));
-            using (Stream s = File.OpenRead(path))
-            {
-                return deserializer.Deserialize(s) as Subscription;
-            }
-        }
-
-        private static void Serialize(Subscription obj, string path)
-        {
-            string dirName = System.IO.Path.GetDirectoryName(path);
-
-            if ((dirName != null) && !Directory.Exists(dirName))
-                Directory.CreateDirectory(dirName);
-            else if (File.Exists(path)) 
-                File.Delete(path);
-            
-            XmlSerializer serializer = new XmlSerializer(typeof (Subscription));
-            using (Stream s = File.OpenWrite(path))
-            {
-                serializer.Serialize(s, obj);
-            }
         }
     }
 }

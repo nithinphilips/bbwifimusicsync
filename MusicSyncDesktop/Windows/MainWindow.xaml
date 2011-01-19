@@ -1,15 +1,13 @@
-﻿<Window x:Class="WifiSyncDesktopClient.Windows.MainWindow"
+﻿<Window x:Class="WifiSyncDesktop.Windows.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:QuickZip="clr-namespace:WifiSyncDesktop.QuickZip" 
-        xmlns:Converters="clr-namespace:QDownloader.Utilities" 
-        xmlns:Controls="clr-namespace:ImageBuildHelper.Controls" xmlns:QControls="clr-namespace:QuickZip.Controls" WindowStartupLocation="CenterScreen"
+        xmlns:QControls="clr-namespace:QuickZip.Controls" xmlns:Utilities="clr-namespace:WifiSyncDesktop.Utilities" xmlns:Tools="clr-namespace:QuickZip.Tools" WindowStartupLocation="CenterScreen"
+        Loaded="Window_Loaded"
+        Icon="../refresh-reload-sync-icon.ico"
         Title="WiFi Music Sync" Height="600" Width="500">
     <Window.Resources>
-        <Converters:TransferredRateConverter x:Key="friendlySizeConverter" />
-        <Converters:BooleanStyleConverter x:Key="boolToStyleConverter" />
-        <Converters:EnumBooleanConverter x:Key="enumBoolConverter" />
-        <Converters:ShortenPathConverter x:Key="shortenPathConverter" />
+        <Utilities:BooleanStyleConverter x:Key="boolToStyleConverter" />
+        <Utilities:ShortenPathConverter x:Key="shortenPathConverter" />
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="NextPage" CanExecute="sync_CanExecute" Executed="sync_Executed" />
@@ -26,9 +24,9 @@
                 </LinearGradientBrush>
             </StackPanel.Background>
             
-            <Controls:ReflectionControl Margin="5,17,0,-2" HorizontalAlignment="Left" VerticalAlignment="Bottom">
+            <Utilities:ReflectionControl Margin="5,17,0,-2" HorizontalAlignment="Left" VerticalAlignment="Bottom">
                 <TextBlock Padding="0" Margin="0, -5, 0, 0" FontSize="22" Foreground="White" FontWeight="SemiBold" Text="WiFi Music Sync" />
-            </Controls:ReflectionControl>
+            </Utilities:ReflectionControl>
         </StackPanel>
 
         <StatusBar DockPanel.Dock="Bottom">
@@ -103,7 +101,7 @@
                         <QControls:SelectFolderTextBox.Text>
                             <Binding Path="Path" UpdateSourceTrigger="PropertyChanged">
                                 <Binding.ValidationRules>
-                                    <QuickZip:PathNotEmptyRule />
+                                    <Tools:PathNotEmptyRule />
                                 </Binding.ValidationRules>
                             </Binding>
                         </QControls:SelectFolderTextBox.Text>

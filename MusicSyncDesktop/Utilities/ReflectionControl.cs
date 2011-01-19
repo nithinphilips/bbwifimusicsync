@@ -1,11 +1,11 @@
-﻿using System;
+﻿// from http://www.nbdtech.com/blog/archive/2007/11/21/WPF-Reflection-Control.aspx
+
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace ImageBuildHelper.Controls
+namespace WifiSyncDesktop.Utilities
 {
-    // from http://www.nbdtech.com/blog/archive/2007/11/21/WPF-Reflection-Control.aspx
     public class ReflectionControl : Decorator
     {
         private VisualBrush _reflection;

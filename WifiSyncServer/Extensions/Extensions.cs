@@ -21,6 +21,7 @@ using System.IO;
 using iTunesLib;
 using libMusicSync.Helpers;
 using libMusicSync.iTunesExport.Parser;
+using libMusicSync.Model;
 using WifiSyncServer.Model;
 
 namespace WifiSyncServer.Extensions

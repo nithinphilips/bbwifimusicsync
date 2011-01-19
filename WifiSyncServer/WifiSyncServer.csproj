@@ -64,18 +64,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\DataManager.cs" />
     <Compile Include="Helpers\DiffHandler.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Helpers\IITTrackEnumerator.cs" />
-    <Compile Include="Helpers\SubscriptionManager.cs" />
     <Compile Include="iTunes\ComiTunesLibrary.cs" />
     <Compile Include="Model\PlaylistRequest.cs" />
     <Compile Include="Model\Request.cs" />
     <Compile Include="Model\Response.cs" />
     <Compile Include="Model\Subscription.cs" />
-    <Compile Include="Model\SyncAction.cs" />
     <Compile Include="Model\SyncResponse.cs" />
-    <Compile Include="Model\SyncType.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -83,7 +81,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Wireless\ServerService.cs" />
+    <Compile Include="ServerService.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="iTunesLib">

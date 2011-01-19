@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using libMusicSync.Helpers;
+using libMusicSync.Model;
 
 namespace WifiSyncServer.Model
 {
@@ -67,7 +68,7 @@ namespace WifiSyncServer.Model
             errorResponse = null;
             if (string.IsNullOrWhiteSpace(parameter))
             {
-                errorResponse = new SyncResponse { ErrorMessage = "Required parameter is missing or empty: " + parameterName, Error = (int)SyncResponse.SyncResponseError.RequiredParameterMissing };
+                errorResponse = new SyncResponse { ErrorMessage = "Required parameter is missing or empty: " + parameterName, Error = (int)SyncResponseError.RequiredParameterMissing };
                 return false;
             }
 

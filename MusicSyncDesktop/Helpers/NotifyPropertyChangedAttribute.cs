@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Part of PostSharp samples.
+
+using System;
 using System.ComponentModel;
 using PostSharp.Aspects;
 using PostSharp.Aspects.Advices;

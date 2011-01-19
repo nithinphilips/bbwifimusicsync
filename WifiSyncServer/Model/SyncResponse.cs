@@ -18,6 +18,7 @@
  **********************************************************************/
 
 using System.Text;
+using libMusicSync.Model;
 
 namespace WifiSyncServer.Model
 {

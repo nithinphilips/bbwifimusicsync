@@ -23,7 +23,7 @@ using libMusicSync.Extensions;
 using libMusicSync.Helpers;
 using libMusicSync.iTunesExport.Parser;
 using WifiSyncDesktop.Model;
-using WifiSyncDesktopClient.Threading;
+using WifiSyncDesktop.Threading;
 using LibQdownloader.Utilities;
 using System.IO;
 
@@ -54,11 +54,9 @@ namespace WifiSyncDesktop.Helpers
 
         public static IEnumerable<FileCopyJob> GetSelectedTracksUniqueAsFileCopyJobs(this SyncSettings s)
         {
-            string root = System.IO.Path.Combine(s.Path, "Songs");
-
             foreach (var item in s.GetSelectedTracksUnique())
             {
-                string targetPath = item.GetPlaylistLine(root, System.IO.Path.DirectorySeparatorChar, false);
+                string targetPath = item.GetPlaylistLine(s.Path, System.IO.Path.DirectorySeparatorChar, false);
                 if (!File.Exists(targetPath))
                 {
                     yield return new FileCopyJob

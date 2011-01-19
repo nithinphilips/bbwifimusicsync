@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Controls;
 
-namespace WifiSyncDesktop.QuickZip
+namespace QuickZip.Tools
 {
     public class PathNotEmptyRule : ValidationRule
     {

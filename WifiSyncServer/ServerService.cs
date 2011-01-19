@@ -27,6 +27,7 @@ using libMusicSync.Extensions;
 using libMusicSync.Helpers;
 using libMusicSync.iTunes;
 using libMusicSync.iTunesExport.Parser;
+using libMusicSync.Model;
 using log4net;
 using WifiSyncServer.Helpers;
 using WifiSyncServer.iTunes;
@@ -34,7 +35,7 @@ using WifiSyncServer.Model;
 using WifiSyncServer.Properties;
 using WifiSyncServer.Extensions;
 
-namespace WifiSyncServer.Wireless
+namespace WifiSyncServer
 {
     public class ServerService : KayakService
     {
@@ -59,12 +60,11 @@ namespace WifiSyncServer.Wireless
                 Log.Info("Sending file: " + SongDb[id]);
                 return new FileInfo(SongDb[id]);
             }
-            else
-            {
-                Log.Warn("File Not Found: " + id);
-                Response.SetStatusToNotFound();
-                return null;
-            }
+
+            // Failure
+            Log.Warn("File Not Found: " + id);
+            Response.SetStatusToNotFound();
+            return null;
         }
 
         [Path("/playlists/{id}")]
@@ -75,12 +75,11 @@ namespace WifiSyncServer.Wireless
                 Log.Info("Sending playlist: " + PlaylistDb[id]);
                 return new FileInfo(PlaylistDb[id]);
             }
-            else
-            {
-                Log.Warn("Playlist Not Found: " + id);
-                Response.SetStatusToNotFound();
-                return null;
-            }
+
+            // Failure
+            Log.Warn("Playlist Not Found: " + id);
+            Response.SetStatusToNotFound();
+            return null;
         }
 
 #if DEBUG
@@ -127,24 +126,33 @@ namespace WifiSyncServer.Wireless
         [Verb("POST")]
         [Verb("PUT")]
         [Path("/subscribe")]
-        public Response Subscribe([RequestBody]Subscription s)
+        public Response Subscribe([RequestBody]Subscription newSubscription)
         {
             Log.Info("Updating subscription");
 
             // Check for errors
             Response errorResponse;
-            if (!s.CheckValidate(out errorResponse)) return errorResponse;
+            if (!newSubscription.CheckValidate(out errorResponse)) return errorResponse;
 
+            SyncAction[] actions;
             // Get garbage tracks list
-            SubscriptionManager man = new SubscriptionManager(s.SafeDeviceId); // Current subscription
-            SyncAction[] actions = man.GetGarbageActions(CachedXmlLibrary.Library, s);
-            actions.UnEscapeAllDeviceLocations();
+            Subscription oldSubscription = DataManager.GetSubscription(newSubscription.SafeDeviceId);
+            if (oldSubscription != null)
+            {
+                SubscriptionManager man = new SubscriptionManager(oldSubscription); // Current subscription
+                actions = man.GetGarbageActions(CachedXmlLibrary.Library, newSubscription);
+                actions.UnEscapeAllDeviceLocations();
+            }
+            else
+            {
+                actions = new SyncAction[] {};
+            }
 
             Log.Info("Saving subscription to disk.");
-            SubscriptionManager.SaveToDisk(s);
+            DataManager.SaveSubscription(newSubscription);
 
             SyncResponse response = new SyncResponse { Actions = actions };
-            Log.Debug("Sending cleanup data:" + Environment.NewLine + response.ToString());
+            Log.Debug("Sending cleanup data:" + Environment.NewLine + response);
             return response;
         }
         
@@ -160,16 +168,16 @@ namespace WifiSyncServer.Wireless
             Response errorResponse;
             if (!request.CheckValidate(out errorResponse)) return errorResponse;
 
-            using (log4net.ThreadContext.Stacks["NDC"].Push("Client " + request.DeviceId))
+            using (ThreadContext.Stacks["NDC"].Push("Client " + request.DeviceId))
             {
                 Log.Info("Client " + request.DeviceId + " connected.");
-                Log.Debug("Received Data:" + Environment.NewLine + request.ToString());
+                Log.Debug("Received Data:" + Environment.NewLine + request);
 
                 string playlistName = Path.GetFileNameWithoutExtension(request.PlaylistDevicePath);
-                SubscriptionManager subManager = new SubscriptionManager(request.SafeDeviceId);
+                Subscription subscription = DataManager.GetSubscription(request.SafeDeviceId) ?? new Subscription();
+                SubscriptionManager subManager = new SubscriptionManager(subscription);
 
-                Directory.CreateDirectory(request.SafeDeviceId);
-                string playlistPath = Path.Combine(request.SafeDeviceId, request.SafePlaylistDevicePath);
+                string playlistPath = DataManager.GetDevicePlaylistDir(request);
 
                 List<string> reconciledPlaylist;
 
@@ -199,7 +207,7 @@ namespace WifiSyncServer.Wireless
                 else
                 {
                     Log.WarnFormat("Fail. Playlist ({0}) does not exist", playlistName);
-                    return new SyncResponse { ErrorMessage = "Playlist does not exist", Error = (int)SyncResponse.SyncResponseError.PlaylistNotFound };
+                    return new SyncResponse { ErrorMessage = "Playlist does not exist", Error = (int)SyncResponseError.PlaylistNotFound };
                 }
                 
 

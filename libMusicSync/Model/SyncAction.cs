@@ -17,7 +17,7 @@
  *
  **********************************************************************/
 
-namespace WifiSyncServer.Model
+namespace libMusicSync.Model
 {
     public class SyncAction
     {

@@ -17,12 +17,25 @@
  *
  **********************************************************************/
 
-namespace WifiSyncServer.Model
+namespace libMusicSync.Model
 {
-    public enum SyncType
+    public interface ISubscription
     {
-        None = 0,
-        Add = 1,
-        Remove = 2
+        string[] Playlists { get; set; }
+
+        /// <summary>
+        /// Get or sets the root folder where media is stored on the device.
+        /// </summary>
+        string DeviceMediaRoot { get; set; }
+
+        /// <summary>
+        /// Get or sets a unique id that represents the device. Allows the server to track subscriptions and support two-way syncing.
+        /// </summary>
+        string DeviceId { get; set; }
+
+        /// <summary>
+        /// Gets a hash of the device ID that can used as key for storing data.
+        /// </summary>
+        string SafeDeviceId { get; }
     }
 }

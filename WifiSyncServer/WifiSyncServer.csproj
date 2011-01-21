@@ -65,7 +65,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\DataManager.cs" />
-    <Compile Include="Helpers\DiffHandler.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Helpers\IITTrackEnumerator.cs" />
     <Compile Include="iTunes\ComiTunesLibrary.cs" />

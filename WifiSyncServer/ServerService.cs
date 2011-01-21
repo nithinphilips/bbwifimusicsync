@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using iTunesLib;
 using Kayak;
 using Kayak.Framework;
 using System.IO;
@@ -123,13 +124,55 @@ namespace WifiSyncServer
             return new { Playlists = playlistEnumerator };
         }
 
+        #region iTunes Control Methods
+
+        [Verb("POST")]
+        [Verb("PUT")]
+        [Path("/playsong")]
+        public void PlaySong([RequestBody]PlaylistRequest request)
+        {
+            // Required parameters: DeviceId, DeviceMediaRoot, PlaylistData
+            if (!Settings.Default.AllowPlayerControl || !ComiTunesLibrary.IsItunesRunning()) return;
+
+            Subscription subscription = DataManager.GetSubscription(request.SafeDeviceId);
+
+            ComiTunesLibrary itunes = new ComiTunesLibrary();
+
+            foreach (var iTrack in
+                itunes.GetSubscribedTracks(subscription).Where(iTrack => request.PlaylistData.Any(track => iTrack.GetPlaylistLine(request.DeviceMediaRoot) == track)))
+            {
+                iTrack.Play();
+                return;
+            }
+        }
+
+        [Path("/play")]
+        public void PlayPlaylist(string playlist)
+        {
+            if (!Settings.Default.AllowPlayerControl || !ComiTunesLibrary.IsItunesRunning()) return;
+
+            ComiTunesLibrary itunes = new ComiTunesLibrary();
+            IITPlaylistCollection playlists = itunes.GetiPlaylists();
+
+            if (playlists == null) return;
+
+            foreach (IITPlaylist _playlist in playlists)
+            {
+                if (_playlist.GetSafeName() == playlist)
+                {
+                    _playlist.PlayFirstTrack();
+                }
+            }
+
+        } 
+
+        #endregion
+
         [Verb("POST")]
         [Verb("PUT")]
         [Path("/subscribe")]
         public Response Subscribe([RequestBody]Subscription newSubscription)
         {
-            Log.Info("Updating subscription");
-
             // Check for errors
             Response errorResponse;
             if (!newSubscription.CheckValidate(out errorResponse)) return errorResponse;
@@ -139,13 +182,20 @@ namespace WifiSyncServer
             Subscription oldSubscription = DataManager.GetSubscription(newSubscription.SafeDeviceId);
             if (oldSubscription != null)
             {
+                Log.Info("Updating subscription");
                 SubscriptionManager man = new SubscriptionManager(oldSubscription); // Current subscription
                 actions = man.GetGarbageActions(CachedXmlLibrary.Library, newSubscription);
                 actions.UnEscapeAllDeviceLocations();
             }
             else
             {
+                Log.Info("New subscription.");
                 actions = new SyncAction[] {};
+            }
+
+            foreach (var subscribedPlaylist in newSubscription.Playlists)
+            {
+                Log.InfoFormat("Subscribing to: {0}", subscribedPlaylist);
             }
 
             Log.Info("Saving subscription to disk.");
@@ -174,8 +224,9 @@ namespace WifiSyncServer
                 Log.Debug("Received Data:" + Environment.NewLine + request);
 
                 string playlistName = Path.GetFileNameWithoutExtension(request.PlaylistDevicePath);
-                Subscription subscription = DataManager.GetSubscription(request.SafeDeviceId) ?? new Subscription();
-                SubscriptionManager subManager = new SubscriptionManager(subscription);
+
+                Subscription subscription = DataManager.GetSubscription(request.SafeDeviceId);
+                SubscriptionManager subManager = subscription != null ? new SubscriptionManager(subscription) : null;
 
                 string playlistPath = DataManager.GetDevicePlaylistDir(request);
 
@@ -187,17 +238,9 @@ namespace WifiSyncServer
 
                 Log.InfoFormat("Loading iTunes Library ({0})...", playlistName);
                 List<string> desktopPlaylist;
-                iTunesLibrary library;
 
-                // TODO: If iTunes is already running, connect to it via COM so we can add remove etc.
-                if (Settings.Default.OneWaySync)
-                    library = CachedXmlLibrary.Library;
-                else
-                    library = new ComiTunesLibrary();
+                XmliTunesLibrary library = CachedXmlLibrary.Library;
 
-
-                Log.InfoFormat("iTunes library (via {0}) loaded.", Settings.Default.OneWaySync ? "XML" : "COM");
-                
 
                 IPlaylist playlist = library.GetFirstPlaylistByName(playlistName);
                 if (playlist != null)
@@ -207,16 +250,40 @@ namespace WifiSyncServer
                 else
                 {
                     Log.WarnFormat("Fail. Playlist ({0}) does not exist", playlistName);
-                    return new SyncResponse { ErrorMessage = "Playlist does not exist", Error = (int)SyncResponseError.PlaylistNotFound };
+
+                    // We're sending an error message, along with a list of track that are no longer subscribed and
+                    // can be safely removed.
+                    var wipeActions =
+                        request.PlaylistData.Select(s => new SyncAction {DeviceLocation = s, Type = SyncType.Remove});
+                    
+                    if (subManager != null)
+                        wipeActions = subManager.FixProposedDeletes(library, wipeActions);
+
+                    return new SyncResponse
+                               {
+                                   ErrorMessage = "Playlist does not exist",
+                                   Error = (int) SyncResponseError.PlaylistNotFound,
+                                   PlaylistDevicePath = request.PlaylistDevicePath,
+                                   Actions = wipeActions.ToArray()
+                               };
                 }
                 
 
-                IEnumerable<SyncAction> changesOnDesktop = null; // changes that were made on the DESKTOP. Apply to DEVICE.
+                IEnumerable<SyncAction> changesOnDesktop = DiffHandler.Diff(desktopPlaylist, devicePlaylist); // changes that were made on the DESKTOP. Apply to DEVICE.
 
+                // Make sure we don't delete any tracks still present by other playlists.
+                // Also, we have to use the xml library because COM is too slow.
+                if (subManager != null)
+                    changesOnDesktop = subManager.FixProposedDeletes(library, changesOnDesktop);
 
                 // Read and sort the playlists
-                if (!Settings.Default.OneWaySync && File.Exists(playlistPath))
+                if (ComiTunesLibrary.IsItunesRunning() && File.Exists(playlistPath))
                 {
+                    //TODO: This leads to an unpredictable situation where the changes on the device could 
+                    // either be wiped out (iTunes is not running) or synced back (iTunes is running)
+
+                    Log.InfoFormat("iTunes is running. Connecting via COM");
+
                     Log.InfoFormat("Loading reference playlist {0}...", playlistPath);
                     List<string> referencePlaylist = Helper.LoadPlaylist(playlistPath);
 
@@ -237,7 +304,7 @@ namespace WifiSyncServer
                                       where change.Type == SyncType.Add
                                       select change.DeviceLocation;
 
-                    ComiTunesLibrary comLibrary = library as ComiTunesLibrary;
+                    ComiTunesLibrary comLibrary = new ComiTunesLibrary();
                     using (log4net.ThreadContext.Stacks["NDC"].Push("Removing iTrack"))
                     {
                         foreach (var track in comLibrary.RemoveTracks(playlist, tracksToDelete))
@@ -249,7 +316,12 @@ namespace WifiSyncServer
 
                     using (log4net.ThreadContext.Stacks["NDC"].Push("Adding iTrack"))
                     {
-                        foreach (var deviceLocation in comLibrary.AddTracks(playlist, tracksToAdd, "All Music", request.DeviceMediaRoot))
+                        // Warning: Subscription could be null.
+                        foreach (var deviceLocation in comLibrary.AddTracks(
+                            playlist, 
+                            tracksToAdd, 
+                            subscription ?? Subscription.GetQuickSubscription(playlistName, request.DeviceMediaRoot, request.DeviceId), 
+                            request.DeviceMediaRoot))
                         {
                             reconciledPlaylist.Add(deviceLocation);
                             Log.Info(deviceLocation);
@@ -259,14 +331,11 @@ namespace WifiSyncServer
                 }
                 else
                 {
-                    changesOnDesktop = DiffHandler.Diff(desktopPlaylist, devicePlaylist);
                     reconciledPlaylist = desktopPlaylist;
                 }
 
-                // Make sure we don't delete any tracks still present by other playlists.
-                // Also, we have to use the xml library because COM is too slow.
-                changesOnDesktop = subManager.FixProposedDeletes(CachedXmlLibrary.Library, changesOnDesktop);
-
+               
+               
                 foreach (var change in changesOnDesktop)
                 {
                     if (change.Type != SyncType.Add) continue;

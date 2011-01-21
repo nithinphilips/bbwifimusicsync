@@ -17,34 +17,18 @@
  *
  **********************************************************************/
 
-using System;
-using LibQdownloader.Threading;
-using log4net;
-
 namespace WifiSyncDesktop.Threading
 {
-    class FileCopyManager : WorkManager<FileCopyJob, FileCopier>
+    public class FileOperation
     {
-        private static readonly ILog log = LogManager.GetLogger("FileCopyManager");
+        public FileOperationType OperationType { get; set; }
+        public string Source { get; set; }
+        public string Destination { get; set; }
+        public string Size { get; set; }
 
-        public FileCopyManager()
-            : base(1, log, "FileCopier") { }
-
-        // We implement a new event, so that we can update the ui with our progress
-        public event EventHandler<FileCopyJobEventArgs> JobProgress;
-
-        protected override bool DoWork(FileCopyJob job)
+        public override string ToString()
         {
-            FileCopier worker = new FileCopier();
-            base.AddActiveWorker(worker);
-            worker.Work(job);
-            base.RemoveActiveWorker(worker);
-            return true;
-        }
-
-        void worker_JobProgress(object sender, FileCopyJobEventArgs e)
-        {
-            base.Post<FileCopyJobEventArgs>(JobProgress, e);
+            return string.Format("{0}: {1}", OperationType, Source);
         }
     }
 }

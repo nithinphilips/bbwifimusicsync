@@ -21,15 +21,15 @@ using System;
 
 namespace WifiSyncDesktop.Threading
 {
-    public sealed class FileCopyJobEventArgs : EventArgs
+    public sealed class FileOperationEventArgs : EventArgs
     {
-        public FileCopyJobEventArgs(int progress, FileCopyJob job)
+        public FileOperationEventArgs(int progress, FileOperation job)
         {
             this.Progress = progress;
             this.Job = job;
         }
 
         public int Progress { get; private set; }
-        public FileCopyJob Job { get; private set; }
+        public FileOperation Job { get; private set; }
     }
 }

@@ -189,7 +189,7 @@ namespace WifiSyncDesktop.Utilities
 
             bool valueBool = (bool)value;
             if (valueBool)
-                return WifiSyncDesktopClient.App.Current.Resources["ImageSizeBarStyle"];
+                return App.Current.Resources["ImageSizeBarStyle"];
             else
                 return null;
         }

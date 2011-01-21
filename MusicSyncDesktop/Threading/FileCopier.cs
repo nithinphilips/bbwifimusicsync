@@ -23,10 +23,10 @@ using System.IO;
 
 namespace WifiSyncDesktop.Threading
 {
-    class FileCopier : IDisposable, IPauseable
+    class FileCopier : FileWorker
     {
 
-        public bool Paused
+        public override bool Paused
         {
             get { return false; }
         }
@@ -34,19 +34,19 @@ namespace WifiSyncDesktop.Threading
 
         #region IPauseable Members
 
-        public void Pause()
+        public override void Pause()
         {
             
         }
 
-        public void Resume()
+        public override void Resume()
         {
             
         }
 
         #endregion
 
-        public void Work(FileCopyJob job)
+        public override void Work(FileOperation job)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(job.Destination));
             File.Copy(job.Source, job.Destination, true);
@@ -54,7 +54,7 @@ namespace WifiSyncDesktop.Threading
 
         #region IDisposable Members
 
-        public void Dispose()
+        public override void Dispose()
         {
             
         }

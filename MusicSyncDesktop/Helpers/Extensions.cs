@@ -17,6 +17,7 @@
  *
  **********************************************************************/
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using libMusicSync.Extensions;
@@ -31,41 +32,59 @@ namespace WifiSyncDesktop.Helpers
 {
     public static class Extensions
     {
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+
         /// <summary>
         /// Gets all selected tracks without any duplicates.
         /// </summary>
         /// <returns>Selected Tracks</returns>
-        public static IEnumerable<ITrack> GetSelectedTracksUnique(this SyncSettings s)
+        public static IEnumerable<ITrack> GetSelectedTracksDistinct(this SyncSettings s)
         {
-            HashSet<int> uniqueTracks = new HashSet<int>();
+            var trackSelector = from track in s.GetSelectedPlaylists().SelectMany(p => p.Playlist.Tracks)
+                                select track;
 
-            foreach (var playlist in s.GetSelectedPlaylists())
-            {
-                foreach (var track in playlist.Playlist.Tracks)
-                {
-                    // Use the hash set to make sure we tally the track size only once.
-                    if (!uniqueTracks.Contains(track.Id))
-                    {
-                        yield return track;
-                    }
-                }
-            }
+            return trackSelector.Distinct();
         }
 
-        public static IEnumerable<FileCopyJob> GetSelectedTracksUniqueAsFileCopyJobs(this SyncSettings s)
+        /// <summary>
+        /// Returns a set of operations, when performed, that will change the state of files at SyncSettings.Path to match the state of the selected playlists.
+        /// The returned operations are either COPY or DELETE.
+        /// The returned operations are ordered COPY, then DELETE.
+        /// </summary>
+        /// <returns>A set of operations, when performed, that will change the state of files at SyncSettings.Path to match the state of the selected playlists.</returns>
+        public static IEnumerable<FileOperation> GetFileOperations(this SyncSettings s)
         {
-            foreach (var item in s.GetSelectedTracksUnique())
+            HashSet<string> selectedTracks = new HashSet<string>();
+
+            foreach (var item in s.GetSelectedTracksDistinct())
             {
-                string targetPath = item.GetPlaylistLine(s.Path, System.IO.Path.DirectorySeparatorChar, false);
-                if (!File.Exists(targetPath))
+                string targetPath = item.GetPlaylistLine(s.Path, Path.DirectorySeparatorChar, false);
+                selectedTracks.Add(targetPath);
+
+                if (File.Exists(targetPath)) continue; // Don't do unnecessary work.
+
+                Log.DebugFormat("Creating COPY operation: {0} to {1}", item.Location, targetPath);
+                yield return new FileOperation
                 {
-                    yield return new FileCopyJob
-                                     {
-                                         Source = item.Location,
-                                         Destination = targetPath,
-                                         Size = Common.ToReadableSize(item.Size)
-                                     };
-                }
+                    OperationType = FileOperationType.Copy,
+                    Source = item.Location,
+                    Destination = targetPath,
+                    Size = Common.ToReadableSize(item.Size)
+                };
+            }
+
+            HashSet<string> existingTracks = Utilities.Utility.GetFiles(s.Path, SearchOption.AllDirectories, "*.mp3", "*.m4a", "*.wma");
+            existingTracks.ExceptWith(selectedTracks);
+
+            foreach (string garbageTrack in existingTracks)
+            {
+                Log.DebugFormat("Creating DELETE operation: {0}", garbageTrack);
+                yield return new FileOperation
+                {
+                    OperationType = FileOperationType.Delete,
+                    Source = garbageTrack,
+                    Size = "-"
+                };
             }
         }
 
@@ -74,6 +93,8 @@ namespace WifiSyncDesktop.Helpers
         /// </summary>
         public static void CheckExistingPlaylists(this SyncSettings s)
         {
+            if (s.Playlists == null) return;
+
             if (!string.IsNullOrWhiteSpace(s.Path) && Directory.Exists(s.Path))
             {
                 IEnumerable<string> existingPlaylistNames = (from f in Directory.GetFiles(s.Path, "*.m3u")
@@ -96,14 +117,17 @@ namespace WifiSyncDesktop.Helpers
             }
         }
 
-        public static void SaveAllM3uPlaylists(this SyncSettings s)
+        public static void WritePlaylistFiles(this SyncSettings s)
         {
+            foreach(string file in Utilities.Utility.GetFiles(s.Path, SearchOption.TopDirectoryOnly, "*.m3u"))
+            {
+                File.Delete(file);
+            }
+
             foreach (var item in s.GetSelectedPlaylists())
             {
                 string playlistPath = System.IO.Path.Combine(s.Path, item.Playlist.GetSafeName() + ".m3u");
-                string root = System.IO.Path.Combine(s.Path, "Songs");
-
-                string tRoot = Helper.ToBlackberryPath(root);
+                string tRoot = Helper.ToBlackberryPath(s.Path);
 
                 List<string> playlist = new List<string>();
                 foreach (var track in item.Playlist.Tracks)

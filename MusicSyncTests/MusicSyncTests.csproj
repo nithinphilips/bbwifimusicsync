@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{6C493CFA-1770-4F86-8D67-261837C732AC}</ProjectGuid>
+    <ProjectGuid>{645BEAF0-8BC8-450D-89A7-ECE64D4A5524}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>libMusicSync</RootNamespace>
-    <AssemblyName>libMusicSync</AssemblyName>
+    <RootNamespace>MusicSyncTests</RootNamespace>
+    <AssemblyName>MusicSyncTests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -31,13 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net">
-      <HintPath>..\lib\log4net\log4net.dll</HintPath>
-    </Reference>
+    <Reference Include="nunit.framework, Version=2.5.9.10348, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Runtime.Caching" />
-    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,23 +41,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions\Extensions.cs" />
-    <Compile Include="Helpers\DiffHandler.cs" />
-    <Compile Include="Helpers\Helper.cs" />
-    <Compile Include="Helpers\CachedXmliTunesLibrary.cs" />
-    <Compile Include="Helpers\SubscriptionManager.cs" />
-    <Compile Include="iTunesExport\Parser\IPlaylist.cs" />
-    <Compile Include="iTunesExport\Parser\ITrack.cs" />
-    <Compile Include="iTunesExport\Parser\LibraryParser.cs" />
-    <Compile Include="iTunesExport\Parser\Playlist.cs" />
-    <Compile Include="iTunesExport\Parser\Track.cs" />
-    <Compile Include="iTunes\iTunesLibrary.cs" />
-    <Compile Include="iTunes\XmliTunesLibrary.cs" />
-    <Compile Include="Model\SyncResponseError.cs" />
-    <Compile Include="Model\ISubscription.cs" />
-    <Compile Include="Model\SyncAction.cs" />
-    <Compile Include="Model\SyncType.cs" />
+    <Compile Include="DiffTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\libMusicSync\libMusicSync.csproj">
+      <Project>{6C493CFA-1770-4F86-8D67-261837C732AC}</Project>
+      <Name>libMusicSync</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

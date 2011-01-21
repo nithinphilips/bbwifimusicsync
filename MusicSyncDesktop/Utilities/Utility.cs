@@ -17,6 +17,9 @@
  *
  **********************************************************************/
 
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -88,5 +91,32 @@ namespace WifiSyncDesktop.Utilities
             System.Diagnostics.Process.Start("explorer.exe", "/select," + path);
         }
 
+        /// <summary>
+        /// Get a list of all file in path
+        /// </summary>
+        /// <param name="path">The path to search in.</param>
+        /// <param name="options">Any options for searching.</param>
+        /// <param name="filters">A set of patterns to search for.</param>
+        /// <returns>A HashSet of the results that can be used for various Set operations.</returns>
+        public static HashSet<string> GetFiles(string path, SearchOption options, params string[] filters)
+        {
+            HashSet<string> files = new HashSet<string>();
+
+            if (!Directory.Exists(path)) return files;
+
+            try
+            {
+                foreach (string file in filters.SelectMany(filter => Directory.GetFiles(path, filter, options)))
+                {
+                    files.Add(file);
+                }
+            }catch
+            {
+                // we're just returning whatever we have
+                return files;
+            }
+
+            return files;
+        }
     }
 }

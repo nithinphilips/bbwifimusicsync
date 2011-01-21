@@ -33,19 +33,24 @@ namespace WifiSyncDesktop.Model
     [NotifyPropertyChanged]
     public class SyncSettings : INotifyPropertyChanged
     {
-        CachedXmliTunesLibrary cachedXmlLibrary = new CachedXmliTunesLibrary();
+        readonly CachedXmliTunesLibrary _cachedXmlLibrary = new CachedXmliTunesLibrary();
 
         public IEnumerable<PlaylistInfo> GetSelectedPlaylists()
         {
-            return from p in Playlists
-                   where (!p.Checked.HasValue) || (p.Checked.HasValue && p.Checked.Value == true) 
-                   select p;
-        } 
+            if (Playlists != null)
+            {
+                return from p in Playlists
+                       where (!p.Checked.HasValue) || (p.Checked.Value == true)
+                       select p;
+            }
+            
+            return new List<PlaylistInfo>();
+        }
 
         public void LoadPlaylists()
         {
             List<PlaylistInfo> result = new List<PlaylistInfo>();
-            foreach (var playlist in cachedXmlLibrary.Library.Playlists)
+            foreach (var playlist in _cachedXmlLibrary.Library.Playlists)
             {
                 PlaylistInfo playlistInfo = new PlaylistInfo
                 {
@@ -83,8 +88,15 @@ namespace WifiSyncDesktop.Model
             }
             SelectedTracksSize = totalTrackSize;
 
+            bool driveReady = false;
+            DriveInfo di = null;
+            if (!string.IsNullOrWhiteSpace(Path) && Path.Length > 1)
+            {
+                di = new DriveInfo(_path.Substring(0, 1));
+                driveReady = di.IsReady;
+            }
 
-            if (string.IsNullOrWhiteSpace(Path) || Path.Length < 1)
+            if (!driveReady)
             {
                 Capacity = totalTrackSize;
                 Size = totalTrackSize;
@@ -92,11 +104,10 @@ namespace WifiSyncDesktop.Model
             }
             else
             {
-                DriveInfo di = new DriveInfo(_path.Substring(0, 1));
                 this.Capacity = di.TotalSize;
 
                 this.Size = (di.TotalSize - di.AvailableFreeSpace) + totalTrackSize;
-                Status = totalTrackSize == 0 ? "No songs to copy" : string.Format("Capacity: {0}, Free: {1}, Required: {2}", Common.ToReadableSize(Capacity), Common.ToReadableSize(di.AvailableFreeSpace), Common.ToReadableSize(totalTrackSize));
+                Status = totalTrackSize == 0 ? "No songs to copy" : string.Format("Need about {0} of space.", Common.ToReadableSize(totalTrackSize));
             }
 
             // These props are calculated on demand

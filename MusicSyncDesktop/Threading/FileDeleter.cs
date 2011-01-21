@@ -17,42 +17,49 @@
  *
  **********************************************************************/
 
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using libMusicSync.Model;
-using WifiSyncServer.Model;
+using System.IO;
+using System.Linq;
+using System.Text;
+using LibQdownloader.Threading;
 
-namespace WifiSyncServer.Helpers
+namespace WifiSyncDesktop.Threading
 {
-    class DiffHandler
+    class FileDeleter : FileWorker
     {
-        
-        public static IEnumerable<SyncAction> Diff(IEnumerable<string> a, IEnumerable<string> b)
+        public override void Pause()
         {
-            List<SyncAction> result = new List<SyncAction>();
+            throw new NotImplementedException();
+        }
 
-            System.Collections.Generic.HashSet<string> setA = new HashSet<string>(a);
-            System.Collections.Generic.HashSet<string> setB = new HashSet<string>(b);
+        public override bool Paused
+        {
+            get { return false; }
+        }
 
-            // Let A = pc, B = phone
+        public override  void Resume()
+        {
+           
+        }
 
-            foreach (var item in setA)
+        public override  void Dispose()
+        {
+           
+        }
+
+        public override void Work(FileOperation job)
+        {
+            File.Delete(job.Source);
+
+            string dir = job.Source;
+            while (!string.IsNullOrEmpty(dir = Path.GetDirectoryName(dir)))
             {
-                if (!setB.Contains(item))
-                {
-                    result.Add(new SyncAction { Type = SyncType.Add, DeviceLocation = item });
-                }
+                if ((Directory.GetFiles(dir).Length == 0) && (Directory.GetDirectories(dir).Length == 0))
+                    Directory.Delete(dir);
+                else
+                    break;
             }
-
-            foreach (var item in setB)
-            {
-                if (!setA.Contains(item))
-                {
-                    result.Add(new SyncAction { Type = SyncType.Remove, DeviceLocation = item });
-                }
-            }
-
-            return result;
         }
     }
 }

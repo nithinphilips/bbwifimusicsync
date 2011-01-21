@@ -19,11 +19,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using iTunesLib;
 using libMusicSync.iTunes;
 using libMusicSync.iTunesExport.Parser;
+using libMusicSync.Model;
 using WifiSyncServer.Extensions;
+using libMusicSync.Extensions;
 using WifiSyncServer.Helpers;
 
 namespace WifiSyncServer.iTunes
@@ -31,7 +34,7 @@ namespace WifiSyncServer.iTunes
     public class ComiTunesLibrary : iTunesLibrary
     {
         iTunesApp app;
-        Dictionary<IPlaylist, IITPlaylist> playlistLookupTable = new Dictionary<IPlaylist, IITPlaylist>();
+        Dictionary<string, IITPlaylist> playlistLookupTable = new Dictionary<string, IITPlaylist>();
 
         public ComiTunesLibrary()
         {
@@ -51,7 +54,7 @@ namespace WifiSyncServer.iTunes
         {
             List<ITrack> removedtracks = new List<ITrack>();
 
-            IITPlaylist pls = playlistLookupTable[playlist];
+            IITPlaylist pls = playlistLookupTable[playlist.GetSafeName()];
 
             foreach (IITTrack iTunesTrack in pls.Tracks)
             {
@@ -81,31 +84,46 @@ namespace WifiSyncServer.iTunes
         /// </param>
         /// <param name="root">The root device path used to generate device location. This should be the same root used to generate "playlistLines"</param>
         /// <returns>An enumeration of all songs that were successfully added to the playlist.</returns>
-        public IEnumerable<string> AddTracks(IPlaylist playlist, IEnumerable<string> playlistLines, string searchHint, string root)
+        public IEnumerable<string> AddTracks(IPlaylist playlist, IEnumerable<string> playlistLines, ISubscription subscription, string root)
         {
             List<string> addedTracks = new List<string>();
 
-            IPlaylist hintPlaylist = this.GetFirstPlaylistByName(searchHint);
-            
-            if (hintPlaylist != null)
-            {
-                IITPlaylist searchPlaylist = playlistLookupTable[hintPlaylist];
-                IITUserPlaylist targetPlaylist = playlistLookupTable[playlist] as IITUserPlaylist;
+            IITUserPlaylist targetPlaylist = playlistLookupTable[playlist.GetSafeName()] as IITUserPlaylist;
 
-                //TODO Changed to linq statements, need testing to verify.
-                foreach (IITFileOrCDTrack itunesTrack in searchPlaylist.Tracks.OfType<IITFileOrCDTrack>())
+            if (targetPlaylist == null) return addedTracks;
+
+            var subscribedTracks = GetSubscribedTracks(subscription);
+
+            foreach (var line in playlistLines)
+            {
+                foreach (var iTrack in subscribedTracks)
                 {
-                    foreach (var playlistLine in
-                        playlistLines.Where(playlistLine => playlistLine == itunesTrack.GetPlaylistLine(root)))
-                    {
-                        targetPlaylist.AddTrack(itunesTrack);
-                        addedTracks.Add(playlistLine);
-                        break; // Avoid 
-                    }
-                }
+                    if (line != iTrack.GetPlaylistLine(root)) continue;
+
+                    targetPlaylist.AddTrack(iTrack);
+                    addedTracks.Add(line);
+                    break;
+                }    
             }
 
             return addedTracks;
+        }
+
+        public IEnumerable<IITFileOrCDTrack> GetSubscribedTracks(ISubscription subscription)
+        {
+            HashSet<IITFileOrCDTrack> tracks = new HashSet<IITFileOrCDTrack>();
+            foreach (var playlist in subscription.Playlists)
+            {
+                IITPlaylist iPlaylist = playlistLookupTable[playlist];
+                if(iPlaylist != null)
+                {
+                    foreach (var track in iPlaylist.Tracks.OfType<IITFileOrCDTrack>())
+                    {
+                        tracks.Add(track);
+                    }
+                }
+            }
+            return tracks;
         }
 
         /// <summary>
@@ -124,10 +142,23 @@ namespace WifiSyncServer.iTunes
             {
                 IPlaylist pls = new Playlist(item.playlistID, item.Name, false, new IITTrackEnumerator(item));
                 playlists.Add(pls);
-                playlistLookupTable.Add(pls, item);
+                playlistLookupTable.Add(pls.GetSafeName(), item);
             }
 
             return playlists;
+        }
+
+        public IITPlaylistCollection GetiPlaylists()
+        {
+            IITSource library = app.Sources.ItemByName["Library"];
+            return library != null ? library.Playlists : null;
+        }
+
+        public static bool IsItunesRunning()
+        {
+            Process[] procs = Process.GetProcessesByName("iTunes");
+
+            return procs.Any();
         }
 
     }

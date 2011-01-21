@@ -17,12 +17,17 @@
  *
  **********************************************************************/
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
 namespace WifiSyncDesktop.Threading
 {
-    public class FileCopyJob
+    public enum FileOperationType
     {
-        public string Source { get; set; }
-        public string Destination { get; set; }
-        public string Size { get; set; }
+        Move,
+        Copy,
+        Delete
     }
 }

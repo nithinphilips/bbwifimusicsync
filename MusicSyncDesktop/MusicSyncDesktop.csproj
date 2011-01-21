@@ -82,9 +82,12 @@
       <DependentUpon>SelectFolderTextBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="Threading\FileCopier.cs" />
-    <Compile Include="Threading\FileCopyJob.cs" />
-    <Compile Include="Threading\FileCopyJobEventArgs.cs" />
-    <Compile Include="Threading\FileCopyManager.cs" />
+    <Compile Include="Threading\FileDeleter.cs" />
+    <Compile Include="Threading\FileOperation.cs" />
+    <Compile Include="Threading\FileOperationEventArgs.cs" />
+    <Compile Include="Threading\FileOperationManager.cs" />
+    <Compile Include="Threading\FileOperationType.cs" />
+    <Compile Include="Threading\FileWorker.cs" />
     <Compile Include="Utilities\Converters.cs" />
     <Compile Include="Utilities\ReflectionControl.cs" />
     <Page Include="Windows\AboutWindow.xaml">
@@ -135,6 +138,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="app.config" />
+    <None Include="log.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

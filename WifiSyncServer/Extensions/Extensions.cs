@@ -28,6 +28,11 @@ namespace WifiSyncServer.Extensions
 {
     public static class Extensions
     {
+        public static string GetSafeName(this IITPlaylist playlist)
+        {
+            return Helper.MakeFileNameSafe(playlist.Name);
+        }
+
         public static string GetPlaylistLine(this IITFileOrCDTrack track, string root)
         {
             return GetPlaylistLine(track, root, '/', true);

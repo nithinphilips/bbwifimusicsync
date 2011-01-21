@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicSyncDesktop", "MusicSy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libMusicSync", "libMusicSync\libMusicSync.csproj", "{6C493CFA-1770-4F86-8D67-261837C732AC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicSyncTests", "MusicSyncTests\MusicSyncTests.csproj", "{645BEAF0-8BC8-450D-89A7-ECE64D4A5524}"
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
@@ -89,6 +91,16 @@ Global
 		{6C493CFA-1770-4F86-8D67-261837C732AC}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{6C493CFA-1770-4F86-8D67-261837C732AC}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{6C493CFA-1770-4F86-8D67-261837C732AC}.Release|x86.ActiveCfg = Release|Any CPU
+		{645BEAF0-8BC8-450D-89A7-ECE64D4A5524}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{645BEAF0-8BC8-450D-89A7-ECE64D4A5524}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{645BEAF0-8BC8-450D-89A7-ECE64D4A5524}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{645BEAF0-8BC8-450D-89A7-ECE64D4A5524}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{645BEAF0-8BC8-450D-89A7-ECE64D4A5524}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{645BEAF0-8BC8-450D-89A7-ECE64D4A5524}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{645BEAF0-8BC8-450D-89A7-ECE64D4A5524}.Release|Any CPU.Build.0 = Release|Any CPU
+		{645BEAF0-8BC8-450D-89A7-ECE64D4A5524}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{645BEAF0-8BC8-450D-89A7-ECE64D4A5524}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{645BEAF0-8BC8-450D-89A7-ECE64D4A5524}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

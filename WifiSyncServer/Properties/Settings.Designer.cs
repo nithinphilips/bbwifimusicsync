@@ -46,5 +46,17 @@ namespace WifiSyncServer.Properties {
                 this["OneWaySync"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AllowPlayerControl {
+            get {
+                return ((bool)(this["AllowPlayerControl"]));
+            }
+            set {
+                this["AllowPlayerControl"] = value;
+            }
+        }
     }
 }

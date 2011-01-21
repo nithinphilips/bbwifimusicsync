@@ -50,7 +50,7 @@ namespace libMusicSync.Helpers
             return GetSubscribedTracks(Subscription.Playlists, library, Subscription.DeviceMediaRoot);
         }
 
-        public static HashSet<string> GetSubscribedTracks(IEnumerable<string> playlists, iTunesLibrary library, string root)
+        static HashSet<string> GetSubscribedTracks(IEnumerable<string> playlists, iTunesLibrary library, string root)
         {
             HashSet<string> tracks = new HashSet<string>();
 
@@ -103,10 +103,18 @@ namespace libMusicSync.Helpers
             );
         }
 
+        /// <summary>
+        /// Compares current subscription to a new subscription and retrieves a list of all tracks that will no longer be referred to by any playlists.
+        /// </summary>
+        /// <param name="library">The libray that can be used to access tracks. (for iTunes, the XML library is preferred, COM access is slow for enumeration)</param>
+        /// <param name="newSubscription">The new subscription request from the client.</param>
+        /// <returns>A list of all tracks that will no longer be referred to by any playlists as SyncActions of type Remove.</returns>
         public SyncAction[] GetGarbageActions(iTunesLibrary library, ISubscription newSubscription)
         {
-            return (from gTrack in GetGarbageTracks(library, newSubscription)
-                    select new SyncAction {DeviceLocation = gTrack, Type = SyncType.Remove}).ToArray();
+            // Do some lambda magic...
+            return GetGarbageTracks(library, newSubscription).Select(
+                    s => new SyncAction {DeviceLocation = s, Type = SyncType.Remove}
+                   ).ToArray();
         }
 
         /// <summary>
@@ -118,7 +126,9 @@ namespace libMusicSync.Helpers
         public IEnumerable<string> GetGarbageTracks(iTunesLibrary library, ISubscription newSubscription)
         {
             // We don't have anything to compare to = nothing to clean up.
-            if (Subscription == null) return new List<string>();
+            if ((Subscription == null) || 
+                (Subscription.Playlists == null) || 
+                (Subscription.Playlists.Length <= 0)) return new List<string>();
             
             HashSet<string> currentTracks = GetSubscribedTracks(library);
             HashSet<string> newTracks = GetSubscribedTracks(newSubscription.Playlists, library, newSubscription.DeviceMediaRoot);

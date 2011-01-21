@@ -19,7 +19,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
@@ -38,7 +41,7 @@ namespace WifiSyncDesktop.Windows
     {
         SyncSettings viewModelSync = new SyncSettings();
         CopyProgressModel viewModelCopy = new CopyProgressModel();
-        FileCopyManager copyMan = new FileCopyManager();
+        FileOperationManager _operationMan = new FileOperationManager();
 
         public int Total { get; set; }
         public int Current { get; set; }
@@ -46,17 +49,22 @@ namespace WifiSyncDesktop.Windows
         public MainWindow()
         {
             InitializeComponent();
+
+            Parallel.Invoke(() =>
+            {
+                viewModelSync.LoadPlaylists();
+                //viewModelSync.Path = Settings.Default.LastPath;
+                viewModelSync.Path = "M:\\";
+            });
             
-            viewModelSync.LoadPlaylists();
             viewModelSync.Status = "Ready";
-            viewModelSync.Path = Settings.Default.LastPath;
+            
 
             this.DataContext = viewModelSync;
-
             this.pnlProgress.DataContext = viewModelCopy;
 
-            copyMan.JobStarting += new EventHandler<LibQdownloader.Threading.JobEventArgs<FileCopyJob>>(copyMan_JobStarting);
-            copyMan.WorkCompleted += new EventHandler(copyMan_WorkCompleted);
+            _operationMan.JobStarting += new EventHandler<LibQdownloader.Threading.JobEventArgs<FileOperation>>(copyMan_JobStarting);
+            _operationMan.WorkCompleted += new EventHandler(copyMan_WorkCompleted);
 
             this.Closing += new System.ComponentModel.CancelEventHandler(MainWindow_Closing);
         }
@@ -131,25 +139,29 @@ namespace WifiSyncDesktop.Windows
 
         void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            copyMan.Dispose();
+            _operationMan.Dispose();
         }
 
         void copyMan_WorkCompleted(object sender, EventArgs e)
         {
-            viewModelSync.SaveAllM3uPlaylists();
+            viewModelSync.WritePlaylistFiles();
             viewModelSync.Status = "";
-            pnlFinished.Visibility = System.Windows.Visibility.Visible;
-            pnlProgress.Visibility = System.Windows.Visibility.Collapsed;
-            this.SizeToContent = System.Windows.SizeToContent.Height;
+            pnlFinished.Visibility = Visibility.Visible;
+            pnlProgress.Visibility = Visibility.Collapsed;
+            this.SizeToContent = SizeToContent.Height;
         }
 
-        void copyMan_JobStarting(object sender, LibQdownloader.Threading.JobEventArgs<FileCopyJob> e)
+        void copyMan_JobStarting(object sender, LibQdownloader.Threading.JobEventArgs<FileOperation> e)
         {
             Current++;
             viewModelCopy.From = e.Job.Source;
             viewModelCopy.To = e.Job.Destination;
             viewModelCopy.Size = e.Job.Size;
-            viewModelSync.Status = "Copying " + System.IO.Path.GetFileNameWithoutExtension(e.Job.Source);
+            if(e.Job.OperationType == FileOperationType.Copy)
+                viewModelSync.Status = "Copying " + System.IO.Path.GetFileNameWithoutExtension(e.Job.Source);
+            else
+                viewModelSync.Status = "Deleting " + System.IO.Path.GetFileNameWithoutExtension(e.Job.Source);
+
             viewModelCopy.Percentage = (int)(Common.CalculatePercent(Current, Total) + 0.5f); // Ceiling
         }
 
@@ -164,9 +176,16 @@ namespace WifiSyncDesktop.Windows
             Settings.Default.LastPath = viewModelSync.Path;
             Settings.Default.Save();
 
-            List<FileCopyJob> jobs = new List<FileCopyJob>(viewModelSync.GetSelectedTracksUniqueAsFileCopyJobs());
+
+            var jobs = viewModelSync.GetFileOperations().ToList();
+
             Total = jobs.Count;
-            copyMan.Enqueue(jobs);
+
+            // We are reversing the operations, because in edge conditions where the available space is very limited, the 
+            // track that we are deleting will free up the necessary amount of space and allow for successful completion.
+            jobs.Reverse();
+
+            _operationMan.Enqueue(jobs);
             pnlProgress.Visibility = Visibility.Visible;
             pnlSelection.Visibility = Visibility.Collapsed;
             this.SizeToContent = SizeToContent.Height;
@@ -175,7 +194,7 @@ namespace WifiSyncDesktop.Windows
 
         private void sync_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = (!string.IsNullOrWhiteSpace(viewModelSync.Path)) && (viewModelSync.SelectedTracksSize > 0);
+            e.CanExecute = !string.IsNullOrWhiteSpace(viewModelSync.Path) && viewModelSync.GetFileOperations().Any();
         }
 
         private void close_Executed(object sender, ExecutedRoutedEventArgs e)

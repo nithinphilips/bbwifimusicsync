@@ -40,6 +40,21 @@ namespace WifiSyncServer.Model
             return true;
         }
 
+        public static Subscription GetQuickSubscription(string playlist, Subscription prototype)
+        {
+            return GetQuickSubscription(playlist, prototype.DeviceMediaRoot, prototype.DeviceId);
+        }
+
+        public static Subscription GetQuickSubscription(string playlist, string deviceMediaRoot, string deviceId)
+        {
+            return new Subscription
+                       {
+                           DeviceId = deviceId,
+                           DeviceMediaRoot = deviceMediaRoot,
+                           Playlists = new string[] {playlist}
+                       };
+        }
+
         public static Subscription Deserialize(string path)
         {
             XmlSerializer deserializer = new XmlSerializer(typeof(Subscription));

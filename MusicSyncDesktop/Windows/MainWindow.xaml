@@ -8,6 +8,22 @@
     <Window.Resources>
         <Utilities:BooleanStyleConverter x:Key="boolToStyleConverter" />
         <Utilities:ShortenPathConverter x:Key="shortenPathConverter" />
+        <Style TargetType="ListBox" BasedOn="{StaticResource {x:Type ListBox}}">
+            <Style.Triggers>
+                <DataTrigger 
+            Binding="{Binding RelativeSource={x:Static RelativeSource.Self}, Path=Items.Count}" 
+            Value="0"
+            >
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate>
+                                <TextBlock HorizontalAlignment="Center">Loading iTunes Playlists...</TextBlock>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="NextPage" CanExecute="sync_CanExecute" Executed="sync_Executed" />
@@ -46,7 +62,7 @@
                 </StackPanel>
 
                 <StackPanel Margin="10">
-                    <TextBlock FontSize="20" FontWeight="Bold" Margin="0,5" Foreground="#FF3681A3">Copy Complete</TextBlock>
+                    <TextBlock FontSize="20" FontWeight="Bold" Margin="0,5" Foreground="#FF3681A3">Sync Complete</TextBlock>
                     <TextBlock>You can now disconnect your phone and the Wifi Sync app will wirelessly keep your music collection on your phone updated.</TextBlock>
                 </StackPanel>
             </DockPanel>
@@ -65,16 +81,16 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" FontSize="20" FontWeight="Bold" Margin="0,5" Foreground="#FF3681A3">Copying files...</TextBlock>
+                <TextBlock Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" FontSize="20" FontWeight="Bold" Margin="0,5" Foreground="#FF3681A3">Syncing...</TextBlock>
 
-                <Label Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right">From:</Label>
-                <Label Grid.Column="1" Grid.Row="1" Padding="2"  HorizontalAlignment="Left" VerticalContentAlignment="Center" Content="{Binding Mode=OneWay,Path=From,Converter={StaticResource shortenPathConverter}}" />
+                <Label Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right">Source:</Label>
+                <TextBlock Grid.Column="1" Grid.Row="1" Padding="2"  HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="NoWrap" Text="{Binding Mode=OneWay,Path=From,Converter={StaticResource shortenPathConverter}}" />
 
-                <Label Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right">To:</Label>
-                <Label Grid.Column="1" Grid.Row="2" Padding="2" HorizontalAlignment="Left" VerticalContentAlignment="Center" Content="{Binding Mode=OneWay,Path=To,Converter={StaticResource shortenPathConverter}}" />
+                <Label Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right">Destination:</Label>
+                <TextBlock Grid.Column="1" Grid.Row="2" Padding="2" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="NoWrap" Text="{Binding Mode=OneWay,Path=To,Converter={StaticResource shortenPathConverter}}" />
 
                 <Label Grid.Column="0" Grid.Row="3" HorizontalAlignment="Right">Size:</Label>
-                <Label Grid.Column="1" Grid.Row="3" Padding="2" HorizontalAlignment="Left" VerticalContentAlignment="Center" Content="{Binding Mode=OneWay,Path=Size}" />
+                <TextBlock Grid.Column="1" Grid.Row="3" Padding="2" HorizontalAlignment="Left" VerticalAlignment="Center" TextWrapping="NoWrap" Text="{Binding Mode=OneWay,Path=Size}" />
 
                 <ProgressBar Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="2" Margin ="5" Height="20" Value="{Binding Mode=OneWay,Path=Percentage}" />
             </Grid>

@@ -37,4 +37,4 @@ To build the solution you need:
  * Log4net (>= 1.2.9.0) (binary included)
  * iTunes (>= 9.0) <http://www.apple.com/itunes/>
 
-$ID$
+$Id$

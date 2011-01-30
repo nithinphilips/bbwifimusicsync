@@ -2,7 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="WifiSyncServer.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="Port" Type="System.Int32" Scope="User">
+    <Setting Name="Port" Type="System.Int32" Scope="Application">
       <Value Profile="(Default)">9000</Value>
     </Setting>
     <Setting Name="OneWaySync" Type="System.Boolean" Scope="User">

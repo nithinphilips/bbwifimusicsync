@@ -23,15 +23,12 @@ namespace WifiSyncServer.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("9000")]
         public int Port {
             get {
                 return ((int)(this["Port"]));
-            }
-            set {
-                this["Port"] = value;
             }
         }
         

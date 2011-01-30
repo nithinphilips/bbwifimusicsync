@@ -79,4 +79,8 @@ public class PlaylistSelectionDialog extends PopupScreen {
 	public int getResult() {
 		return result;
 	}
+	
+	public void save(){
+		result = Dialog.OK;
+	}
 }

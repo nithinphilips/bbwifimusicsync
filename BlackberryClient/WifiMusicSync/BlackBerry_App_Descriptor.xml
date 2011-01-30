@@ -1,12 +1,12 @@
 <Properties ModelVersion="1.1.2">
-  <General Title="Wifi Music Sync" Version="1.1.0" Vendor="Nithin Philips" Description="An Application to wirelessly Sync iTunes playlists."/>
+  <General Title="Music Sync" Version="1.1.0" Vendor="Nithin Philips" Description="An Application to wirelessly Sync iTunes playlists."/>
   <Application Type="BlackBerry Application" MainMIDletName="" MainArgs="" HomeScreenPosition="0" StartupTier="7" IsSystemModule="false" IsAutostartup="false"/>
   <Resources hasTitleResource="false" TitleResourceBundleName="" TitleResourceBundleRelativePath="" TitleResourceBundleClassName="" TitleResourceBundleKey="" DescriptionId="">
     <Icons>
-      <Icon CanonicalFileName="res/refresh-reload-sync.png" IsFocus="false"/>
+      <Icon CanonicalFileName="res/music-sync-68.png" IsFocus="false"/>
     </Icons>
   </Resources>
-  <Compile OutputCompilerMessages="true" ConvertImages="false" CreateWarningForNoExportedRoutine="true" CompressResources="false" AliasList="">
+  <Compile OutputCompilerMessages="true" ConvertImages="false" CreateWarningForNoExportedRoutine="true" CompressResources="true" AliasList="">
     <PreprocessorDefines/>
   </Compile>
   <Packaging OutputFileName="WifiMusicSync" OutputFolder="deliverables" PreBuildStep="" PostBuildStep="" CleanStep="" GenerateALXFile="true">
@@ -16,5 +16,9 @@
     <ClassProtection/>
     <PackageProtection/>
   </HiddenProperties>
-  <AlternateEntryPoints/>
+  <AlternateEntryPoints>
+    <AlternateEntryPoint Title="Wifi Music Sync - Background Sync" MainMIDletName="" ArgumentsForMain="sync" HomeScreenPosition="0" StartupTier="7" IsSystemModule="true" IsAutostartup="true" hasTitleResource="false" TitleResourceBundleKey="" TitleResourceBundleName="" TitleResourceBundleClassName="" TitleResourceBundleRelativePath="">
+      <Icons/>
+    </AlternateEntryPoint>
+  </AlternateEntryPoints>
 </Properties>

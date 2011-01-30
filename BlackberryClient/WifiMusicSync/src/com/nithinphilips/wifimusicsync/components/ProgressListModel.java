@@ -163,7 +163,7 @@ public class ProgressListModel implements ListFieldCallback, SyncActionChangedCa
   }
 
   public void changed(SyncAction action) {
-		modify(action, action.getIndex());
+		_view.invalidate(action.getIndex());
   }
   
 }

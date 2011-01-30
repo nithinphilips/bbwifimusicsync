@@ -40,7 +40,7 @@ public class WifiMusicSyncProperties implements Persistable
         homeWifiName = "";
         
         localStoreRoot = "file:///SDCard/Blackberry/music/WiFiSync/";
-        clientId = Integer.toHexString(UIDGenerator.getUID());
+        clientId = Integer.toHexString(DeviceInfo.getDeviceId() + UIDGenerator.getUID());
     }
     
   //Canonical copy constructor.

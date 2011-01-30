@@ -46,3 +46,4 @@ public class AboutDialog extends MainScreen {
     }
 
 }
+

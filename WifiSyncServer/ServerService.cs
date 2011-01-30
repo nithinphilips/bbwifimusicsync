@@ -73,8 +73,11 @@ namespace WifiSyncServer
         {
             if (PlaylistDb.ContainsKey(id))
             {
-                Log.Info("Sending playlist: " + PlaylistDb[id]);
-                return new FileInfo(PlaylistDb[id]);
+                string playlistPath = PlaylistDb[id];
+                Log.Info("Commiting playlist as reference.");
+                File.Copy(playlistPath, DataManager.GetReferencePlaylistPath(playlistPath), true);
+                Log.Info("Sending playlist: " + playlistPath);
+                return new FileInfo(playlistPath);
             }
 
             // Failure
@@ -228,7 +231,7 @@ namespace WifiSyncServer
                 Subscription subscription = DataManager.GetSubscription(request.SafeDeviceId);
                 SubscriptionManager subManager = subscription != null ? new SubscriptionManager(subscription) : null;
 
-                string playlistPath = DataManager.GetDevicePlaylistDir(request);
+                string playlistPath = DataManager.GetDevicePlaylistPath(request);
 
                 List<string> reconciledPlaylist;
 
@@ -276,16 +279,22 @@ namespace WifiSyncServer
                 if (subManager != null)
                     changesOnDesktop = subManager.FixProposedDeletes(library, changesOnDesktop);
 
-                // Read and sort the playlists
-                if (ComiTunesLibrary.IsItunesRunning() && File.Exists(playlistPath))
+                // We use different files for the serving and referencing playlists because this allows us to delay 
+                // commiting a playlist as reference playlist until the client has retrieved the playlist. 
+                // In situations where the sync is interrupted, it can otherwise lead to the server having incorrect 
+                // state information and results in improper deletion of tracks from iTunes playlist.
+                string playlistRefPath = DataManager.GetReferencePlaylistPath(playlistPath);
+                if (ComiTunesLibrary.IsItunesRunning() && File.Exists(playlistRefPath))
                 {
-                    //TODO: This leads to an unpredictable situation where the changes on the device could 
+                    // TODO: This leads to an unpredictable situation where the changes on the device could 
                     // either be wiped out (iTunes is not running) or synced back (iTunes is running)
-
+		            // NOTE: If this must be done, it is also safer to check if the PlaylistData is empty,
+		            // (Possibly due to a error on the device side) in that case, we'd want to bring the 
+		            // device up-to-date, by setting the desktop playlist as the reference.
                     Log.InfoFormat("iTunes is running. Connecting via COM");
 
-                    Log.InfoFormat("Loading reference playlist {0}...", playlistPath);
-                    List<string> referencePlaylist = Helper.LoadPlaylist(playlistPath);
+                    Log.InfoFormat("Loading reference playlist {0}...", playlistRefPath);
+                    List<string> referencePlaylist = Helper.LoadPlaylist(playlistRefPath);
 
                     changesOnDesktop = DiffHandler.Diff(desktopPlaylist, referencePlaylist);
                     IEnumerable<SyncAction> changesOnDevice = DiffHandler.Diff(devicePlaylist, referencePlaylist);  // changes that were made on the DEVICE. Apply to DESKTOP.

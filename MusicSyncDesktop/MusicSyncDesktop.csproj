@@ -37,7 +37,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>refresh-reload-sync-icon.ico</ApplicationIcon>
+    <ApplicationIcon>music-sync-desktop.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="libQdownloader">
@@ -165,7 +165,7 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="refresh-reload-sync-icon.ico" />
+    <Resource Include="music-sync-desktop.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

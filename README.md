@@ -36,3 +36,5 @@ To build the solution you need:
  * Kayak Server Fx (source included)
  * Log4net (>= 1.2.9.0) (binary included)
  * iTunes (>= 9.0) <http://www.apple.com/itunes/>
+
+$ID$

@@ -17,7 +17,7 @@
    style="display:inline"
    inkscape:version="0.48.0 r9654"
    sodipodi:docname="music-sync-server.svg"
-   inkscape:export-filename="C:\Users\Nithin\Desktop\Icons\music-sync-server.png"
+   inkscape:export-filename="music-sync-server.png"
    inkscape:export-xdpi="240"
    inkscape:export-ydpi="240">
   <sodipodi:namedview
@@ -34,7 +34,7 @@
      id="namedview229"
      showgrid="false"
      inkscape:zoom="6.0625001"
-     inkscape:cx="32.22331"
+     inkscape:cx="5.9965063"
      inkscape:cy="60.140721"
      inkscape:window-x="1672"
      inkscape:window-y="-8"
@@ -1328,7 +1328,7 @@
        xlink:href="#linearGradient3168"
        id="linearGradient4062"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0,0.6989338,0.6798771,0,54.398946,19.361683)"
+       gradientTransform="matrix(0,0.6989338,0.6798771,0,62.563894,19.361683)"
        x1="7.6643033"
        y1="24.000008"
        x2="40.357948"
@@ -1338,7 +1338,7 @@
        xlink:href="#linearGradient3168"
        id="linearGradient4064"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0,-0.7065858,-0.6873204,0,71.592066,30.761402)"
+       gradientTransform="matrix(0,-0.7065858,-0.6873204,0,82.437429,30.761402)"
        x1="40.335697"
        y1="25.534824"
        x2="7.6302123"
@@ -1348,7 +1348,7 @@
        xlink:href="#linearGradient3336"
        id="linearGradient4066"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0,-0.7065858,-0.6873204,0,71.592066,30.761402)"
+       gradientTransform="matrix(0,-0.7065858,-0.6873204,0,82.437429,30.761402)"
        x1="38.405285"
        y1="26.887053"
        x2="7.7796769"
@@ -1358,7 +1358,7 @@
        xlink:href="#linearGradient3336"
        id="linearGradient4068"
        gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0,0.6989338,0.6798771,0,54.398946,19.361683)"
+       gradientTransform="matrix(0,0.6989338,0.6798771,0,62.563894,19.361683)"
        x1="10.525804"
        y1="23.984999"
        x2="40.357948"
@@ -1517,22 +1517,22 @@
     <path
        inkscape:connector-curvature="0"
        style="fill:url(#linearGradient4062);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.4692626;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       d="m 70.716006,24.953155 10.87803,11.182939 -5.43902,0 0,11.182939 -10.87803,-2e-6 0,-11.182937 -5.43901,0 10.87803,-11.182939 z"
+       d="m 78.880954,24.953155 10.878034,11.182939 -5.439024,0 0,11.182939 -10.87803,-2e-6 0,-11.182937 -5.43901,0 10.87803,-11.182939 z"
        id="path2360" />
     <path
        inkscape:connector-curvature="0"
        style="fill:url(#linearGradient4064);fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:0.4744001;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       d="m 55.096376,25.108712 -10.997126,-11.30537 5.498564,0 10e-7,-11.3053706 10.997121,1e-6 0,11.3053686 5.49857,1e-6 -10.99713,11.30537 z"
+       d="m 65.941739,25.108712 -10.997126,-11.30537 5.498564,0 1e-6,-11.3053706 10.997121,1e-6 0,11.3053686 5.49857,1e-6 -10.99713,11.30537 z"
        id="path2292" />
     <path
        inkscape:connector-curvature="0"
        id="path3194"
-       d="m 50.737046,3.6247724 0,10.1875006 c -6e-5,0.621295 -0.503701,1.124938 -1.124996,1.125 l -2.84375,0 4.218746,4.3125 c 1.25877,-4.154459 4.36949,-7.587223 8.46875,-9.4687504 l 0,-6.1562502 -8.71875,0 z"
+       d="m 61.582409,3.6247724 0,10.1875006 c -6e-5,0.621295 -0.503701,1.124938 -1.124996,1.125 l -2.84375,0 4.218746,4.3125 c 1.25877,-4.154459 4.36949,-7.587223 8.46875,-9.4687504 l 0,-6.1562502 -8.71875,0 z"
        style="opacity:0.75298803;fill:url(#linearGradient4066);fill-opacity:1;fill-rule:evenodd;stroke:none;display:inline" />
     <path
        inkscape:connector-curvature="0"
        id="path4174"
-       d="m 70.705796,26.718523 -8,8.1875 2.5625,0 c 0.67244,0.0016 1.21715,0.546317 1.21875,1.21875 l 0,9.96875 2.71875,0 c -0.13386,-0.81356 -0.21875,-1.648165 -0.21875,-2.5 0,-5.049439 2.45993,-9.50231 6.21875,-12.25 l -4.5,-4.625 z"
+       d="m 78.870744,26.718523 -8,8.1875 2.5625,0 c 0.67244,0.0016 1.21715,0.546317 1.21875,1.21875 l 0,9.96875 2.71875,0 c -0.13386,-0.81356 -0.21875,-1.648165 -0.21875,-2.5 0,-5.049439 2.45993,-9.50231 6.21875,-12.25 l -4.5,-4.625 z"
        style="opacity:0.65338649;fill:url(#linearGradient4068);fill-opacity:1;fill-rule:evenodd;stroke:none;display:inline" />
   </g>
 </svg>

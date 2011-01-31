@@ -18,7 +18,7 @@
    sodipodi:docname="view-refresh.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.1"
-   inkscape:export-filename="F:\Work\Projects\WifiMusicSync\Icons\view-refresh.png"
+   inkscape:export-filename="view-refresh.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -60,19 +60,6 @@
        r="18.1705"
        gradientTransform="matrix(1,0,0,0.195124,0,39.338316)"
        gradientUnits="userSpaceOnUse" />
-    <filter
-       inkscape:collect="always"
-       x="-0.13259722"
-       width="1.2651945"
-       y="-0.68473589"
-       height="2.3694718"
-       id="filter3616"
-       color-interpolation-filters="sRGB">
-      <feGaussianBlur
-         inkscape:collect="always"
-         stdDeviation="2.0103976"
-         id="feGaussianBlur3618" />
-    </filter>
     <linearGradient
        id="linearGradient269">
       <stop
@@ -208,14 +195,47 @@
            in="SourceGraphic" />
       </feMerge>
     </filter>
+    <filter
+       id="filter3240"
+       inkscape:label="Drop shadow"
+       width="1.5"
+       height="1.5"
+       x="-.25"
+       y="-.25">
+      <feGaussianBlur
+         id="feGaussianBlur3242"
+         in="SourceAlpha"
+         stdDeviation="2"
+         result="blur" />
+      <feColorMatrix
+         id="feColorMatrix3244"
+         result="bluralpha"
+         type="matrix"
+         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 0.4 0 " />
+      <feOffset
+         id="feOffset3246"
+         in="bluralpha"
+         dx="1"
+         dy="1"
+         result="offsetBlur" />
+      <feMerge
+         id="feMerge3248">
+        <feMergeNode
+           id="feMergeNode3250"
+           in="offsetBlur" />
+        <feMergeNode
+           id="feMergeNode3252"
+           in="SourceGraphic" />
+      </feMerge>
+    </filter>
   </defs>
   <sodipodi:namedview
      showborder="true"
      id="base"
-     pagecolor="#ffffff"
+     pagecolor="#000000"
      bordercolor="#666666"
      borderopacity="1.0"
-     inkscape:pageopacity="0.0"
+     inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="8"
      inkscape:cx="17.6092"
@@ -226,7 +246,7 @@
      inkscape:document-units="px"
      inkscape:window-width="1680"
      inkscape:window-height="988"
-     inkscape:window-x="1672"
+     inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:showpageshadow="false"
      inkscape:object-nodes="true"
@@ -350,7 +370,7 @@
       <g
          id="g3019"
          transform="matrix(1.2597027,0,0,1.2597027,-6.6441571,-3.3417246)"
-         style="filter:url(#filter3069)">
+         style="filter:url(#filter3240)">
         <g
            transform="matrix(0.8440012,0.4098924,-0.3976349,0.8700185,20.079693,-20.682868)"
            id="g3359"

@@ -12,8 +12,8 @@
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    inkscape:export-ydpi="90"
    inkscape:export-xdpi="90"
-   inkscape:export-filename="music-sync-68.png"
-   sodipodi:docname="music-sync.svg"
+   inkscape:export-filename="music-sync-glow-68.png"
+   sodipodi:docname="music-sync-glow.svg"
    inkscape:version="0.48.0 r9654"
    style="display:inline"
    id="svg2408"
@@ -21,7 +21,7 @@
    width="68"
    version="1.0">
   <sodipodi:namedview
-     pagecolor="#ffffff"
+     pagecolor="#000000"
      bordercolor="#666666"
      borderopacity="1"
      objecttolerance="10"
@@ -2114,6 +2114,39 @@
          offset="1"
          style="stop-color:#ffffff;stop-opacity:0;" />
     </linearGradient>
+    <filter
+       id="filter5456"
+       inkscape:label="Drop shadow"
+       width="1.5"
+       height="1.5"
+       x="-.25"
+       y="-.25">
+      <feGaussianBlur
+         id="feGaussianBlur5458"
+         in="SourceAlpha"
+         stdDeviation="3"
+         result="blur" />
+      <feColorMatrix
+         id="feColorMatrix5460"
+         result="bluralpha"
+         type="matrix"
+         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 0.5 0 " />
+      <feOffset
+         id="feOffset5462"
+         in="bluralpha"
+         dx="0"
+         dy="0"
+         result="offsetBlur" />
+      <feMerge
+         id="feMerge5464">
+        <feMergeNode
+           id="feMergeNode5466"
+           in="offsetBlur" />
+        <feMergeNode
+           id="feMergeNode5468"
+           in="SourceGraphic" />
+      </feMerge>
+    </filter>
   </defs>
   <metadata
      id="metadata2413">
@@ -2181,7 +2214,8 @@
   </g>
   <g
      id="g3249"
-     transform="matrix(0.6655,0,0,0.6655,5.2500838,18.950606)">
+     transform="matrix(0.6655,0,0,0.6655,5.2500838,18.950606)"
+     style="filter:url(#filter5456)">
     <g
        transform="translate(0,-26)"
        id="layer3" />

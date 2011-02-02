@@ -1,0 +1,18 @@
+<Properties ModelVersion="1.1.2">
+  <General Title="Send Media Demo" Version="0.9" Vendor="Research In Motion Ltd." Description=""/>
+  <Application Type="BlackBerry Application" MainMIDletName="" MainArgs="startup" HomeScreenPosition="0" StartupTier="7" IsSystemModule="true" IsAutostartup="true"/>
+  <Resources hasTitleResource="false" TitleResourceBundleName="" TitleResourceBundleRelativePath="" TitleResourceBundleClassName="" TitleResourceBundleKey="" DescriptionId="">
+    <Icons/>
+  </Resources>
+  <Compile OutputCompilerMessages="false" ConvertImages="true" CreateWarningForNoExportedRoutine="true" CompressResources="false">
+    <PreprocessorDefines/>
+  </Compile>
+  <Packaging OutputFileName="SendMediaDemo" OutputFolder="deliverables" PreBuildStep="" PostBuildStep="" CleanStep="" GenerateALXFile="true">
+    <AlxFiles/>
+  </Packaging>
+  <HiddenProperties>
+    <ClassProtection/>
+    <PackageProtection/>
+  </HiddenProperties>
+  <AlternateEntryPoints/>
+</Properties>

@@ -7,15 +7,12 @@ import java.util.Vector;
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 
-import net.rim.device.api.ui.component.Dialog;
-
 import org.json.me.JSONException;
 import org.json.me.JSONObject;
 
 import com.nithinphilips.JsonHttpHelper;
 import com.nithinphilips.wifimusicsync.model.PlaylistInfo;
 import com.nithinphilips.wifimusicsync.model.PlaylistListResponse;
-import com.nithinphilips.wifimusicsync.model.PlaylistRequest;
 import com.nithinphilips.wifimusicsync.model.Subscription;
 import com.nithinphilips.wifimusicsync.model.SyncResponse;
 import com.nithinphilips.wifimusicsync.model.UrlBuilder;
@@ -32,6 +29,20 @@ public class Subscriber {
 		this.clientId = clientId;
 	}
 	
+	public PlaylistInfo[] getAlbums() throws JSONException, IOException
+    {
+        return getPlaylists(server.getAlbumsUrl(), ".hpl");
+    }
+	
+	public PlaylistInfo[] getArtists() throws JSONException, IOException
+    {
+        return getPlaylists(server.getArtistsUrl(), ".hpl");
+    }
+	
+	public PlaylistInfo[] getPlaylists() throws JSONException, IOException
+	{
+	    return getPlaylists(server.getPlaylistsUrl(), ".m3u");
+	}
 	
 	/**
 	 * Get a list of all playlists on the server.
@@ -39,8 +50,9 @@ public class Subscriber {
 	 * @throws JSONException
 	 * @throws IOException
 	 */
-	public PlaylistInfo[] getPlaylists() throws JSONException, IOException{
-		byte[] httpBytes = JsonHttpHelper.httpGet((server.getPlaylistsUrl()));
+	public PlaylistInfo[] getPlaylists(String url, String extension) throws JSONException, IOException{
+	    // TODO: Choose URL based on the request type.
+		byte[] httpBytes = JsonHttpHelper.httpGet(url);
 		String s_response = null;
 		if(httpBytes != null) s_response = new String(httpBytes);
 
@@ -51,6 +63,7 @@ public class Subscriber {
 			PlaylistListResponse response = PlaylistListResponse.fromJson(new JSONObject(s_response));
 			PlaylistInfo[] playlists = response.getPlaylists();
 			for (int i = 0; i < playlists.length; i++) {
+			    playlists[i].setExtension(extension);
 				playlists[i].setSelected(playlists[i].existsOnFileSystem(rootPath));
 			}
 			return playlists;
@@ -60,13 +73,15 @@ public class Subscriber {
 	public void updateSubscription() throws JSONException, IOException {
 
 		Vector playlists = new Vector();
-		Enumeration files = findPlaylists(rootPath);
 		
+		Vector files = findPlaylists(rootPath);
 		if(files != null){
-			while (files.hasMoreElements()) {
-				String file = (String)files.nextElement();
-				playlists.addElement(file.substring(0, file.length() - 4));
-			}
+		    for (int i = 0; i < files.size(); i++)
+            {
+		        String file = (String)files.elementAt(i);
+		        // NOTE: We assume that the extension is a dot + 3 chars 
+                playlists.addElement(file.substring(0, file.length() - 4));
+            }
 		}
 
 		Subscription subscription = new Subscription();
@@ -96,12 +111,23 @@ public class Subscriber {
 		
 	}
 
-	public static Enumeration findPlaylists(String root) throws IOException {
+	public static Vector findPlaylists(String root) throws IOException {
 		FileConnection fileConnection = null;
 		try {
 			fileConnection = (FileConnection) Connector.open(root, Connector.READ);
 			if (fileConnection.exists() && fileConnection.isDirectory()) {
-				return fileConnection.list("*.m3u", false);
+                // NOTE: In other locations we assume that the extension is a dot + 3 chars
+			    Vector result = new Vector();
+				
+				Enumeration m3uFiles = fileConnection.list("*.m3u", false);
+				while (m3uFiles.hasMoreElements())
+                    result.addElement(m3uFiles.nextElement());
+				
+				Enumeration hplFiles = fileConnection.list("*.hpl", false);
+				while (hplFiles.hasMoreElements())
+                    result.addElement(hplFiles.nextElement());
+                
+				return result;
 			} else {
 				return null;
 			}

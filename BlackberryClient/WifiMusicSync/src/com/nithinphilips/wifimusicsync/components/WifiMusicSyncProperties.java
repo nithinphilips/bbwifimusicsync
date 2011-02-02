@@ -6,6 +6,15 @@ import net.rim.device.api.util.*;
 
 public class WifiMusicSyncProperties implements Persistable
 {
+    
+    public final static int         LOCAL_STORE_TYPE_MEMORY = 0;
+    public final static int         LOCAL_STORE_TYPE_SDCARD = 1;
+    
+
+    public final static String      LOCAL_STORE_SD_PATH     = "file:///SDCard/Blackberry/music/WiFiSync/";
+    public final static String      LOCAL_STORE_MEMORY_PATH = "file:///store/Blackberry/music/WiFiSync/";
+        
+    
     private String serverIp;
     private String serverPort;
     
@@ -39,7 +48,7 @@ public class WifiMusicSyncProperties implements Persistable
         serverPort = "9000";
         homeWifiName = "";
         
-        localStoreRoot = "file:///SDCard/Blackberry/music/WiFiSync/";
+        localStoreRoot = LOCAL_STORE_SD_PATH;
         clientId = Integer.toHexString(DeviceInfo.getDeviceId() + UIDGenerator.getUID());
     }
     
@@ -107,7 +116,11 @@ public class WifiMusicSyncProperties implements Persistable
 		else
 			this.localStoreRoot = localStoreRoot + "/";
 	}
-
+	
+	public int getLocalStoreType(){
+	    return localStoreRoot.equals(LOCAL_STORE_SD_PATH) ? LOCAL_STORE_TYPE_SDCARD : LOCAL_STORE_TYPE_MEMORY;
+	}
+	
 	public String getHomeWifiName() {
 		return homeWifiName;
 	}

@@ -51,4 +51,20 @@ public class UrlBuilder {
 		return serverRoot + "/getplaylists";
 	}
 	
+	public String getAlbumsUrl()
+    {
+        return serverRoot + "/getalbums";
+    }
+	
+	public String getArtistsUrl()
+    {
+        return serverRoot + "/getartists";
+    }
+	
+	public String getPlaySongUrl()
+    {
+        return serverRoot + "/playsong";
+    }
+    
+	
 }

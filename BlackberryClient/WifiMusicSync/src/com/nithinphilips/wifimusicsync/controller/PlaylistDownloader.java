@@ -18,215 +18,264 @@ import com.nithinphilips.wifimusicsync.model.SyncAction;
 import com.nithinphilips.wifimusicsync.model.SyncResponse;
 import com.nithinphilips.wifimusicsync.model.UrlBuilder;
 
-public class PlaylistDownloader {
+public class PlaylistDownloader
+{
 
-	UrlBuilder server;
-	String playlistPath;
-	String rootPath;
-	String clientId;
+    UrlBuilder server;
+    String     playlistPath;
+    String     rootPath;
+    String     clientId;
 
-	public PlaylistDownloader(String serverUrl, String playlistPath, String rootPath,
-			String clientId) {
-		this.server = new UrlBuilder(serverUrl);
-		this.playlistPath = playlistPath;
-		this.rootPath = rootPath;
-		this.clientId = clientId;
-	}
+    public PlaylistDownloader(String serverUrl, String playlistPath, String rootPath, String clientId)
+    {
+        this.server = new UrlBuilder(serverUrl);
+        this.playlistPath = playlistPath;
+        this.rootPath = rootPath;
+        this.clientId = clientId;
+    }
 
-	SyncResponse response;
-	public SyncResponse getResponse() throws IOException, JSONException
-	{
-		
-		this.response = null;
-		
-		PlaylistRequest playlistRequest = new PlaylistRequest();
-		playlistRequest.setDeviceId(this.clientId);
-		playlistRequest.setPlaylistDevicePath(this.playlistPath);
-		playlistRequest.setDeviceMediaRoot(this.rootPath);
-		playlistRequest.loadPlaylistData(this.playlistPath);
+    SyncResponse response;
 
-		String s_response = JsonHttpHelper.executeCommand(server.getQueryUrl(),
-				playlistRequest.toJsonObject().toString());
+    public SyncResponse getResponse() throws IOException, JSONException
+    {
 
-		if ((s_response == null) || (s_response.compareTo("") == 0)) {
-			log("Error: No response from server.");
-		} else {
-			SyncResponse response = SyncResponse.fromJson(new JSONObject(s_response), server);
+        this.response = null;
 
-			if (response.getError() == SyncResponse.ERROR_NONE) {
-				this.response = response;
-			} else {
-				log("Server Error " + response.getErrorMessage());
-			}
-		}
-		
-		return this.response;
-	}
-	
-	public void handleResponse() throws JSONException, IOException{
-		if(this.response == null) getResponse(); // Try once
-		if(this.response == null) return;		// Some error
-		
-		// exec actions
-		executeActions(response.getActions());
+        PlaylistRequest playlistRequest = new PlaylistRequest();
+        playlistRequest.setDeviceId(this.clientId);
+        playlistRequest.setPlaylistDevicePath(this.playlistPath);
+        playlistRequest.setDeviceMediaRoot(this.rootPath);
+        playlistRequest.loadPlaylistData(this.playlistPath);
 
-		// update playlist
-		downloadFile(response.getPlaylistServerUrl(), response.getPlaylistDevicePath(), true);
-	}
+        String s_response = JsonHttpHelper.executeCommand(server.getQueryUrl(), playlistRequest.toJsonObject().toString());
 
-	public static void executeActions(SyncAction[] actions) throws JSONException, IOException {
-		for (int i = 0; i < actions.length; i++) {
-			if (actions[i].getType() == SyncAction.ADD) {
-				log("Add " + actions[i].getTrackUrl() + " "
-						+ actions[i].getDeviceLocation());
-				createDirectoryTree(actions[i].getDeviceLocation());
-				actions[i].setStatus("Downloading...");
-				downloadFile(actions[i].getTrackUrl(), actions[i].getDeviceLocation());
-				actions[i].setStatus("Completed");
-			} else if (actions[i].getType() == SyncAction.REMOVE) {
-				log("Delete " + actions[i].getDeviceLocation());
-				actions[i].setStatus("Deleting...");
-				deleteFile(actions[i].getDeviceLocation());
-				actions[i].setStatus("Completed");
-				// TODO: Delete empty directory trees too
-			}
-		}
-	}
+        if ((s_response == null) || (s_response.compareTo("") == 0))
+        {
+            log("Error: No response from server.");
+        }
+        else
+        {
+            SyncResponse response = SyncResponse.fromJson(new JSONObject(s_response), server);
 
-	private static void log(String string) {
+            if (response.getError() == SyncResponse.ERROR_NONE)
+            {
+                this.response = response;
+            }
+            else
+            {
+                log("Server Error " + response.getErrorMessage());
+            }
+        }
 
-	}
+        return this.response;
+    }
 
-	static void deleteFile(String fileName) throws IOException {
-		FileConnection fileConnection = null;
-		try {
-			fileConnection = (FileConnection) Connector.open(fileName);
-			if (fileConnection.exists())
-				fileConnection.delete();
-		} finally {
-			if (fileConnection != null) {
-				try {
-					fileConnection.close();
-				} catch (Exception error) {
-					/* log error */
-				}
-			}
-		}
-	}
+    public void handleResponse() throws JSONException, IOException
+    {
+        if (this.response == null) getResponse(); // Try once
+        if (this.response == null) return; // Some error
 
-	static final int BUFFER_SIZE = 1024;
+        // exec actions
+        executeActions(response.getActions());
 
-	public static void createDirectoryTree(String fileName) throws IOException {
-		// Create directories
-		String[] segments = WifiMusicSync.getDirectories("file:///", fileName);
-		for (int i = 0; i < segments.length - 1; i++) {
-			log(segments[i]);
-			FileConnection dir = (FileConnection) Connector.open(segments[i],
-					Connector.READ_WRITE);
-			if (!dir.exists())
-				dir.mkdir();
-			dir.close();
-		}
-	}
+        // update playlist
+        downloadFile(response.getPlaylistServerUrl(), response.getPlaylistDevicePath(), true, null);
+    }
 
-	static void downloadFile(String url, String fileName) throws IOException {
-		downloadFile(url, fileName, false);
-	}
+    public static void executeActions(SyncAction[] actions) throws JSONException, IOException
+    {
+        for (int i = 0; i < actions.length; i++)
+        {
+            if (actions[i].getType() == SyncAction.ADD)
+            {
+                log("Add " + actions[i].getTrackUrl() + " " + actions[i].getDeviceLocation());
+                createDirectoryTree(actions[i].getDeviceLocation());
+                actions[i].setStatus("Downloading...");
+                downloadFile(actions[i].getTrackUrl(), actions[i].getDeviceLocation(), actions[i]);
+            }
+            else if (actions[i].getType() == SyncAction.REMOVE)
+            {
+                log("Delete " + actions[i].getDeviceLocation());
+                actions[i].setStatus("Deleting...");
+                deleteFile(actions[i].getDeviceLocation());
+                actions[i].setStatus("Completed");
+                // TODO: Delete empty directory trees too
+            }
+        }
+    }
 
-	static void downloadFile(final String url, final String fileName,
-			boolean forceOverwrite) throws IOException {
-		log("Downloading: " + fileName + " from: " + url);
+    private static void log(String string)
+    {
 
-		HttpConnection httpConnection = null;
-		FileConnection fileConnection = null;
+    }
 
-		InputStream httpInStream = null;
-		OutputStream fileOutStream = null;
+    static void deleteFile(String fileName) throws IOException
+    {
+        FileConnection fileConnection = null;
+        try
+        {
+            fileConnection = (FileConnection) Connector.open(fileName);
+            if (fileConnection.exists()) fileConnection.delete();
+        }
+        finally
+        {
+            if (fileConnection != null)
+            {
+                try
+                {
+                    fileConnection.close();
+                }
+                catch (Exception error)
+                {
+                    /* log error */
+                }
+            }
+        }
+    }
 
-		try {
-			httpConnection = (HttpConnection) Connector.open(url
-					+ JsonHttpHelper.URL_SUFFIX);
-			// HTTP Request
-			httpConnection.setRequestMethod(HttpConnection.GET);
-			httpConnection.setRequestProperty("Connection", "close");
+    static final int BUFFER_SIZE = 1024;
 
-			int status = httpConnection.getResponseCode();
+    public static void createDirectoryTree(String fileName) throws IOException
+    {
+        // Create directories
+        String[] segments = WifiMusicSync.getDirectories("file:///", fileName);
+        for (int i = 0; i < segments.length - 1; i++)
+        {
+            log(segments[i]);
+            FileConnection dir = (FileConnection) Connector.open(segments[i], Connector.READ_WRITE);
+            if (!dir.exists()) dir.mkdir();
+            dir.close();
+        }
+    }
 
-			if (status == HttpConnection.HTTP_OK) {
-				fileConnection = (FileConnection) Connector.open(fileName,
-						Connector.READ_WRITE);
+    static void downloadFile(String url, String fileName, SyncAction updateReceiver) throws IOException
+    {
+        downloadFile(url, fileName, false, updateReceiver);
+    }
 
-				if (fileConnection.exists()) {
-					if (forceOverwrite) {
-						fileConnection.delete();
-					} else {
-						try {
-							long contentLength = Long.parseLong(httpConnection
-									.getHeaderField("Content-Length"));
-							log("Sever: " + Long.toString(contentLength)
-									+ " Client: "
-									+ Long.toString(fileConnection.fileSize()));
-							if (contentLength != fileConnection.fileSize()) {
-								fileConnection.delete();
-							} else {
-								// Same file. No skip download
-								httpConnection.close();
-								log("Skip download");
-								return;
-							}
-						} catch (Exception ex) {
-							// Delete the file, to be safe
-							if (fileConnection.exists())
-								fileConnection.delete();
-						}
-					}
-				}
+    static void downloadFile(final String url, final String fileName, boolean forceOverwrite, SyncAction updateReceiver) throws IOException
+    {
+        log("Downloading: " + fileName + " from: " + url);
 
-				fileConnection.create();
+        HttpConnection httpConnection = null;
+        FileConnection fileConnection = null;
 
-				log("Creating " + fileName);
+        InputStream httpInStream = null;
+        OutputStream fileOutStream = null;
 
-				httpInStream = httpConnection.openInputStream();
-				fileOutStream = fileConnection.openOutputStream();
+        try
+        {
+            httpConnection = (HttpConnection) Connector.open(url + JsonHttpHelper.URL_SUFFIX);
+            httpConnection.setRequestMethod(HttpConnection.GET);
+            httpConnection.setRequestProperty("Connection", "close");
 
-				byte[] readBuf = new byte[BUFFER_SIZE];
-				while (true) {
-					int read = httpInStream.read(readBuf);
-					// Dialog.alert("Read " + Integer.toString(read));
-					if (read == -1)
-						break;
-					fileOutStream.write(readBuf, 0, read);
-				}
+            int status = httpConnection.getResponseCode();
+            
 
-				fileOutStream.flush();
+            if (status == HttpConnection.HTTP_OK)
+            {
+                long contentLength = Long.parseLong(httpConnection.getHeaderField("Content-Length"));
 
-				log("Done: " + fileName);
-			}
-		} finally {
-			try {
-				if (httpInStream != null)
-					httpInStream.close();
-			} catch (Exception error) {
-			}
+                fileConnection = (FileConnection) Connector.open(fileName, Connector.READ_WRITE);
 
-			try {
-				if (fileOutStream != null)
-					fileOutStream.close();
-			} catch (Exception error) {
-			}
+                if (fileConnection.exists())
+                {
+                    if (forceOverwrite)
+                    {
+                        fileConnection.delete();
+                    }
+                    else
+                    {
+                        try
+                        {
+                            log("Sever: " + Long.toString(contentLength) + " Client: " + Long.toString(fileConnection.fileSize()));
+                            if (contentLength != fileConnection.fileSize())
+                            {
+                                fileConnection.delete();
+                            }
+                            else
+                            {
+                                // Same file. No skip download
+                                httpConnection.close();
+                                if (updateReceiver != null) updateReceiver.setStatus("Skip duplicate");
+                                return;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Delete the file, to be safe
+                            if (fileConnection.exists()) fileConnection.delete();
+                        }
+                    }
+                }
 
-			try {
-				if (httpConnection != null)
-					httpConnection.close();
-			} catch (Exception error) {
-			}
+                fileConnection.create();
 
-			try {
-				if (fileConnection != null)
-					fileConnection.close();
-			} catch (Exception error) {
-			}
-		}
-	}
+                httpInStream = httpConnection.openInputStream();
+                fileOutStream = fileConnection.openOutputStream();
+
+                long totalRead = 0;
+                
+                byte[] readBuf = new byte[BUFFER_SIZE];
+                while (true)
+                {
+                    int read = httpInStream.read(readBuf);
+                    
+                    totalRead += read;
+                    if (read == -1) break;
+                    fileOutStream.write(readBuf, 0, read);
+                    if(updateReceiver != null) updateReceiver.setStatus(Integer.toString(calculatePercent(totalRead, contentLength)) + "% done");
+                }
+
+                fileOutStream.flush();
+
+                if(updateReceiver != null) updateReceiver.setStatus("Complete");
+            }
+        }
+        finally
+        {
+            try
+            {
+                if (httpInStream != null) httpInStream.close();
+            }
+            catch (Exception error)
+            {
+            }
+
+            try
+            {
+                if (fileOutStream != null) fileOutStream.close();
+            }
+            catch (Exception error)
+            {
+            }
+
+            try
+            {
+                if (httpConnection != null) httpConnection.close();
+            }
+            catch (Exception error)
+            {
+            }
+
+            try
+            {
+                if (fileConnection != null) fileConnection.close();
+            }
+            catch (Exception error)
+            {
+            }
+        }
+    }
+    
+    public static int calculatePercent(long value, long total)
+    {
+        return calculatePercent((double)value, (double)total);
+    }
+    
+    public static int calculatePercent(double value, double total)
+    {
+        return (int)((value / total) * 100.00);
+    }
 
 }

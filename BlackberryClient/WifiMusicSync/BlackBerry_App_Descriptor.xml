@@ -4,6 +4,7 @@
   <Resources hasTitleResource="false" TitleResourceBundleName="" TitleResourceBundleRelativePath="" TitleResourceBundleClassName="" TitleResourceBundleKey="" DescriptionId="">
     <Icons>
       <Icon CanonicalFileName="res/music-sync-68.png" IsFocus="false"/>
+      <Icon CanonicalFileName="res/music-sync-glow-68.png" IsFocus="true"/>
     </Icons>
   </Resources>
   <Compile OutputCompilerMessages="true" ConvertImages="false" CreateWarningForNoExportedRoutine="true" CompressResources="true" AliasList="">
@@ -16,9 +17,5 @@
     <ClassProtection/>
     <PackageProtection/>
   </HiddenProperties>
-  <AlternateEntryPoints>
-    <AlternateEntryPoint Title="Wifi Music Sync - Background Sync" MainMIDletName="" ArgumentsForMain="sync" HomeScreenPosition="0" StartupTier="7" IsSystemModule="true" IsAutostartup="true" hasTitleResource="false" TitleResourceBundleKey="" TitleResourceBundleName="" TitleResourceBundleClassName="" TitleResourceBundleRelativePath="">
-      <Icons/>
-    </AlternateEntryPoint>
-  </AlternateEntryPoints>
+  <AlternateEntryPoints/>
 </Properties>

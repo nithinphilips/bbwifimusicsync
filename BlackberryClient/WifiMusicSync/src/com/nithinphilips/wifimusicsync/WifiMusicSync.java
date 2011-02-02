@@ -4,9 +4,14 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Vector;
 
+import javax.microedition.content.ActionNameMap;
+import javax.microedition.content.ContentHandler;
+import javax.microedition.content.Registry;
+
 import net.rim.device.api.system.ApplicationDescriptor;
 import net.rim.device.api.system.ApplicationManager;
 import net.rim.device.api.system.DeviceInfo;
+import net.rim.device.api.system.RuntimeStore;
 import net.rim.device.api.system.WLANInfo;
 import net.rim.device.api.ui.UiApplication;
 
@@ -25,11 +30,12 @@ public final class WifiMusicSync extends UiApplication
         // check available memory FileConnection.availableSize();
 
         // Check battery level
-        if (((DeviceInfo.getBatteryStatus() & DeviceInfo.BSTAT_CHARGING) == DeviceInfo.BSTAT_CHARGING) || (DeviceInfo.getBatteryLevel() >= 10)) // Check wifi status
+        if (((DeviceInfo.getBatteryStatus() & DeviceInfo.BSTAT_CHARGING) == DeviceInfo.BSTAT_CHARGING) || (DeviceInfo.getBatteryLevel() >= 10)) 
+        // Check wifi status
         if (WLANInfo.getWLANState() == WLANInfo.WLAN_STATE_CONNECTED)
         {
             WLANInfo.WLANAPInfo apInfo = WLANInfo.getAPInfo();
-            if (apInfo != null) if (apInfo.getSSID() == props.getHomeWifiName()) sync();
+            //if (apInfo != null) if (apInfo.getSSID() == props.getHomeWifiName()) sync();
         }
 
         // Schedule run
@@ -139,43 +145,6 @@ public final class WifiMusicSync extends UiApplication
 
         }
         return vec;
-    }
-
-    private static void sync()
-    {
-        Thread t = new Thread() {
-            public void run()
-            {
-                try
-                {
-                    WifiMusicSyncProperties props = WifiMusicSyncProperties.fetch();
-                    Enumeration playlists = Subscriber.findPlaylists(props.getLocalStoreRoot());
-                    if (playlists != null) while (playlists.hasMoreElements())
-                    {
-                        String playlist = props.getLocalStoreRoot() + (String) playlists.nextElement();
-
-                        PlaylistDownloader downloader = new PlaylistDownloader(props.getServerUrl(), playlist, props.getLocalStoreRoot(), props.getClientId());
-
-                        downloader.getResponse();
-                        downloader.handleResponse();
-                    }
-                    else log("No playlists found");
-                }
-                catch (JSONException e)
-                {
-                    log(e.toString());
-                }
-                catch (IOException e)
-                {
-                    log(e.toString());
-                }
-                catch (IllegalArgumentException e)
-                {
-                    log(e.toString());
-                }
-            }
-        };
-        t.start();
     }
 
     public WifiMusicSync()

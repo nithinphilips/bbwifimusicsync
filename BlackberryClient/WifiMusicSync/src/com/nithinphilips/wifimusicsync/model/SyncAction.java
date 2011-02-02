@@ -1,107 +1,127 @@
 package com.nithinphilips.wifimusicsync.model;
 
-import net.rim.blackberry.api.pdap.BlackBerryContactList.AddressTypes;
-
 import org.json.me.JSONException;
 import org.json.me.JSONObject;
 
 import com.nithinphilips.wifimusicsync.components.SyncActionChangedCallBack;
 
-public class SyncAction {
-	
-	public static final int NONE = 0;
-	public static final int ADD = 1;
-	public static final int REMOVE = 2;
-	
-	SyncActionChangedCallBack notifier;
-	
-	public SyncActionChangedCallBack getNotifier() {
-		return notifier;
-	}
-	public void setNotifier(SyncActionChangedCallBack notifier) {
-		this.notifier = notifier;
-	}
+public class SyncAction
+{
 
-	int index = 0;
+    public static final int   NONE   = 0;
+    public static final int   ADD    = 1;
+    public static final int   REMOVE = 2;
+    
+    int                       index  = 0;
+    int                       type   = NONE;
+    String                    deviceLocation;
+    String                    trackPath;
+    String                    status = "Pending";
+    SyncActionChangedCallBack notifier;
 
-	public int getIndex() {
-		return index;
-	}
-	public void setIndex(int index) {
-		this.index = index;
-	}
+    public String getDeviceLocation()
+    {
+        return deviceLocation;
+    }
 
-	int type = NONE;
-	String deviceLocation;
-	
-	public void setType(int type) {
-		this.type = type;
-	}
-	public void setDeviceLocation(String deviceLocation) {
-		this.deviceLocation = deviceLocation;
-	}
-	
-	public String getFileName(){
-		int index = deviceLocation == null ? -1 : deviceLocation.lastIndexOf('/');
-		
-		if(index >= 0){
-			return deviceLocation.substring(index + 1);
-		}else{
-			return deviceLocation;
-		}
-	}
-	
-	public void setTrackUrl(String trackUrl) {
-		this.trackPath = trackUrl;
-	}
-	
+    public String getFileName()
+    {
+        int index = deviceLocation == null ? -1 : deviceLocation.lastIndexOf('/');
 
-	String trackPath;
-	String status = "Queued";
+        if (index >= 0)
+        {
+            return deviceLocation.substring(index + 1);
+        }
+        else
+        {
+            return deviceLocation;
+        }
+    }
 
-	public int getType() {
-		return type;
-	}
-	public String getDeviceLocation() {
-		return deviceLocation;
-	}
-	public String getTrackUrl() {
-		return trackPath;
-	}
-	
-	public static SyncAction fromJson(JSONObject json, UrlBuilder server) throws JSONException{
-		SyncAction result = new SyncAction();
+    public int getIndex()
+    {
+        return index;
+    }
 
-		if(json.getString("Type").compareTo("Add") == 0){
-			result.type = SyncAction.ADD;
-			result.trackPath = server.getFullUrl(json.getString("TrackPath"));
-		}else if(json.getString("Type").compareTo("Remove") == 0){
-			result.type = SyncAction.REMOVE;
-		}
-		
-		result.deviceLocation = json.getString("DeviceLocation");
-		return result;
-	}
-	
-	public String toString()
-	{
-		StringBuffer sb = new StringBuffer();
-		sb.append(type == ADD ? "Add" : "Remove");
-		sb.append(": \"");
-		sb.append(deviceLocation);
-		sb.append("\" \"");
-		sb.append(trackPath);
-		sb.append("\"");
-		return sb.toString();
-		
-	}
-	
-	public String getStatus() {		
-		return status;
-	}
-	
-	public void setStatus(String status) {
-		this.status = status;
-		if(notifier != null) notifier.changed(this);
-	}
+    public SyncActionChangedCallBack getNotifier()
+    {
+        return notifier;
+    }
+
+    public String getStatus()
+    {
+        return status;
+    }
+
+    public String getTrackUrl()
+    {
+        return trackPath;
+    }
+
+    public int getType()
+    {
+        return type;
+    }
+
+    public void setDeviceLocation(String deviceLocation)
+    {
+        this.deviceLocation = deviceLocation;
+    }
+
+    public void setIndex(int index)
+    {
+        this.index = index;
+    }
+
+    public void setNotifier(SyncActionChangedCallBack notifier)
+    {
+        this.notifier = notifier;
+    }
+
+    public void setStatus(String status)
+    {
+        this.status = status;
+        if (notifier != null) notifier.changed(this);
+    }
+
+    public void setTrackUrl(String trackUrl)
+    {
+        this.trackPath = trackUrl;
+    }
+
+    public void setType(int type)
+    {
+        this.type = type;
+    }
+    
+    public static SyncAction fromJson(JSONObject json, UrlBuilder server) throws JSONException
+    {
+        SyncAction result = new SyncAction();
+
+        if (json.getString("Type").compareTo("Add") == 0)
+        {
+            result.type = SyncAction.ADD;
+            result.trackPath = server.getFullUrl(json.getString("TrackPath"));
+        }
+        else if (json.getString("Type").compareTo("Remove") == 0)
+        {
+            result.type = SyncAction.REMOVE;
+        }
+
+        result.deviceLocation = json.getString("DeviceLocation");
+        return result;
+    }
+
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer();
+        sb.append(type == ADD ? "Add" : "Remove");
+        sb.append(": \"");
+        sb.append(deviceLocation);
+        sb.append("\" \"");
+        sb.append(trackPath);
+        sb.append("\"");
+        return sb.toString();
+
+    }
 }

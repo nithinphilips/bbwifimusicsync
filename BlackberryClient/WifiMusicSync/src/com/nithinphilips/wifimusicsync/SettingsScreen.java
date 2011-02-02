@@ -1,33 +1,50 @@
 package com.nithinphilips.wifimusicsync;
 
-import com.nithinphilips.*;
-import com.nithinphilips.wifimusicsync.components.WifiMusicSyncProperties;
+import java.util.Enumeration;
 
+import javax.microedition.io.file.FileSystemRegistry;
+
+import net.rim.device.api.system.DeviceInfo;
 import net.rim.device.api.system.WLANInfo;
-import net.rim.device.api.ui.*;
-import net.rim.device.api.ui.component.*;
-import net.rim.device.api.ui.container.*;
-import net.rim.device.api.ui.decor.*;
-import net.rim.device.api.ui.picker.FilePicker;
-import net.rim.device.api.ui.picker.FilePicker.Listener;
+import net.rim.device.api.ui.Field;
+import net.rim.device.api.ui.FieldChangeListener;
+import net.rim.device.api.ui.Manager;
+import net.rim.device.api.ui.component.ButtonField;
+import net.rim.device.api.ui.component.ChoiceField;
+import net.rim.device.api.ui.component.EditField;
+import net.rim.device.api.ui.component.LabelField;
+import net.rim.device.api.ui.component.ObjectChoiceField;
+import net.rim.device.api.ui.component.StandardTitleBar;
+import net.rim.device.api.ui.container.GridFieldManager;
+import net.rim.device.api.ui.container.MainScreen;
+import net.rim.device.api.ui.container.VerticalFieldManager;
+import net.rim.device.api.ui.decor.BackgroundFactory;
+
+import com.nithinphilips.UiFactory;
+import com.nithinphilips.wifimusicsync.components.WifiMusicSyncProperties;
 
 public class SettingsScreen extends MainScreen{
 
 	private EditField serverIpEdit;
     private EditField serverPortEdit;
-    private EditField localStoreRoot;
-    private EditField homeWifiEdit;
+    private ObjectChoiceField localStoreType;
  
     private WifiMusicSyncProperties optionProperties; 
+    
+    private String sdCardLabel = "SD Card";
+    private String deviceStoreLabel = "Device Memory";
     
     public SettingsScreen(){
     	super(VERTICAL_SCROLL);
 		
-		StandardTitleBar _titleBar = new StandardTitleBar();
-		_titleBar.addTitle("Music Sync Settings");
-		_titleBar.addNotifications();
-		_titleBar.addSignalIndicator();
-		this.setTitle(_titleBar);
+
+        StandardTitleBar _titleBar = new StandardTitleBar();
+        _titleBar.addTitle("Settings");
+        _titleBar.addNotifications();
+        _titleBar.addSignalIndicator();
+        this.setTitle(_titleBar);
+        
+        //this.setTitle(new LabelField("Settings")); 
 		
 		((VerticalFieldManager) getMainManager()).setBackground(BackgroundFactory.createSolidBackground(UiFactory.COLOR_SCREEN_BACKGROUND));
 
@@ -48,8 +65,27 @@ public class SettingsScreen extends MainScreen{
         
         serverIpEdit = UiFactory.createEditField(optionProperties.getServerIp(), 0);
         serverPortEdit = UiFactory.createNumericEditField(optionProperties.getServerPort());
-        localStoreRoot = UiFactory.createEditField(optionProperties.getLocalStoreRoot(), 0);        
-        homeWifiEdit = UiFactory.createEditField(optionProperties.getHomeWifiName(), 0);
+        // 0 = SDCard, 1 = Device store
+        // TODO: No sdcard option if no sdcard inserted.
+        
+        boolean hasSDCard = false;
+        String root = null;
+        Enumeration e = FileSystemRegistry.listRoots();
+        while (e.hasMoreElements()) {
+             root = (String) e.nextElement();
+             if( root.equalsIgnoreCase("sdcard/") ) {
+                 hasSDCard = true;
+                 break;
+             }
+        }
+        
+        if(hasSDCard)
+            localStoreType = new ObjectChoiceField("", new String[]{ deviceStoreLabel, sdCardLabel}, optionProperties.getLocalStoreType(), Field.FIELD_LEFT);
+        else
+            localStoreType = new ObjectChoiceField("", new String[]{ deviceStoreLabel }, 0, Field.USE_ALL_WIDTH);
+        
+        if((!hasSDCard) &&  optionProperties.getLocalStoreType() == WifiMusicSyncProperties.LOCAL_STORE_TYPE_SDCARD)
+            localStoreType.setDirty(true);
 
         
         VerticalFieldManager serverGroup = UiFactory.createVerticalFieldGroup("Server Settings");
@@ -63,54 +99,32 @@ public class SettingsScreen extends MainScreen{
         serverGrid.add(serverPortEdit);
         serverGroup.add(serverGrid);
 
-//        ButtonField pickDirectoryButton = new ButtonField("Browse...", ButtonField.FIELD_RIGHT);
-//        pickDirectoryButton.setChangeListener(new FieldChangeListener() {
-//			public void fieldChanged(Field field, int context) {
-//				FilePicker picker = FilePicker.getInstance();
-//				picker.setPath(localStoreRoot.getText());
-//				picker.setView(FilePicker.VIEW_ALL);
-//				picker.setListener(new Listener() {
-//					public void selectionDone(String selected) {
-//						localStoreRoot.setText(selected);
-//					}
-//				});
-//				picker.show();
-//			}
-//		});
         
-        VerticalFieldManager storageGroup = UiFactory.createVerticalFieldGroup("Music Storage");
-        storageGroup.add(new LabelField("Directory:"));
-        storageGroup.add(localStoreRoot);
-//        storageGroup.add(pickDirectoryButton);
+        VerticalFieldManager storageGroup = UiFactory.createVerticalFieldGroup("Media Storage");
+        storageGroup.add(new LabelField("Select the location to store downloaded media:"));
+        storageGroup.add(localStoreType);
         
-        ButtonField getCurrentSsidButton = new ButtonField("Use Current SSID", ButtonField.FIELD_RIGHT);
-        getCurrentSsidButton.setChangeListener(new FieldChangeListener() {
-			public void fieldChanged(Field field, int context) {
-				WLANInfo.WLANAPInfo apInfo = WLANInfo.getAPInfo();
-				if(apInfo != null){
-					homeWifiEdit.setText(apInfo.getSSID());
-				}
-			}
-		});
-        
-        VerticalFieldManager wifiGroup = UiFactory.createVerticalFieldGroup("WiFi Settings");
-        wifiGroup.add(new LabelField("Your Home WiFi SSID:"));
-        wifiGroup.add(homeWifiEdit);
-        wifiGroup.add(getCurrentSsidButton);
+        VerticalFieldManager deviceIdGroup = UiFactory.createVerticalFieldGroup("Device ID");
+        deviceIdGroup.add(new LabelField("Sync Client ID: " + optionProperties.getClientId()));
+        deviceIdGroup.add(new LabelField("This ID uniquely identifies your device. You should only add known and trusted devices to your server's allowed clients list."));
         
         mainScreen.add(serverGroup);
         mainScreen.add(storageGroup);
-        mainScreen.add(wifiGroup);
+        mainScreen.add(deviceIdGroup);
     }
 
     public void save()
     {
+        String storageChoice = (String)localStoreType.getChoice(localStoreType.getSelectedIndex());
         //Get the new values from the UI controls
         //and set them in optionProperties.
         optionProperties.setServerIp(serverIpEdit.getText());
         optionProperties.setServerPort(serverPortEdit.getText());
-        optionProperties.setLocalStoreRoot(localStoreRoot.getText());
-        optionProperties.setHomeWifiName(homeWifiEdit.getText());
+        
+        if(storageChoice.equals(deviceStoreLabel))
+            optionProperties.setLocalStoreRoot(WifiMusicSyncProperties.LOCAL_STORE_MEMORY_PATH);
+        else if(storageChoice.equals(sdCardLabel))
+            optionProperties.setLocalStoreRoot(WifiMusicSyncProperties.LOCAL_STORE_SD_PATH);
  
         
         //Write our changes back to the persistent store.

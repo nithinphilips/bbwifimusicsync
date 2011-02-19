@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\Extensions.cs" />
+    <Compile Include="Helpers\Constants.cs" />
     <Compile Include="Helpers\DiffHandler.cs" />
     <Compile Include="Helpers\Helper.cs" />
     <Compile Include="Helpers\CachedXmliTunesLibrary.cs" />

@@ -6,8 +6,11 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 // #ifdef BlackBerry6.0.0
+import net.rim.device.api.applicationcontrol.ApplicationPermissions;
+import net.rim.device.api.applicationcontrol.ApplicationPermissionsManager;
 import net.rim.device.api.command.CommandHandler;
 import net.rim.device.api.command.ReadOnlyCommandMetadata; // #endif
+import net.rim.device.api.system.ApplicationDescriptor;
 import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.ui.Color;
 import net.rim.device.api.ui.DrawStyle;
@@ -49,6 +52,7 @@ import com.nithinphilips.wifimusicsync.controller.Subscriber;
 import com.nithinphilips.wifimusicsync.model.PlaylistInfo;
 import com.nithinphilips.wifimusicsync.model.SyncAction;
 import com.nithinphilips.wifimusicsync.model.SyncResponse;
+import com.nithinphilips.wifimusicsync.permissions.MusicSyncPermissionReasonProvider;
 
 public class WifiMusicSyncScreen extends MainScreen
 {
@@ -88,6 +92,8 @@ public class WifiMusicSyncScreen extends MainScreen
     public WifiMusicSyncScreen()
     {
         super(VERTICAL_SCROLL);
+        
+        checkPermissions();
 
         ((VerticalFieldManager) getMainManager()).setBackground(BackgroundFactory.createSolidBackground(Color.BLACK));
 
@@ -631,5 +637,58 @@ public class WifiMusicSyncScreen extends MainScreen
             }
         });
     }
+    
+ 
+    private void checkPermissions()
+    {
+        // Capture the current state of permissions and check against the requirements
+        ApplicationPermissionsManager apm = ApplicationPermissionsManager.getInstance();
+        ApplicationPermissions original = apm.getApplicationPermissions();
+
+        // Set up and attach a reason provider
+        MusicSyncPermissionReasonProvider drp = new MusicSyncPermissionReasonProvider();
+        apm.addReasonProvider(ApplicationDescriptor.currentApplicationDescriptor(), drp);
+
+        if(original.getPermission(ApplicationPermissions.PERMISSION_FILE_API) == ApplicationPermissions.VALUE_ALLOW &&
+           original.getPermission(ApplicationPermissions.PERMISSION_INTERNET) == ApplicationPermissions.VALUE_ALLOW &&
+           original.getPermission(ApplicationPermissions.PERMISSION_WIFI) == ApplicationPermissions.VALUE_ALLOW &&
+           original.getPermission(ApplicationPermissions.PERMISSION_DEVICE_SETTINGS) == ApplicationPermissions.VALUE_ALLOW &&
+           original.getPermission(ApplicationPermissions.PERMISSION_CROSS_APPLICATION_COMMUNICATION) == ApplicationPermissions.VALUE_ALLOW)
+        {
+            // All of the necessary permissions are currently available
+            return;
+        }
+
+        // Create a permission request for each of the permissions your application
+        // needs. Note that you do not want to list all of the possible permission
+        // values since that provides little value for the application or the user.  
+        // Please only request the permissions needed for your application.
+        ApplicationPermissions permRequest = new ApplicationPermissions();
+        permRequest.addPermission(ApplicationPermissions.PERMISSION_FILE_API);
+        permRequest.addPermission(ApplicationPermissions.PERMISSION_INTERNET);
+        permRequest.addPermission(ApplicationPermissions.PERMISSION_WIFI);
+        permRequest.addPermission(ApplicationPermissions.PERMISSION_DEVICE_SETTINGS);
+        permRequest.addPermission(ApplicationPermissions.PERMISSION_CROSS_APPLICATION_COMMUNICATION);
+        
+
+        boolean acceptance = ApplicationPermissionsManager.getInstance().invokePermissionsRequest(permRequest);
+
+        if(acceptance)
+        {
+            // User has accepted all of the permissions
+            return;
+        }
+        else
+        {
+            // The user has only accepted some or none of the permissions 
+            // requested. In this sample, we will not perform any additional 
+            // actions based on this information. However, there are several 
+            // scenarios where this information could be used. For example,
+            // if the user denied networking capabilities then the application 
+            // could disable that functionality if it was not core to the 
+            // operation of the application.
+        }
+    }
+
 
 }

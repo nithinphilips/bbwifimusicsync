@@ -35,6 +35,8 @@ namespace libMusicSync.iTunes
             CanModify = false;
             MusicFolderPath = parser.MusicFolder;
             Playlists = parser.Playlists;
+            Artists = parser.GetArtists();
+            Albums = parser.GetAlbums();
         }
 
     }

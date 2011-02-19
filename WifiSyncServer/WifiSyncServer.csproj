@@ -6,7 +6,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{A67A3E5F-A42B-450C-B464-6A352CF42AFC}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WifiSyncServer</RootNamespace>
     <AssemblyName>WifiSyncServer</AssemblyName>
@@ -37,6 +37,9 @@
   <PropertyGroup>
     <ApplicationIcon>music-sync-server.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
       <HintPath>..\lib\log4net\log4net.dll</HintPath>
@@ -47,6 +50,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Kayak\lib\rx3.5\System.CoreEx.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Observable, Version=1.0.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Kayak\lib\rx3.5\System.Observable.dll</HintPath>
@@ -60,6 +64,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Kayak\lib\rx3.5\System.Threading.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />

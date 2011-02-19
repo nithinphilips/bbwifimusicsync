@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Web;
 using System.Xml;
 using System.Xml.XPath;
@@ -61,6 +62,38 @@ namespace libMusicSync.iTunesExport.Parser
         }
 
         #endregion
+
+        public IEnumerable<IPlaylist> GetArtists()
+        {
+            Dictionary<string, List<ITrack>> artistView = new Dictionary<string, List<ITrack>>();
+
+            foreach (var track in _tracks.Values)
+            {
+                if (artistView.ContainsKey(track.AlbumArtist))
+                    artistView[track.AlbumArtist].Add(track);
+                else
+                    artistView.Add(track.AlbumArtist, new List<ITrack> {track});
+            }
+
+            return artistView.Keys.Select(artist => new Playlist(-1, artist, false, artistView[artist]));
+        }
+
+
+        public IEnumerable<IPlaylist> GetAlbums()
+        {
+            Dictionary<string, List<ITrack>> albumView = new Dictionary<string, List<ITrack>>();
+
+            foreach (var track in _tracks.Values)
+            {
+                if (albumView.ContainsKey(track.Album))
+                    albumView[track.Album].Add(track);
+                else
+                    albumView.Add(track.Album, new List<ITrack> { track });
+                
+            }
+
+            return albumView.Keys.Select(album => new Playlist(-1, album, false, albumView[album]));
+        }
 
         #region Public Static Methods
 

@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using libMusicSync.Extensions;
+using libMusicSync.Helpers;
 using libMusicSync.iTunesExport.Parser;
 
 namespace libMusicSync.iTunes
@@ -43,6 +44,12 @@ namespace libMusicSync.iTunes
         public string MusicFolderPath { get; protected set; }
 
         public IEnumerable<IPlaylist> Playlists { get; protected set; }
+
+        //TODO: Not assigned
+        public IEnumerable<IPlaylist> Artists { get; protected set; }
+
+        //TODO: Not assigned
+        public IEnumerable<IPlaylist> Albums { get; protected set; }
 
         /// <summary>
         ///   Generates a playlist (m3u) from an iTunes playlist.
@@ -74,9 +81,18 @@ namespace libMusicSync.iTunes
         /// <returns>The playlist if found, or null if no match.</returns>
         public IPlaylist GetFirstPlaylistByName(string name)
         {
-            return (from p in Playlists
-                    where p.GetSafeName() == name
-                    select p).FirstOrDefault();
+            if (name.StartsWith(Constants.ArtistPlaylistPrefix))
+                return (from p in Artists
+                        where p.GetArtistPlaylistSafeName() == name
+                        select p).FirstOrDefault();
+            else if (name.StartsWith(Constants.AlbumPlaylistPrefix))
+                return (from p in Albums
+                       where p.GetAlbumPlaylistSafeName()== name
+                       select p).FirstOrDefault();
+            else
+                return (from p in Playlists
+                       where p.GetSafeName() == name
+                       select p).FirstOrDefault();
         }
 
         /// <summary>
@@ -86,9 +102,18 @@ namespace libMusicSync.iTunes
         /// <returns>An enumeration of the found playlists.</returns>
         public IEnumerable<IPlaylist> GetPlaylistsByName(string name)
         {
-            return from p in Playlists
-                   where p.GetSafeName() == name
-                   select p;
+            if (name.StartsWith(Constants.ArtistPlaylistPrefix))
+                return from p in Artists
+                       where p.GetArtistPlaylistSafeName() == name
+                       select p;
+            else if (name.StartsWith(Constants.AlbumPlaylistPrefix))
+                return from p in Albums
+                       where p.GetAlbumPlaylistSafeName() == name
+                       select p;
+            else
+                return from p in Playlists
+                       where p.GetSafeName() == name
+                       select p;
         }
 
         /// <summary>

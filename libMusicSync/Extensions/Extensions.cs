@@ -30,6 +30,16 @@ namespace libMusicSync.Extensions
             return Helper.MakeFileNameSafe(playlist.Name);
         }
 
+        public static string GetArtistPlaylistSafeName(this IPlaylist playlist)
+        {
+            return Constants.ArtistPlaylistPrefix + playlist.GetSafeName();
+        }
+
+        public static string GetAlbumPlaylistSafeName(this IPlaylist playlist)
+        {
+            return Constants.AlbumPlaylistPrefix + playlist.GetSafeName();
+        }
+
         public static string GetPlaylistLine(this ITrack track, string root)
         {
             return GetPlaylistLine(track, root, '/', true);

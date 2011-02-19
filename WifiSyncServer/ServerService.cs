@@ -127,6 +127,47 @@ namespace WifiSyncServer
             return new { Playlists = playlistEnumerator };
         }
 
+        [Path("/getartists")]
+        public object GetArtists()
+        {
+            Log.Info("Listing artists");
+
+            // Note: t.Tracks.Count() causes the entire library to be enumerated and
+            //       when using COM this will take f-o-r-e-v-e-r. So load the XML, no 
+            //       matter what. It only takes ~4 seconds for a reasonably large library (23K ct.)
+            //       Plus, it caches!
+            var resultEnumerator = from playlist in CachedXmlLibrary.Library.Artists
+                                     select new
+                                     {
+                                         DisplayName = playlist.Name,
+                                         Name = playlist.GetArtistPlaylistSafeName(),
+                                         TrackCount = playlist.Tracks.Count()
+                                     };
+
+            return new { Playlists = resultEnumerator };
+        }
+
+        [Path("/getalbums")]
+        public object GetAlbums()
+        {
+            //TODO: Add album view to Library.
+            Log.Info("Listing albums");
+
+            // Note: t.Tracks.Count() causes the entire library to be enumerated and
+            //       when using COM this will take f-o-r-e-v-e-r. So load the XML, no 
+            //       matter what. It only takes ~4 seconds for a reasonably large library (23K ct.)
+            //       Plus, it caches!
+            var resultEnumerator = from playlist in CachedXmlLibrary.Library.Albums
+                                   select new
+                                   {
+                                       DisplayName = playlist.Name,
+                                       Name = playlist.GetAlbumPlaylistSafeName(),
+                                       TrackCount = playlist.Tracks.Count()
+                                   };
+
+            return new { Playlists = resultEnumerator };
+        }
+
         #region iTunes Control Methods
 
         [Verb("POST")]
@@ -138,6 +179,8 @@ namespace WifiSyncServer
             if (!Settings.Default.AllowPlayerControl || !ComiTunesLibrary.IsItunesRunning()) return;
 
             Subscription subscription = DataManager.GetSubscription(request.SafeDeviceId);
+
+            if (subscription == null) return;
 
             ComiTunesLibrary itunes = new ComiTunesLibrary();
 
@@ -286,9 +329,11 @@ namespace WifiSyncServer
                 string playlistRefPath = DataManager.GetReferencePlaylistPath(playlistPath);
                 if (ComiTunesLibrary.IsItunesRunning() && File.Exists(playlistRefPath))
                 {
+                    // TODO: >>>>>>>> For Album/Artist playlists, we shouldn't be modifying them at all.
+
                     // TODO: This leads to an unpredictable situation where the changes on the device could 
                     // either be wiped out (iTunes is not running) or synced back (iTunes is running)
-		            // NOTE: If this must be done, it is also safer to check if the PlaylistData is empty,
+		            // If this must be done, it is also safer to check if the PlaylistData is empty,
 		            // (Possibly due to a error on the device side) in that case, we'd want to bring the 
 		            // device up-to-date, by setting the desktop playlist as the reference.
                     Log.InfoFormat("iTunes is running. Connecting via COM");

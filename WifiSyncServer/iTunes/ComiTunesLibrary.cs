@@ -42,6 +42,7 @@ namespace WifiSyncServer.iTunes
             CanModify = true;
             MusicFolderPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
             Playlists = GetPlaylists();
+            //TODO: Assign Artists and Albums
         }
 
         /// <summary>

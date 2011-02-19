@@ -18,6 +18,8 @@
  **********************************************************************/
 
 using System;
+using System.Drawing;
+using System.Windows.Forms;
 using System.IO;
 using Kayak.Framework;
 using Kayak;
@@ -86,10 +88,26 @@ namespace WifiSyncServer
 
             log.Info("Now: " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToLongTimeString());
             log.Info("Wifi Sync Server listening on " + server.ListenEndPoint);
-            Console.ReadLine();
 
+            NotifyIcon notifyIcon = new NotifyIcon();
+
+            MenuItem exitMenu = new MenuItem("Exit", (sender, e) =>
+                                                         {
+                                                             notifyIcon.Visible = false;
+                                                             Application.Exit();
+                                                         });
+            
+            notifyIcon.Icon = new Icon("App.ico");
+            notifyIcon.ContextMenu = new ContextMenu(new MenuItem[] { exitMenu });
+            notifyIcon.Text = "Music Sync Server Running";
+            notifyIcon.Visible = true;
+            
+            Application.EnableVisualStyles();
+            Application.Run();
+            
             // unsubscribe from server (close the listening socket)
             framework.Dispose();
+
         }
 
         

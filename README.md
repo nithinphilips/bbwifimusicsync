@@ -1,8 +1,10 @@
-Wifi Music Sync
-===============
+BB Wifi Music Sync
+==================
 
 A Client-Server program to keep the music on your Blackberry 
-(and potentially other devices with Wifi) updated.
+(and potentially other devices with WiFi capability) updated.
+
+**Note:** This project is in no way associated with [RIM](http://www.rim.com/).
 
 Why?
 ----
@@ -25,28 +27,54 @@ with the Music Sync Desktop program, which will load rather
 quickly you can easily keep your music updated even 
 without Wifi.
 
-Runtime Dependencies
---------------------
-To run the server you need:
- * .NET FX 4.0 (Needs to be verfied)
- * iTunes
+Using WiFi Music Sync
+---------------------
+There are several ways to get started with Music Sync. The recommended
+way is to initially load music on to your Blackberry device using the
+Desktop Sync application. Then you can start the Wifi Sync application
+on your phone and the necessary server settings and the synced playlists
+will be automatically imported. You'll then have to simply choose to sync
+occasionally to keep the music on your Blackberry updated.
 
-Build Dependencies
-------------------
-To build the solution you need:
- * .NET Fx + Tools (>= 4.0)
- * PostSharp (>= 2.0) <http://www.sharpcrafters.com/postsharp>
-    -> Get the free Community Edition (for the Desktop client)
- * Kayak Server Fx (source included)
- * Log4net (>= 1.2.9.0) (binary included)
- * iTunes (>= 9.0) <http://www.apple.com/itunes/>
- 
- * VS.NET 2010+ is the easiest way to build.
+###Runtime Dependencies
+
+To run the server application you need:
+
+ * Windows XP or higher.
+ * .NET FX 4.0 (Needs to be verfied).
+ * iTunes.
+
+###Build Dependencies
+
+To build Wifi Music Sync you need:
+
+ * [.NET Framework](http://msdn.microsoft.com/en-us/netframework/default) + Tools (>= 4.0)
+ * [Kayak Server Framework](https://github.com/kayak/kayak) (source included)
+ * [PostSharp](http://www.sharpcrafters.com/postsharp) (>= 2.0) _(Get the free Community Edition)_
+ * [Log4net](http://logging.apache.org/log4net/) (>= 1.2.9.0) (unmodified binary included)
+ * [iTunes](http://www.apple.com/itunes/) (>= 9.0)
+
+AND
+
+* [VS.NET 2010](https://www.microsoft.com/express/Downloads/)+ (Optional) It is the easiest way to build.
+
+Get It
+------
+
+ * [Download the Latest Release](http://sourceforge.net/projects/bbwifimusicsync/files/)
+ * [Get Source Code](http://sourceforge.net/projects/bbwifimusicsync/develop)
+
+Links
+-----
+
+ * [SourceForge Project Page](http://sourceforge.net/projects/bbwifimusicsync/)
 
 Future Plans
 ------------
-Rewrite the server in Vala for GNOME. This kind of application is
-needed on the linux desktop and it'll be an opportunity to learn
-Vala, GNOME and the GNU Build Sytem.
+Rewrite the server in Vala (or use Mono) for GNOME. We can add support
+for Banshee by interacting with the SQLite database. The problems with 
+locking etc. of the database need to be investigated. A plugin is out of
+scope because we need to be always on.
 
-$Id$
+-------------------------------------------------------------------
+_$Id$_

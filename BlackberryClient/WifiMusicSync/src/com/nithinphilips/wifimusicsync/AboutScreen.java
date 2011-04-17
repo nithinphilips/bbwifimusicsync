@@ -1,4 +1,4 @@
-package com.nithinphilips.wifimusicsync.components;
+package com.nithinphilips.wifimusicsync;
 
 import net.rim.blackberry.api.browser.Browser;
 import net.rim.device.api.system.Bitmap;
@@ -17,10 +17,10 @@ import net.rim.device.api.ui.container.VerticalFieldManager;
 import net.rim.device.api.ui.decor.BackgroundFactory;
 import net.rim.device.api.util.StringProvider;
 
-public class AboutDialog extends MainScreen
+public class AboutScreen extends MainScreen
 {
 
-    public AboutDialog()
+    public AboutScreen()
     {
 
         net.rim.device.api.ui.Font defaultFont = this.getFont();
@@ -92,7 +92,7 @@ public class AboutDialog extends MainScreen
         LabelField copyrightField = new LabelField("(C) 2011 Nithin Philips.");
         LabelField descriptionField = new LabelField("Music Sync allows you to wirelessly sync your iTunes playlists and with your Blackberry device.");
         
-        LabelField iconsInfoField = new LabelField("Icons shamelessy ripped from Ultimate-Gnome, Faenza and Elementary icon themes.");
+        LabelField iconsInfoField = new LabelField("Icons shamelessy ripped from Ultimate-Gnome, Faenza and Elementary icon themes. This application uses components from KeePassBB <http://f5bbutils.fairview5.com/keepassbb2/>");
         LabelField gnuField0 = new LabelField(
                 "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.");
         LabelField gnuField1 = new LabelField(

@@ -43,8 +43,6 @@ import net.rim.device.api.util.StringProvider; // #endif
 
 import com.fairview5.keepassbb2.common.ui.ProgressDialog;
 import com.nithinphilips.Debug;
-import com.nithinphilips.wifimusicsync.components.AboutDialog;
-import com.nithinphilips.wifimusicsync.components.PlaylistSelectionDialog;
 import com.nithinphilips.wifimusicsync.components.ProgressListModel;
 import com.nithinphilips.wifimusicsync.components.WifiMusicSyncProperties;
 import com.nithinphilips.wifimusicsync.controller.PlaylistDownloader;
@@ -231,6 +229,7 @@ public class WifiMusicSyncScreen extends MainScreen
         menu.add(menuItemSync);
         menu.add(menuItemAbout);
         menu.add(menuItemOptions);
+        menu.add(menuItemTest);
         
         super.makeMenu(menu, instance);
     }
@@ -286,57 +285,57 @@ public class WifiMusicSyncScreen extends MainScreen
 
     void runTest()
     {
-        // PlaylistInfo[] choices = new PlaylistInfo[20];
-        //      
-        // for (int i = 0; i < choices.length; i++)
-        // choices[i] = new PlaylistInfo("", "Test" + i, i);
-        //      
-        // pushChoicesScreen(choices);
+         PlaylistInfo[] choices = new PlaylistInfo[20];
+              
+         for (int i = 0; i < choices.length; i++)
+         choices[i] = new PlaylistInfo("", "Test" + i, i);
+              
+         pushChoicesScreen(choices, "Hello");
+        
 
-        Thread t = new Thread() {
-            public void run()
-            {
-                final SyncAction addaction = new SyncAction();
-                final SyncAction remaction = new SyncAction();
-
-                addaction.setDeviceLocation("file:///SDCard/add.mp3");
-                addaction.setType(SyncAction.ADD);
-
-                remaction.setDeviceLocation("file:///SDCard/test2/remove.mp3");
-                remaction.setType(SyncAction.REMOVE);
-
-                addaction.setStatus("Downloading");
-                remaction.setStatus("Queued");
-
-                UiApplication.getUiApplication().invokeLater(new Runnable() {
-                    public void run()
-                    {
-                        WifiMusicSyncScreen.this.myListModel.insert(addaction);
-                        WifiMusicSyncScreen.this.myListModel.insert(remaction);
-                    }
-                });
-
-                TimerTask task = new TimerTask() {
-
-                    public void run()
-                    {
-                        UiApplication.getUiApplication().invokeLater(new Runnable() {
-                            public void run()
-                            {
-                                addaction.setStatus("Completed");
-                                remaction.setStatus("Completed");
-                            }
-                        });
-                    }
-                };
-
-                Timer timer = new Timer();
-                timer.schedule(task, 10000);
-
-            }
-        };
-        t.start();
-
+//        Thread t = new Thread() {
+//            public void run()
+//            {
+//                final SyncAction addaction = new SyncAction();
+//                final SyncAction remaction = new SyncAction();
+//
+//                addaction.setDeviceLocation("file:///SDCard/add.mp3");
+//                addaction.setType(SyncAction.ADD);
+//
+//                remaction.setDeviceLocation("file:///SDCard/test2/remove.mp3");
+//                remaction.setType(SyncAction.REMOVE);
+//
+//                addaction.setStatus("Downloading");
+//                remaction.setStatus("Queued");
+//
+//                UiApplication.getUiApplication().invokeLater(new Runnable() {
+//                    public void run()
+//                    {
+//                        WifiMusicSyncScreen.this.myListModel.insert(addaction);
+//                        WifiMusicSyncScreen.this.myListModel.insert(remaction);
+//                    }
+//                });
+//
+//                TimerTask task = new TimerTask() {
+//
+//                    public void run()
+//                    {
+//                        UiApplication.getUiApplication().invokeLater(new Runnable() {
+//                            public void run()
+//                            {
+//                                addaction.setStatus("Completed");
+//                                remaction.setStatus("Completed");
+//                            }
+//                        });
+//                    }
+//                };
+//
+//                Timer timer = new Timer();
+//                timer.schedule(task, 10000);
+//
+//            }
+//        };
+//        t.start();
     }
 
     void pushSettingsScreen()
@@ -366,7 +365,7 @@ public class WifiMusicSyncScreen extends MainScreen
     void pushAboutScreen()
     {
 
-        AboutDialog screen = new AboutDialog();
+        AboutScreen screen = new AboutScreen();
 
         TransitionContext transitionContextIn;
         TransitionContext transitionContextOut;
@@ -390,7 +389,7 @@ public class WifiMusicSyncScreen extends MainScreen
 
     boolean pushChoicesScreen(PlaylistInfo[] choices, String title)
     {
-        PlaylistSelectionDialog screen = new PlaylistSelectionDialog(choices, title);
+        SyncItemsSelectionScreen screen = new SyncItemsSelectionScreen(choices, title);
 
         TransitionContext transitionContextIn;
         TransitionContext transitionContextOut;

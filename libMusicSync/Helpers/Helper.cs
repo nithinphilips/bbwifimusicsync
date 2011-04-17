@@ -102,6 +102,17 @@ namespace libMusicSync.Helpers
             return uri.ToString().Replace(driveName, "SDCard");
         }
 
+        /// <summary>
+        /// Checks if a playlist is a pseudo Album or Artist playlist
+        /// </summary>
+        /// <param name="playlistName">The name of the playlist</param>
+        /// <returns>True, if the this playlist is a pseudo playlist, otherwise false.</returns>
+        public static bool IsAlbumOrArtistPlaylist(string playlistName)
+        {
+            return playlistName.StartsWith(Constants.AlbumPlaylistPrefix) ||
+                   playlistName.StartsWith(Constants.ArtistPlaylistPrefix);
+        }
+
         public static string EscapeString(string name)
         {
             string result = Uri.EscapeUriString(name);

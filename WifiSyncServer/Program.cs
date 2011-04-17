@@ -18,13 +18,16 @@
  **********************************************************************/
 
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO;
 using Kayak.Framework;
 using Kayak;
+using libMusicSync.iTunesExport.Parser;
 using log4net.Config;
 using log4net;
+using WifiSyncServer.Model;
 using WifiSyncServer.Properties;
 
 namespace WifiSyncServer

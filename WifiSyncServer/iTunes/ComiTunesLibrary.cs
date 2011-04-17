@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using iTunesLib;
+using libMusicSync.Helpers;
 using libMusicSync.iTunes;
 using libMusicSync.iTunesExport.Parser;
 using libMusicSync.Model;
@@ -115,6 +116,9 @@ namespace WifiSyncServer.iTunes
             HashSet<IITFileOrCDTrack> tracks = new HashSet<IITFileOrCDTrack>();
             foreach (var playlist in subscription.Playlists)
             {
+                if (Helper.IsAlbumOrArtistPlaylist(playlist))
+                    continue;
+                
                 IITPlaylist iPlaylist = playlistLookupTable[playlist];
                 if(iPlaylist != null)
                 {

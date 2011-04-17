@@ -46,6 +46,12 @@ namespace WifiSyncServer
         static readonly CachedXmliTunesLibrary CachedXmlLibrary = new CachedXmliTunesLibrary();
 
         [Path("/")]
+        [Path("/help")]
+        public string Help()
+        {
+            return "WifiMusicServer is up and running.\nFirst you must add your device to the device whitelist.";
+        }
+
         [Path("/hello")]
         public object SayHello()
         {
@@ -295,6 +301,7 @@ namespace WifiSyncServer
                 }
                 else
                 {
+                    // Playlist was deleted on the server
                     Log.WarnFormat("Fail. Playlist ({0}) does not exist", playlistName);
 
                     // We're sending an error message, along with a list of track that are no longer subscribed and
@@ -313,74 +320,93 @@ namespace WifiSyncServer
                                    Actions = wipeActions.ToArray()
                                };
                 }
-                
 
-                IEnumerable<SyncAction> changesOnDesktop = DiffHandler.Diff(desktopPlaylist, devicePlaylist); // changes that were made on the DESKTOP. Apply to DEVICE.
+                // changes that were made on the DESKTOP. Apply to DEVICE.
+                IEnumerable<SyncAction> changesOnDesktop = DiffHandler.Diff(desktopPlaylist, devicePlaylist);
 
                 // Make sure we don't delete any tracks still present by other playlists.
-                // Also, we have to use the xml library because COM is too slow.
                 if (subManager != null)
                     changesOnDesktop = subManager.FixProposedDeletes(library, changesOnDesktop);
 
                 // We use different files for the serving and referencing playlists because this allows us to delay 
-                // commiting a playlist as reference playlist until the client has retrieved the playlist. 
+                // committing a playlist as reference playlist until the client has retrieved the playlist. 
                 // In situations where the sync is interrupted, it can otherwise lead to the server having incorrect 
                 // state information and results in improper deletion of tracks from iTunes playlist.
                 string playlistRefPath = DataManager.GetReferencePlaylistPath(playlistPath);
-                if (ComiTunesLibrary.IsItunesRunning() && File.Exists(playlistRefPath))
-                {
-                    // TODO: >>>>>>>> For Album/Artist playlists, we shouldn't be modifying them at all.
+                string pendingChangesPath = DataManager.GetChangeSetCollectionPath(playlistPath);
 
-                    // TODO: This leads to an unpredictable situation where the changes on the device could 
-                    // either be wiped out (iTunes is not running) or synced back (iTunes is running)
-		            // If this must be done, it is also safer to check if the PlaylistData is empty,
-		            // (Possibly due to a error on the device side) in that case, we'd want to bring the 
-		            // device up-to-date, by setting the desktop playlist as the reference.
-                    Log.InfoFormat("iTunes is running. Connecting via COM");
+                if (File.Exists(playlistRefPath) && !Helper.IsAlbumOrArtistPlaylist(playlistName))
+                {
+
+                    // load any pending changes
+                    ChangeSetCollection pendingChanges = ChangeSetCollection.DeserializeOrCreate(pendingChangesPath);
+
+                    // apply those changes to the desktopPlaylist, so we can move into the expected state
+                    ApplyChangeSet(request.DeviceMediaRoot, pendingChanges, desktopPlaylist);
 
                     Log.InfoFormat("Loading reference playlist {0}...", playlistRefPath);
                     List<string> referencePlaylist = Helper.LoadPlaylist(playlistRefPath);
+
+                    
 
                     changesOnDesktop = DiffHandler.Diff(desktopPlaylist, referencePlaylist);
                     IEnumerable<SyncAction> changesOnDevice = DiffHandler.Diff(devicePlaylist, referencePlaylist);  // changes that were made on the DEVICE. Apply to DESKTOP.
 
                     reconciledPlaylist = new List<string>(desktopPlaylist);
 
-                    // Pick REMOVE changes, get associated tracks, and then exclude null ones.
-                    var tracksToDelete = (from change in changesOnDevice
-                                          where change.Type == SyncType.Remove
-                                          select library.GetTrack(change.DeviceLocation)).TakeWhile(t => t != null);
-
-
-
-                    // Pick ADD changes
-                    var tracksToAdd = from change in changesOnDevice
+                    var currentChangeSet = new ChangeSet
+                    {
+                        AddChanges = (from change in changesOnDevice
                                       where change.Type == SyncType.Add
-                                      select change.DeviceLocation;
+                                      select change.DeviceLocation).ToList(),
+                        RemoveChanges = ((from change in changesOnDevice
+                                          where change.Type == SyncType.Remove
+                                          select library.GetTrack(change.DeviceLocation) as Track).TakeWhile(t => t != null)).ToList()
+                    };
 
-                    ComiTunesLibrary comLibrary = new ComiTunesLibrary();
-                    using (log4net.ThreadContext.Stacks["NDC"].Push("Removing iTrack"))
+                    if(!currentChangeSet.IsEmpty)
+                        pendingChanges.Add(currentChangeSet);
+
+                    if (ComiTunesLibrary.IsItunesRunning())
                     {
-                        foreach (var track in comLibrary.RemoveTracks(playlist, tracksToDelete))
+                        ComiTunesLibrary comLibrary = new ComiTunesLibrary();
+
+                        foreach (var pendingChange in pendingChanges)
                         {
-                            reconciledPlaylist.Remove(track.GetPlaylistLine(request.DeviceMediaRoot));
-                            Log.Info(track.Location);
+                            using (log4net.ThreadContext.Stacks["NDC"].Push("Removing iTrack"))
+                            {
+                                foreach (var track in comLibrary.RemoveTracks(playlist, pendingChange.RemoveChanges))
+                                {
+                                    reconciledPlaylist.Remove(track.GetPlaylistLine(request.DeviceMediaRoot));
+                                    Log.Info(track.Location);
+                                }
+                            }
+
+                            using (log4net.ThreadContext.Stacks["NDC"].Push("Adding iTrack"))
+                            {
+                                // Warning: Subscription could be null.
+                                foreach (var deviceLocation in comLibrary.AddTracks(
+                                    playlist,
+                                    pendingChange.AddChanges,
+                                    subscription ??
+                                    Subscription.GetQuickSubscription(playlistName, request.DeviceMediaRoot,
+                                                                      request.DeviceId),
+                                    request.DeviceMediaRoot))
+                                {
+                                    reconciledPlaylist.Add(deviceLocation);
+                                    Log.Info(deviceLocation);
+                                }
+                            }
                         }
+
+                        pendingChanges.Clear();
+                    }else
+                    {
+                        if(!currentChangeSet.IsEmpty)
+                            ApplyChangeSet(request.DeviceMediaRoot, currentChangeSet, reconciledPlaylist);
                     }
 
-                    using (log4net.ThreadContext.Stacks["NDC"].Push("Adding iTrack"))
-                    {
-                        // Warning: Subscription could be null.
-                        foreach (var deviceLocation in comLibrary.AddTracks(
-                            playlist, 
-                            tracksToAdd, 
-                            subscription ?? Subscription.GetQuickSubscription(playlistName, request.DeviceMediaRoot, request.DeviceId), 
-                            request.DeviceMediaRoot))
-                        {
-                            reconciledPlaylist.Add(deviceLocation);
-                            Log.Info(deviceLocation);
-                        }
-                    }
+                    ChangeSetCollection.Serialize(pendingChanges, pendingChangesPath);
 
                 }
                 else
@@ -414,6 +440,34 @@ namespace WifiSyncServer
                 Log.Debug("Sending Data:" + Environment.NewLine + syncResponse.ToString());
 
                 return syncResponse;
+            }
+        }
+
+        private static void ApplyChangeSet(string root, IEnumerable<ChangeSet> pendingChanges, List<string> playlist)
+        {
+            foreach (var pendingChange in pendingChanges)
+            {
+                ApplyChangeSet(root, pendingChange, playlist);
+            }
+        }
+
+        private static void ApplyChangeSet(string root, ChangeSet pendingChange, List<string> playlist)
+        {
+            using (log4net.ThreadContext.Stacks["NDC"].Push("Deferred Removing iTrack"))
+            {
+                foreach (var track in pendingChange.RemoveChanges)
+                {
+                    playlist.Remove(track.GetPlaylistLine(root));
+                }
+            }
+
+            using (log4net.ThreadContext.Stacks["NDC"].Push("Deferred Adding iTrack"))
+            {
+                foreach (var addChange in pendingChange.AddChanges)
+                {
+                    if(!playlist.Contains(addChange))
+                        playlist.Add(addChange);
+                }
             }
         }
     }

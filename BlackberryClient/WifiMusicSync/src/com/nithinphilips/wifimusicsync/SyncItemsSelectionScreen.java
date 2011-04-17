@@ -1,10 +1,9 @@
-package com.nithinphilips.wifimusicsync.components;
+package com.nithinphilips.wifimusicsync;
 
 import net.rim.device.api.ui.Color;
 import net.rim.device.api.ui.Font;
 import net.rim.device.api.ui.Graphics;
 import net.rim.device.api.ui.component.CheckboxField;
-import net.rim.device.api.ui.component.Dialog;
 import net.rim.device.api.ui.component.RichTextField;
 import net.rim.device.api.ui.component.SeparatorField;
 import net.rim.device.api.ui.container.MainScreen;
@@ -13,18 +12,27 @@ import net.rim.device.api.ui.decor.BackgroundFactory;
 
 import com.nithinphilips.wifimusicsync.model.PlaylistInfo;
 
-public class PlaylistSelectionDialog extends MainScreen
+public class SyncItemsSelectionScreen extends MainScreen
 {
 
     int             result;
     CheckboxField[] checkBoxes;
     PlaylistInfo[]  choices;
 
-    public PlaylistSelectionDialog(PlaylistInfo[] choices, String title)
+    public SyncItemsSelectionScreen(PlaylistInfo[] choices, String title)
     {
         this.choices = choices;
 
         ((VerticalFieldManager) getMainManager()).setBackground(BackgroundFactory.createSolidBackground(Color.BLACK));
+        
+        VerticalFieldManager checkItemsContainer = new VerticalFieldManager() {
+            public void paint(Graphics graphics)
+            {
+                graphics.setColor(Color.WHITE);
+                super.paint(graphics);
+            }
+        };
+        
         VerticalFieldManager container = new VerticalFieldManager() {
             public void paint(Graphics graphics)
             {
@@ -39,14 +47,22 @@ public class PlaylistSelectionDialog extends MainScreen
         net.rim.device.api.ui.Font defaultFont = popupTitleField.getFont();
         popupTitleField.setFont(defaultFont.derive(Font.BOLD, defaultFont.getHeight() + 1));
 
-        container.add(popupTitleField);
+        
         container.add(new SeparatorField());
         checkBoxes = new CheckboxField[choices.length];
         for (int i = 0; i < choices.length; i++)
         {
             checkBoxes[i] = new CheckboxField(choices[i].toString(), choices[i].isSelected());
-            container.add(checkBoxes[i]);
+            if(choices[i].isSelected()){
+                checkItemsContainer.add(checkBoxes[i]);
+            }else{
+                container.add(checkBoxes[i]);
+            }
         }
+        
+        add(popupTitleField);
+        add(checkItemsContainer);
+        add(new SeparatorField());
         add(container);
     }
 

@@ -53,6 +53,16 @@ namespace WifiSyncServer.Helpers
         }
 
         /// <summary>
+        /// Gets the path to the file containing the list of pending changes.
+        /// </summary>
+        /// <param name="playlistPath">The path of the playlist.</param>
+        /// <returns>The path to the file containing the list of pending changes.</returns>
+        public static string GetChangeSetCollectionPath(string playlistPath)
+        {
+            return playlistPath + ".changes";
+        }
+
+        /// <summary>
         /// Gets the path to a particular playlist.
         /// </summary>
         public static string GetDevicePlaylistPath(PlaylistRequest request)

@@ -76,6 +76,8 @@
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Helpers\IITTrackEnumerator.cs" />
     <Compile Include="iTunes\ComiTunesLibrary.cs" />
+    <Compile Include="Model\ChangeSet.cs" />
+    <Compile Include="Model\ChangeSetCollection.cs" />
     <Compile Include="Model\PlaylistRequest.cs" />
     <Compile Include="Model\Request.cs" />
     <Compile Include="Model\Response.cs" />

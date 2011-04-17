@@ -191,6 +191,7 @@ public class PlaylistDownloader
                             log("Sever: " + Long.toString(contentLength) + " Client: " + Long.toString(fileConnection.fileSize()));
                             if (contentLength != fileConnection.fileSize())
                             {
+                                // File size mismatch. Redownload.
                                 fileConnection.delete();
                             }
                             else

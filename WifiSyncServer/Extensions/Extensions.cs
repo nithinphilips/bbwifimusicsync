@@ -71,7 +71,19 @@ namespace WifiSyncServer.Extensions
 
         public static ITrack ToTrack(this IITFileOrCDTrack track)
         {
-            return new Track(track.trackID, track.Name, track.Artist, track.AlbumArtist, track.Album, track.Genre, track.Year, track.Size, track.Duration, track.Location, false, !track.Enabled);
+            return new Track(
+                track.trackID, 
+                track.Name, 
+                track.Artist, 
+                track.AlbumArtist, 
+                track.Album, 
+                track.Genre, 
+                track.Year, 
+                track.Size, 
+                track.Duration, 
+                track.Location, 
+                false, 
+                !track.Enabled);
         }
 
 

@@ -11,6 +11,9 @@ import com.nithinphilips.wifimusicsync.components.WifiMusicSyncProperties;
 import com.nithinphilips.wifimusicsync.model.PlaylistRequest;
 import com.nithinphilips.wifimusicsync.model.UrlBuilder;
 
+import net.rim.blackberry.api.menuitem.ApplicationMenuItem;
+import net.rim.blackberry.api.menuitem.ApplicationMenuItemRepository;
+import net.rim.device.api.system.ApplicationDescriptor;
 import net.rim.device.api.ui.*;
 import net.rim.device.api.ui.component.*;
 
@@ -59,10 +62,30 @@ public final class SendToItunes extends UiApplication implements RequestListener
         // Get access to the registry
         Registry registry = Registry.getRegistry(CLASSNAME); 
         
+        ApplicationMenuItem appMenu = new ApplicationMenuItem(100) {
+            
+            public String toString()
+            {
+                return "Play in iTunes";
+            }
+            
+            public Object run(Object context)
+            {
+                Dialog.alert(context.getClass().getName());
+                return context;
+            }
+        };        
+
         try
         {                       
             // Register as a content handler       
-            registry.register(CLASSNAME, types, suffixes, actions, actionNameMaps, ID, null);             
+            registry.register(CLASSNAME, types, suffixes, actions, actionNameMaps, ID, null);      
+            
+            ApplicationMenuItemRepository amir = ApplicationMenuItemRepository.getInstance();
+            ApplicationDescriptor ad_startup = ApplicationDescriptor.currentApplicationDescriptor();
+            ApplicationDescriptor ad_gui = new ApplicationDescriptor(ad_startup, "", null);
+            amir.addMenuItem(ApplicationMenuItemRepository.MENUITEM_MUSIC_SERVICE_ITEM, appMenu, ad_gui);
+            amir.addMenuItem(ApplicationMenuItemRepository.MENUITEM_MUSIC_SERVICE_LIST_ITEM, appMenu, ad_gui);
         }
         catch (ContentHandlerException che)
         {   

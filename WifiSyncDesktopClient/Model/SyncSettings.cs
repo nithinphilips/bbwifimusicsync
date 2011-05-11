@@ -30,7 +30,6 @@ using WifiSyncDesktop.Helpers;
 
 namespace WifiSyncDesktop.Model
 {
-    [NotifyPropertyChanged]
     public class SyncSettings : INotifyPropertyChanged
     {
         CachedXmliTunesLibrary cachedXmlLibrary = new CachedXmliTunesLibrary();
@@ -115,11 +114,34 @@ namespace WifiSyncDesktop.Model
 
         
         public IEnumerable<PlaylistInfo> Playlists { get; set; }
-        public string Status { get; set; }
-        public long Size { get; set; }
-        public long Capacity { get; set; }
-        public long SelectedTracksSize { get; set; }
-        
+        private string _status;
+        public string Status
+        {
+            get { return _status; }
+            set { _status = value; OnPropertyChanged("Status");}
+        }
+
+        private long _size;
+        public long Size
+        {
+            get { return _size; }
+            set { _size = value; OnPropertyChanged("Size");}
+        }
+
+        private long _capacity;
+        public long Capacity
+        {
+            get { return _capacity; }
+            set { _capacity = value; OnPropertyChanged("Capacity");}
+        }
+
+        private long _selectedTracksSize;
+        public long SelectedTracksSize
+        {
+            get { return _selectedTracksSize; }
+            set { _selectedTracksSize = value; OnPropertyChanged("SelectedTracksSize"); }
+        }
+
         string _path;
         public string Path
         {
@@ -134,6 +156,7 @@ namespace WifiSyncDesktop.Model
                     _path = value;
                     this.CheckExistingPlaylists();
                     CalculatePlaylistSize();
+                    OnPropertyChanged("Path");
                 }
             }
         }

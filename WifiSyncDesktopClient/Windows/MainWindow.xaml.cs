@@ -73,7 +73,7 @@ namespace WifiSyncDesktopClient.Windows
                 return;
             }
 
-            viewModelSync.Path = Settings.Default.LastPath;
+            Settings.Default.LastPath = viewModelSync.Path;
             List<FileCopyJob> jobs = new List<FileCopyJob>(viewModelSync.GetSelectedTracksUniqueAsFileCopyJobs());
             Total = jobs.Count;
             copyMan.Enqueue(jobs);

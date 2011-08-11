@@ -70,7 +70,7 @@ public class Subscriber {
 		}
 	}
 
-	public void updateSubscription() throws JSONException, IOException {
+	public SyncResponse updateSubscription() throws JSONException, IOException {
 
 		Vector playlists = new Vector();
 		
@@ -93,17 +93,21 @@ public class Subscriber {
 
 		if ((s_response == null) || (s_response.compareTo("") == 0)) {
 			log("Error: No response from server.");
+			
+			return null;
 		} else {
 			SyncResponse response = SyncResponse.fromJson(new JSONObject(
 					s_response), server);
+			
+			return response;
 
-			if (response.getError() == SyncResponse.ERROR_NONE) {
-				// exec actions
-				PlaylistDownloader.executeActions(response.getActions());
-
-			} else {
-				log("Server Error " + response.getErrorMessage());
-			}
+//			if (response.getError() == SyncResponse.ERROR_NONE) {
+//				// exec actions
+//				PlaylistDownloader.executeActions(response.getActions());
+//
+//			} else {
+//				log("Server Error " + response.getErrorMessage());
+//			}
 		}
 	}
 

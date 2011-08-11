@@ -1,9 +1,12 @@
 package com.nithinphilips.wifimusicsync;
 
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+
+import org.json.me.JSONException;
 
 // #ifdef BlackBerry6.0.0
 import net.rim.device.api.applicationcontrol.ApplicationPermissions;
@@ -229,7 +232,7 @@ public class WifiMusicSyncScreen extends MainScreen
         menu.add(menuItemSync);
         menu.add(menuItemAbout);
         menu.add(menuItemOptions);
-        menu.add(menuItemTest);
+        //menu.add(menuItemTest);
         
         super.makeMenu(menu, instance);
     }
@@ -462,7 +465,41 @@ public class WifiMusicSyncScreen extends MainScreen
                                             else playlists[i].deleteOnFileSystem(props.getLocalStoreRoot());
                                         }
 
-                                        subscriber.updateSubscription();
+                                        final SyncResponse response = subscriber.updateSubscription();                                        
+                                        
+                                        if (response != null)
+                                        {
+                                            final SyncAction[] actions = response.getActions();
+
+                                            WifiMusicSyncScreen.this.myListModel.erase();
+
+                                            for (int i = 0; i < actions.length; i++)
+                                            {
+                                                WifiMusicSyncScreen.this.myListModel.insert(actions[i]);
+                                            }
+                                            
+                                            Thread u = new Thread() {
+                                                // The actions are not intensive, but may still cause the UI to hang.
+                                                // so, we're running in another thread.
+                                                public void run() {
+                                                    try
+                                                    {
+                                                        PlaylistDownloader.executeActions(response.getActions());
+                                                    }
+                                                    catch (Exception e)
+                                                    {
+                                                        if (Debug.DEBUG) setStatusMessage(e.toString() + e.getMessage());
+                                                        else setStatusMessage("Critical error. Subscription failed.");
+                                                    }
+                                                };
+                                            };
+                                            u.start();
+                                        }
+                                        else
+                                        {
+                                            setStatusMessage("Error updating subscriptions.");
+                                        }
+                                        
                                     }
                                 }
                                 catch (Exception e)
@@ -535,7 +572,7 @@ public class WifiMusicSyncScreen extends MainScreen
                                         }
                                     }
                                 });
-
+                                
                                 downloader.handleResponse();
                             }
                             else

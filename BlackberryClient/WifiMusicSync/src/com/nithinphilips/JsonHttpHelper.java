@@ -17,12 +17,16 @@ import net.rim.device.api.system.WLANInfo;
 public class JsonHttpHelper {
 
 	
-	/**
-	 * The device specific suffic used with the URL. Default: ";deviceside=false;ConnectionTimeout=10000"
-	 */
-	//public static String URL_SUFFIX = ";deviceside=false;ConnectionTimeout=10000";
-	public static String URL_SUFFIX = ";deviceside=true;ConnectionTimeout=10000;interface=wifi";
-	protected static final boolean USE_MDS_IN_SIMULATOR = true;
+    public static String URL_SUFFIX;
+    protected static final boolean USE_MDS_IN_SIMULATOR = true;
+    
+    static {
+        if(Debug.DEBUG){
+            URL_SUFFIX = ";deviceside=false;ConnectionTimeout=10000";
+        }else{
+            URL_SUFFIX = ";deviceside=true;interface=wifi;ConnectionTimeout=10000";
+        }
+    }
 	
 	public static String getVfsAccessUrl(String url){
 		return url.substring(0, url.lastIndexOf('/')) + "/vfs/";

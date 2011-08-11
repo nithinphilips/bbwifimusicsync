@@ -119,7 +119,8 @@ namespace WifiSyncServer.iTunes
                 if (Helper.IsAlbumOrArtistPlaylist(playlist))
                     continue;
                 
-                IITPlaylist iPlaylist = playlistLookupTable[playlist];
+                
+                IITPlaylist iPlaylist = playlistLookupTable.ContainsKey(playlist) ? playlistLookupTable[playlist] : null;
                 if(iPlaylist != null)
                 {
                     foreach (var track in iPlaylist.Tracks.OfType<IITFileOrCDTrack>())

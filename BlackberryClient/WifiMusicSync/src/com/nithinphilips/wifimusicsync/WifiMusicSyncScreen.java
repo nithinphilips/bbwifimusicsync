@@ -232,7 +232,7 @@ public class WifiMusicSyncScreen extends MainScreen
         menu.add(menuItemSync);
         menu.add(menuItemAbout);
         menu.add(menuItemOptions);
-        //menu.add(menuItemTest);
+        menu.add(menuItemTest);
         
         super.makeMenu(menu, instance);
     }

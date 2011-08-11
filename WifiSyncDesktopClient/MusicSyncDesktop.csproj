@@ -44,6 +44,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\log4net\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="PostSharp, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b13fd38b8f9c99d7, processorArchitecture=MSIL" />
     <Reference Include="PresentationFramework.Aero" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -66,6 +67,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Helpers\Extensions.cs" />
+    <Compile Include="Helpers\NotifyPropertyChangedAttribute.cs" />
     <Compile Include="Model\CopyProgressModel.cs" />
     <Compile Include="Model\PlaylistInfo.cs" />
     <Compile Include="Model\SyncSettings.cs" />

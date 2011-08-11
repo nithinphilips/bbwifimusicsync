@@ -44,7 +44,7 @@ namespace WifiSyncServer.Model
             sb.AppendLine("Actions: ");
             foreach (var item in Actions)
             {
-                sb.AppendFormat(" < {0}\n", item);
+                sb.AppendFormat("<<< {0}\n", item);
             }
             return sb.ToString();
         }

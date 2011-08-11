@@ -17,18 +17,49 @@
  *
  **********************************************************************/
 
+using System.ComponentModel;
 using libMusicSync.iTunesExport.Parser;
 using WifiSyncDesktop.Helpers;
 
 namespace WifiSyncDesktop.Model
 {
-    [NotifyPropertyChanged]
-    public class PlaylistInfo
+    public class PlaylistInfo : INotifyPropertyChanged
     {
-        public string Name { get; set; }
-        public bool? Checked { get; set; }
-        public IPlaylist Playlist { get; set; }
-        public bool ExistsAtDestination { get; set; }
+        private string _name;
+        public string Name
+        {
+            get { return _name; }
+            set { _name = value; OnPropertyChanged("Name"); }
+        }
+
+        private bool? _checked;
+        public bool? Checked
+        {
+            get { return _checked; }
+            set { _checked = value; OnPropertyChanged("Checked"); }
+        }
+
+        private IPlaylist _playlist;
+        public IPlaylist Playlist
+        {
+            get { return _playlist; }
+            set { _playlist = value; OnPropertyChanged("Playlist"); }
+        }
+
+        private bool _existsAtDestination;
+        public bool ExistsAtDestination
+        {
+            get { return _existsAtDestination; }
+            set { _existsAtDestination = value; OnPropertyChanged("ExistsAtDestination"); }
+        }
+
+        private void OnPropertyChanged(string name)
+        {
+            if (PropertyChanged != null)
+                PropertyChanged(this, new PropertyChangedEventArgs(name));
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public override string ToString()
         {

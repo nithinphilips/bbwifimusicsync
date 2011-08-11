@@ -19,20 +19,68 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.ComponentModel;
 using System.IO;
+using iTuner;
 using libMusicSync.Extensions;
 using libMusicSync.Helpers;
 using libMusicSync.iTunesExport.Parser;
 using LibQdownloader.Utilities;
 using WifiSyncDesktop.Helpers;
+using NotifyPropertyChanged;
 
 namespace WifiSyncDesktop.Model
 {
     [NotifyPropertyChanged]
     public class SyncSettings : INotifyPropertyChanged
     {
+        UsbManager man = new UsbManager();
+
+        public SyncSettings()
+        {    
+            
+        }
+
+        public void LoadDrives()
+        {
+            this.Drives = man.GetAvailableDisks();
+            UpdateCurrentPath();
+
+            man.StateChanged += man_StateChanged;
+        }
+
+        void man_StateChanged(UsbStateChangedEventArgs e)
+        {
+            switch (e.State)
+            {
+                case UsbStateChange.Added:
+                    Drives.Add(e.Disk);
+                    break;
+                case UsbStateChange.Removing:
+                case UsbStateChange.Removed:
+                    Drives.Remove(e.Disk.Name);
+                    break;
+            }
+
+            if (this.Path == null) UpdateCurrentPath();
+        }
+
+        void UpdateCurrentPath()
+        {
+            this.Path = this.Drives.FirstOrDefault();
+
+            if (this.Path == null)
+            {
+                Status = "Plug in your BlackBerry or insert a memory card to begin.";
+            }
+            else if(string.IsNullOrEmpty(Status))
+            {
+                Status = "Ready.";
+            }
+        }
+
         readonly CachedXmliTunesLibrary _cachedXmlLibrary = new CachedXmliTunesLibrary();
 
         public IEnumerable<PlaylistInfo> GetSelectedPlaylists()
@@ -74,29 +122,20 @@ namespace WifiSyncDesktop.Model
         {
             long totalTrackSize = 0;
             
-            // Use the hash set to make sure we tally the track size only once.
+            // Use the hash set to make sure we tally a track's size only once.
             HashSet<int> uniqueTracks = new HashSet<int>();
            
             foreach (var track in GetSelectedPlaylists().SelectMany(playlist => playlist.Playlist.Tracks))
             {
                 if(uniqueTracks.Contains(track.Id)) continue; // Skip duplicates
-
-                if (!DoesTrackExistAtDestination(track))
-                    totalTrackSize += track.Size;
-                 
+                totalTrackSize += track.Size; 
                 uniqueTracks.Add(track.Id);
             }
+            
+            // Total size of all unique selected tracks.
             SelectedTracksSize = totalTrackSize;
 
-            bool driveReady = false;
-            DriveInfo di = null;
-            if (!string.IsNullOrWhiteSpace(Path) && Path.Length > 1)
-            {
-                di = new DriveInfo(_path.Substring(0, 1));
-                driveReady = di.IsReady;
-            }
-
-            if (!driveReady)
+            if (this.Path == null)
             {
                 Capacity = totalTrackSize;
                 Size = totalTrackSize;
@@ -104,10 +143,31 @@ namespace WifiSyncDesktop.Model
             }
             else
             {
-                this.Capacity = di.TotalSize;
+                DriveInfo di = new DriveInfo(this.Path.Name);
 
-                this.Size = (di.TotalSize - di.AvailableFreeSpace) + totalTrackSize;
-                Status = totalTrackSize == 0 ? "No songs to copy" : string.Format("Need about {0} of space.", Common.ToReadableSize(totalTrackSize));
+                // Get the size of the MusicSync directory
+                long currentSize = DirectorySizeCalculator.GetDirectorySize(this.SyncPath);
+
+                long sizeVariance = totalTrackSize - currentSize;
+
+                this.Capacity = di.TotalSize;
+                this.Size = (di.TotalSize - di.AvailableFreeSpace) + sizeVariance;
+
+                //Console.WriteLine("--------------------------------------------------------");
+                //Console.WriteLine("Current Size: {0}", Common.ToReadableSize(currentSize));
+                //Console.WriteLine("Capacity: {0}", Common.ToReadableSize(Capacity));
+                //Console.WriteLine("Size: {0}", Common.ToReadableSize(Size));
+                //Console.WriteLine("Total Track Size: {0}", Common.ToReadableSize(totalTrackSize));
+
+                if( sizeVariance == 0)
+                    Status = "No songs to copy."; 
+                else if(sizeVariance > 0)
+                    Status = string.Format("Need about {0} of space.", Common.ToReadableSize(sizeVariance, 0));
+                else
+                    Status = string.Format("About {0} of space will be freed.", Common.ToReadableSize(-sizeVariance, 0));
+
+                Console.WriteLine(Status);
+                //OnPropertyChanged("Status");
             }
 
             // These props are calculated on demand
@@ -118,21 +178,19 @@ namespace WifiSyncDesktop.Model
 
         bool DoesTrackExistAtDestination(ITrack track)
         {
-            if (string.IsNullOrWhiteSpace(Path) || Path.Length < 1)
-                return false;
-
-            return File.Exists(track.GetPlaylistLine(this.Path, System.IO.Path.DirectorySeparatorChar, false));
+            return File.Exists(track.GetPlaylistLine(this.SyncPath, System.IO.Path.DirectorySeparatorChar, false));
         }
 
-        
+
         public IEnumerable<PlaylistInfo> Playlists { get; set; }
         public string Status { get; set; }
         public long Size { get; set; }
         public long Capacity { get; set; }
         public long SelectedTracksSize { get; set; }
-        
-        string _path;
-        public string Path
+        public UsbDiskCollection Drives { get; set; }
+
+        UsbDisk _path;
+        public UsbDisk Path
         {
             get
             {
@@ -145,7 +203,16 @@ namespace WifiSyncDesktop.Model
                     _path = value;
                     this.CheckExistingPlaylists();
                     CalculatePlaylistSize();
+                    OnPropertyChanged("Path");
                 }
+            }
+        }
+
+        public string SyncPath
+        {
+            get
+            {
+                return this.Path == null ? "" : System.IO.Path.Combine(Path.Name, "Blackberry", "music", "WiFiSync");
             }
         }
 

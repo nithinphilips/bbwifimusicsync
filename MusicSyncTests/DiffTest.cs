@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using libMusicSync.Helpers;
 using libMusicSync.Model;
-using NUnit.Framework;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace MusicSyncTests
 {
-    [TestFixture]
+    [TestClass]
     public class DiffTest
     {
-        [Test]
+        [TestMethod]
         public void TestDiffAdd()
         {
             List<string> a = new List<string> { "Line1", "Line2", "Line3", "Line4", "Line5" };
@@ -27,7 +26,7 @@ namespace MusicSyncTests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void TestDiffRemove()
         {
             List<string> a = new List<string> { "Line1", "Line2", "Line3", "Line4", "Line5" };
@@ -42,7 +41,7 @@ namespace MusicSyncTests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void TestDiffEmptyArgument1()
         {
             List<string> a = new List<string> { "Line1", "Line2", "Line3", "Line4", "Line5" };
@@ -62,7 +61,7 @@ namespace MusicSyncTests
             }
         }
 
-        [Test]
+        [TestMethod]
         public void TestDiffEmptyArgument2()
         {
             List<string> a = new List<string> { "Line1", "Line2", "Line3", "Line4", "Line5" };
@@ -82,21 +81,21 @@ namespace MusicSyncTests
             }
         }
 
-        [Test]
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void TestDiffNullArgument1()
         {
             DiffHandler.Diff(null, null);
         }
 
-        [Test]
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void TestDiffNullArgument2()
         {
             DiffHandler.Diff(new List<string>(), null);
         }
 
-        [Test]
+        [TestMethod]
         [ExpectedException(typeof(ArgumentNullException))]
         public void TestDiffNullArgument3()
         {

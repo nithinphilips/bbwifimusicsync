@@ -73,7 +73,7 @@ namespace WifiSyncServer.Model
             sb.AppendLine("DeviceMediaRoot: " + DeviceMediaRoot);
             foreach (var item in PlaylistData)
             {
-                sb.AppendLine(" > " + item);
+                sb.AppendLine(">>> " + item);
             }
             return sb.ToString();
         }

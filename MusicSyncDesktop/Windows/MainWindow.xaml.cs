@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using iTuner;
 using WifiSyncDesktop.Helpers;
 using WifiSyncDesktop.Model;
 using LibQdownloader.Utilities;
@@ -50,14 +51,13 @@ namespace WifiSyncDesktop.Windows
         {
             InitializeComponent();
 
+            viewModelSync.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(viewModelSync_PropertyChanged);
+
             Parallel.Invoke(() =>
             {
                 viewModelSync.LoadPlaylists();
-                //viewModelSync.Path = Settings.Default.LastPath;
-                viewModelSync.Path = "M:\\";
+                viewModelSync.LoadDrives();
             });
-            
-            viewModelSync.Status = "Ready";
             
 
             this.DataContext = viewModelSync;
@@ -67,6 +67,11 @@ namespace WifiSyncDesktop.Windows
             _operationMan.WorkCompleted += new EventHandler(copyMan_WorkCompleted);
 
             this.Closing += new System.ComponentModel.CancelEventHandler(MainWindow_Closing);
+        }
+
+        void viewModelSync_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            Console.WriteLine(e.PropertyName);
         }
 
         #region System Menu Hooks
@@ -169,11 +174,11 @@ namespace WifiSyncDesktop.Windows
         {
             if (viewModelSync.HasCapacityExceeded)
             {
-                MessageBox.Show(string.Format("Current selection exceeds drive capacity by {0}", Common.ToReadableSize(-viewModelSync.RemainingCapacity)));
-                return;
+                MessageBox.Show(string.Format("Current selection exceeds drive capacity by {0}. Continue?", Common.ToReadableSize(-viewModelSync.RemainingCapacity)));
+                //return;
             }
 
-            Settings.Default.LastPath = viewModelSync.Path;
+            Settings.Default.LastPath = viewModelSync.SyncPath;
             Settings.Default.Save();
 
 
@@ -194,7 +199,7 @@ namespace WifiSyncDesktop.Windows
 
         private void sync_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = !string.IsNullOrWhiteSpace(viewModelSync.Path) && viewModelSync.GetFileOperations().Any();
+            e.CanExecute = !string.IsNullOrWhiteSpace(viewModelSync.SyncPath); // && viewModelSync.GetFileOperations().Any();
         }
 
         private void close_Executed(object sender, ExecutedRoutedEventArgs e)

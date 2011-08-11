@@ -58,7 +58,7 @@ namespace WifiSyncDesktop.Helpers
 
             foreach (var item in s.GetSelectedTracksDistinct())
             {
-                string targetPath = item.GetPlaylistLine(s.Path, Path.DirectorySeparatorChar, false);
+                string targetPath = item.GetPlaylistLine(s.SyncPath, Path.DirectorySeparatorChar, false);
                 selectedTracks.Add(targetPath);
 
                 if (File.Exists(targetPath)) continue; // Don't do unnecessary work.
@@ -73,7 +73,7 @@ namespace WifiSyncDesktop.Helpers
                 };
             }
 
-            HashSet<string> existingTracks = Utilities.Utility.GetFiles(s.Path, SearchOption.AllDirectories, "*.mp3", "*.m4a", "*.wma");
+            HashSet<string> existingTracks = Utilities.Utility.GetFiles(s.SyncPath, SearchOption.AllDirectories, "*.mp3", "*.m4a", "*.wma");
             existingTracks.ExceptWith(selectedTracks);
 
             foreach (string garbageTrack in existingTracks)
@@ -95,9 +95,9 @@ namespace WifiSyncDesktop.Helpers
         {
             if (s.Playlists == null) return;
 
-            if (!string.IsNullOrWhiteSpace(s.Path) && Directory.Exists(s.Path))
+            if (!string.IsNullOrWhiteSpace(s.SyncPath) && Directory.Exists(s.SyncPath))
             {
-                IEnumerable<string> existingPlaylistNames = (from f in Directory.GetFiles(s.Path, "*.m3u")
+                IEnumerable<string> existingPlaylistNames = (from f in Directory.GetFiles(s.SyncPath, "*.m3u")
                                                              select Path.GetFileNameWithoutExtension(f)).ToList();
 
                 foreach (var librayPlaylist in s.Playlists)
@@ -119,15 +119,15 @@ namespace WifiSyncDesktop.Helpers
 
         public static void WritePlaylistFiles(this SyncSettings s)
         {
-            foreach(string file in Utilities.Utility.GetFiles(s.Path, SearchOption.TopDirectoryOnly, "*.m3u"))
+            foreach (string file in Utilities.Utility.GetFiles(s.SyncPath, SearchOption.TopDirectoryOnly, "*.m3u"))
             {
                 File.Delete(file);
             }
 
             foreach (var item in s.GetSelectedPlaylists())
             {
-                string playlistPath = System.IO.Path.Combine(s.Path, item.Playlist.GetSafeName() + ".m3u");
-                string tRoot = Helper.ToBlackberryPath(s.Path);
+                string playlistPath = System.IO.Path.Combine(s.SyncPath, item.Playlist.GetSafeName() + ".m3u");
+                string tRoot = Helper.ToBlackberryPath(s.SyncPath);
 
                 List<string> playlist = new List<string>();
                 foreach (var track in item.Playlist.Tracks)

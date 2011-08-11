@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:QControls="clr-namespace:QuickZip.Controls" xmlns:Utilities="clr-namespace:WifiSyncDesktop.Utilities" xmlns:Tools="clr-namespace:QuickZip.Tools" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded"
-        Icon="../refresh-reload-sync-icon.ico"
+        Icon="../music-sync-desktop.ico"
         Title="WiFi Music Sync" Height="600" Width="500">
     <Window.Resources>
         <Utilities:BooleanStyleConverter x:Key="boolToStyleConverter" />
@@ -46,7 +46,7 @@
         </StackPanel>
 
         <StatusBar DockPanel.Dock="Bottom">
-            <TextBlock Text="{Binding Path=Status}" />
+            <TextBlock Text="{Binding Path=Status,Mode=OneWay}" />
         </StatusBar>
         
         <Grid>
@@ -108,30 +108,33 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
+                        <!-- <RowDefinition Height="Auto" /> -->
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
                     <Label Grid.Row="0" Margin="0" Padding="0,5">Where would you like to store your music?</Label>
-                    <QControls:SelectFolderTextBox  Grid.Row="1" x:Name="pathText" Margin="0,3,3,3">
-                        <QControls:SelectFolderTextBox.Text>
-                            <Binding Path="Path" UpdateSourceTrigger="PropertyChanged">
-                                <Binding.ValidationRules>
-                                    <Tools:PathNotEmptyRule />
-                                </Binding.ValidationRules>
-                            </Binding>
-                        </QControls:SelectFolderTextBox.Text>
-                    </QControls:SelectFolderTextBox>
+                    <ComboBox  Grid.Row="1" x:Name="pathText" Margin="0,3,3,3"
+                           ItemsSource="{Binding Path=Drives}"
+                           SelectedItem="{Binding Path=Path}"
+                    />
 
-                    <Label Grid.Row="2" Margin="0" Padding="0,5">Choose Playlists to Sync</Label>
-                    <ListBox  Grid.Row="3" ItemsSource="{Binding Path=Playlists}">
-                        <ListBox.ItemTemplate>
-                            <HierarchicalDataTemplate>
-                                <CheckBox Content="{Binding Name}" IsChecked="{Binding Checked}" IsThreeState="{Binding ExistsAtDestination}" />
-                            </HierarchicalDataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                
+                    <TabControl Grid.Row="2" >
+                        <TabItem Header="Playlists">
+                            <DockPanel LastChildFill="True">
+                                <Label DockPanel.Dock="Top" Margin="0" Padding="0,5">Choose Playlists to Sync</Label>
+                                <ListBox  ItemsSource="{Binding Path=Playlists}">
+                                    <ListBox.ItemTemplate>
+                                        <HierarchicalDataTemplate>
+                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding Checked}" IsThreeState="{Binding ExistsAtDestination}" />
+                                        </HierarchicalDataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem Header="All Music">
+                            
+                        </TabItem>
+                    </TabControl>
                 </Grid>
             </DockPanel>
         </Grid>

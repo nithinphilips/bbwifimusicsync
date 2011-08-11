@@ -384,7 +384,6 @@ namespace WifiSyncServer
 
                             using (log4net.ThreadContext.Stacks["NDC"].Push("Adding iTrack"))
                             {
-                                // Warning: Subscription could be null.
                                 foreach (var deviceLocation in comLibrary.AddTracks(
                                     playlist,
                                     pendingChange.AddChanges,

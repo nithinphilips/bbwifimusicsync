@@ -87,12 +87,12 @@ public final class WifiMusicSync extends UiApplication
         // e.printStackTrace();
         // }
 
-        if (args != null && args.length > 0 && "sync".equals(args[0])) checkScheduleSync();
-        else
-        {
+        //if (args != null && args.length > 0 && "sync".equals(args[0])) checkScheduleSync();
+        //else
+        //{
             WifiMusicSync theApp = new WifiMusicSync();
             theApp.enterEventDispatcher();
-        }
+        //}
     }
 
     public static String[] split(String inString, String delimeter)

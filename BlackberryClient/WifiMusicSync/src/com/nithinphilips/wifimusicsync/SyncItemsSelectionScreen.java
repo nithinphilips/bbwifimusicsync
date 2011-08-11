@@ -4,6 +4,7 @@ import net.rim.device.api.ui.Color;
 import net.rim.device.api.ui.Font;
 import net.rim.device.api.ui.Graphics;
 import net.rim.device.api.ui.component.CheckboxField;
+import net.rim.device.api.ui.component.EditField;
 import net.rim.device.api.ui.component.RichTextField;
 import net.rim.device.api.ui.component.SeparatorField;
 import net.rim.device.api.ui.component.StandardTitleBar;
@@ -19,6 +20,7 @@ public class SyncItemsSelectionScreen extends MainScreen
     int             result;
     CheckboxField[] checkBoxes;
     PlaylistInfo[]  choices;
+    EditField searchQueryEdit;
 
     public SyncItemsSelectionScreen(PlaylistInfo[] choices, String title)
     {
@@ -29,9 +31,20 @@ public class SyncItemsSelectionScreen extends MainScreen
         _titleBar.addSignalIndicator();
         this.setTitle(_titleBar);
         
+        searchQueryEdit = new EditField("Search:", "");
+        
+        
         this.choices = choices;
 
         ((VerticalFieldManager) getMainManager()).setBackground(BackgroundFactory.createSolidBackground(Color.BLACK));
+        
+        VerticalFieldManager checkBoxContainer = new VerticalFieldManager(VerticalFieldManager.NO_VERTICAL_SCROLL) {
+            public void paint(Graphics graphics)
+            {
+                graphics.setColor(Color.WHITE);
+                super.paint(graphics);
+            }
+        };
         
         VerticalFieldManager checkItemsContainer = new VerticalFieldManager() {
             public void paint(Graphics graphics)
@@ -49,7 +62,6 @@ public class SyncItemsSelectionScreen extends MainScreen
             }
         };
         
-        container.add(new SeparatorField());
         checkBoxes = new CheckboxField[choices.length];
         for (int i = 0; i < choices.length; i++)
         {
@@ -61,9 +73,12 @@ public class SyncItemsSelectionScreen extends MainScreen
             }
         }
 
-        add(checkItemsContainer);
-        add(new SeparatorField());
-        add(container);
+        checkBoxContainer.add(checkItemsContainer);
+        checkBoxContainer.add(container);
+        
+        add(searchQueryEdit);
+        add(checkBoxContainer);
+        
     }
 
     public int getResult()

@@ -1,31 +1,26 @@
+<!--!# { "pagewidth": "850px" } -->
 BB Wifi Music Sync
 ==================
 
-A Client-Server program to keep the music on your Blackberry 
-(and potentially other devices with WiFi capability) updated.
-
-**Note:** This project is in no way associated with [RIM](http://www.rim.com/).
-
-Why?
-----
-Well, Blackberry Desktop already implements a sweet music sync
-option. Why reinvent the proverbial wheel, you may ask. Well, 
-the answer is due to the way the BB Desktop sync works,
-if you have a very large library (like I do), the program 
-will not do much beyond making your Blackberry grind to a halt.
-I stared at the busy cursor for far too long and heard no music!
-Thus Wifi Music Sync was born.
+BBWifiMusicSync is a Client-Server program to keep the music updated on
+your Blackberry, and potentially other, devices with WiFi capability.
 
 Wifi Music Sync only pushes out only the songs and playlists
 _you want_, while trying to do as much work as it can on the 
-server side, leaving your battery free to...um..make phone calls.
+server side.
 
-Even when you only want to sync manually, the Blackberry 
-Desktop Software takes long enough to load, you'll have forgotten
-why you connected your phone to the PC in the first place. So, 
-with the Music Sync Desktop program, which will load rather 
-quickly you can easily keep your music updated even 
-without Wifi.
+###Features
+
+ * Sync a Playlist, an Album or an Artist.
+ * Fast, On-Demand sync.
+ * Server uses minimal amount of memory while idle.
+ * Two-Way sync.
+   * Usually iTunes must be running to make changes to the playlists
+     on the PC, but BBWifiMusicSync will remember all the changes and apply
+     it whenever iTunes is run by the user.
+ * Open protocol and code, modify it to your heart's content.
+ * Potential to add support for any number of media players and even
+   simple file based access.
 
 Using WiFi Music Sync
 ---------------------
@@ -41,20 +36,19 @@ occasionally to keep the music on your Blackberry updated.
 To run the server application you need:
 
  * Windows XP or higher.
- * .NET FX 4.0 (Needs to be verfied).
+ * .NET FX 4.0.
  * iTunes.
 
-###Build Dependencies
+###Dependencies
 
 To build Wifi Music Sync you need:
 
  * [.NET Framework](http://msdn.microsoft.com/en-us/netframework/default) + Tools (>= 4.0)
  * [Kayak Server Framework](https://github.com/kayak/kayak) (source included)
- * [PostSharp](http://www.sharpcrafters.com/postsharp) (>= 2.0) _(Get the free Community Edition)_
  * [Log4net](http://logging.apache.org/log4net/) (>= 1.2.9.0) (unmodified binary included)
  * [iTunes](http://www.apple.com/itunes/) (>= 9.0)
 
-AND
+And
 
 * [VS.NET 2010](https://www.microsoft.com/express/Downloads/)+ (Optional) It is the easiest way to build.
 
@@ -63,18 +57,16 @@ Get It
 
  * [Download the Latest Release](http://sourceforge.net/projects/bbwifimusicsync/files/)
  * [Get Source Code](http://sourceforge.net/projects/bbwifimusicsync/develop)
+ * [Install Blackberry Client OTA](Web/6.0.0/WifiMusicSync.jad)
 
 Links
 -----
 
  * [SourceForge Project Page](http://sourceforge.net/projects/bbwifimusicsync/)
 
-Future Plans
-------------
-Rewrite the server in Vala (or use Mono) for GNOME. We can add support
-for Banshee by interacting with the SQLite database. The problems with 
-locking etc. of the database need to be investigated. A plugin is out of
-scope because we need to be always on.
-
 -------------------------------------------------------------------
+<a style="float: right;" href="http://sourceforge.net/" title="visit SourceForge.net">
+    <img alt="SourceForge.net Logo" src="http://sourceforge.net/sflogo.php?group_id=402939&amp;type=13"/>
+</a>
+Page generated from [README.md](README.md).<br />
 _$Id$_

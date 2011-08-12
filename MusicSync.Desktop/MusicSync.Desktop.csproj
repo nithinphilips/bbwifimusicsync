@@ -61,9 +61,6 @@
     <Reference Include="Afterthought, Version=1.0.6.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Afterthought.1.0.8\lib\Afterthought.dll</HintPath>
     </Reference>
-    <Reference Include="libQdownloader">
-      <HintPath>..\..\Qdownloader-2\src\libQdownloader\bin\Debug\libQdownloader.dll</HintPath>
-    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\log4net\log4net.dll</HintPath>
@@ -96,16 +93,8 @@
     <Compile Include="Helpers\Extensions.cs" />
     <Compile Include="Helpers\NotifyPropertyChangedExtensions.cs" />
     <Compile Include="Model\CopyProgressModel.cs" />
-    <Compile Include="Model\NOtifiable.cs" />
     <Compile Include="Model\PlaylistInfo.cs" />
     <Compile Include="Model\SyncSettings.cs" />
-    <Compile Include="QuickZip\DirectoryExistsRule.cs" />
-    <Compile Include="QuickZip\InvertSign.cs" />
-    <Compile Include="QuickZip\PathNotEmptyRule.cs" />
-    <Compile Include="QuickZip\Resources\BoolToVisibilty.cs" />
-    <Compile Include="QuickZip\SelectFolderTextBox.xaml.cs">
-      <DependentUpon>SelectFolderTextBox.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Threading\FileCopier.cs" />
     <Compile Include="Threading\FileDeleter.cs" />
     <Compile Include="Threading\FileOperation.cs" />
@@ -141,14 +130,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="QuickZip\Resources\Brushes.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="QuickZip\SelectFolderTextBox.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -186,6 +167,10 @@
     <ProjectReference Include="..\lib\Afterthought\Examples\NotifyPropertyChanged\NotifyPropertyChanged\NotifyPropertyChanged.csproj">
       <Project>{91D3E48E-0CFC-4F86-8B1C-456428095B1C}</Project>
       <Name>NotifyPropertyChanged</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\lib\libQdownloader\libQdownloader.csproj">
+      <Project>{6703AF3C-3731-4066-A180-7980810E32A7}</Project>
+      <Name>libQdownloader</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

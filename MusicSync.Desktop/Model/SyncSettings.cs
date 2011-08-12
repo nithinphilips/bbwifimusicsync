@@ -34,7 +34,7 @@ using NotifyPropertyChanged;
 namespace WifiSyncDesktop.Model
 {
     [NotifyPropertyChanged]
-    public class SyncSettings : INotifyPropertyChanged
+    public class SyncSettings : INotifyPropertyChangedAmendment
     {
         UsbManager man = new UsbManager();
 
@@ -153,34 +153,19 @@ namespace WifiSyncDesktop.Model
                 this.Capacity = di.TotalSize;
                 this.Size = (di.TotalSize - di.AvailableFreeSpace) + sizeVariance;
 
-                //Console.WriteLine("--------------------------------------------------------");
-                //Console.WriteLine("Current Size: {0}", Common.ToReadableSize(currentSize));
-                //Console.WriteLine("Capacity: {0}", Common.ToReadableSize(Capacity));
-                //Console.WriteLine("Size: {0}", Common.ToReadableSize(Size));
-                //Console.WriteLine("Total Track Size: {0}", Common.ToReadableSize(totalTrackSize));
-
                 if( sizeVariance == 0)
                     Status = "No songs to copy."; 
                 else if(sizeVariance > 0)
                     Status = string.Format("Need about {0} of space.", Common.ToReadableSize(sizeVariance, 0));
                 else
                     Status = string.Format("About {0} of space will be freed.", Common.ToReadableSize(-sizeVariance, 0));
-
-                Console.WriteLine(Status);
-                //OnPropertyChanged("Status");
             }
 
-            // These props are calculated on demand
+            // Fake it!
             OnPropertyChanged("RemainingCapacity");
             OnPropertyChanged("ImageSizePercentage");
             OnPropertyChanged("HasCapacityExceeded");
         }
-
-        bool DoesTrackExistAtDestination(ITrack track)
-        {
-            return File.Exists(track.GetPlaylistLine(this.SyncPath, System.IO.Path.DirectorySeparatorChar, false));
-        }
-
 
         public IEnumerable<PlaylistInfo> Playlists { get; set; }
         public string Status { get; set; }
@@ -198,13 +183,11 @@ namespace WifiSyncDesktop.Model
             }
             set
             {
-                if (value != _path)
-                {
-                    _path = value;
-                    this.CheckExistingPlaylists();
-                    CalculatePlaylistSize();
-                    OnPropertyChanged("Path");
-                }
+                if (value == _path) return;
+
+                _path = value;
+                this.CheckExistingPlaylists();
+                CalculatePlaylistSize();
             }
         }
 
@@ -212,18 +195,14 @@ namespace WifiSyncDesktop.Model
         {
             get
             {
-                return this.Path == null ? "" : System.IO.Path.Combine(Path.Name, "Blackberry", "music", "WiFiSync");
+                return this.Path == null ? "" : System.IO.Path.Combine(Path.Name + System.IO.Path.DirectorySeparatorChar, "Blackberry", "music", "WiFiSync");
             }
         }
 
         public float ImageSizePercentage
         {
-            get
-            {
-                if (Size > Capacity)
-                    return Common.CalculatePercent(Capacity, Size);
-                else
-                    return Common.CalculatePercent(Size, Capacity);
+            get {
+                return Size > Capacity ? Common.CalculatePercent(Capacity, Size) : Common.CalculatePercent(Size, Capacity);
             }
         }
 
@@ -239,8 +218,13 @@ namespace WifiSyncDesktop.Model
 
         private void OnPropertyChanged(string name)
         {
+            OnPropertyChanged(new PropertyChangedEventArgs(name));
+        }
+
+        public void OnPropertyChanged(PropertyChangedEventArgs e)
+        {
             if (PropertyChanged != null)
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
+                PropertyChanged(this, e);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

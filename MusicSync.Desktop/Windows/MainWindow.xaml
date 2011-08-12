@@ -1,7 +1,7 @@
 ﻿<Window x:Class="WifiSyncDesktop.Windows.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:QControls="clr-namespace:QuickZip.Controls" xmlns:Utilities="clr-namespace:WifiSyncDesktop.Utilities" xmlns:Tools="clr-namespace:QuickZip.Tools" WindowStartupLocation="CenterScreen"
+        xmlns:Utilities="clr-namespace:WifiSyncDesktop.Utilities" WindowStartupLocation="CenterScreen"
         Loaded="Window_Loaded"
         Icon="../music-sync-desktop.ico"
         Title="WiFi Music Sync" Height="600" Width="500">

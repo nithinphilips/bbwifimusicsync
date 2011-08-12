@@ -42,7 +42,7 @@ namespace WifiSyncDesktop.Windows
     {
         SyncSettings viewModelSync = new SyncSettings();
         CopyProgressModel viewModelCopy = new CopyProgressModel();
-        FileOperationManager _operationMan = new FileOperationManager();
+        private FileOperationManager _operationMan;
 
         public int Total { get; set; }
         public int Current { get; set; }
@@ -51,7 +51,9 @@ namespace WifiSyncDesktop.Windows
         {
             InitializeComponent();
 
-            viewModelSync.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(viewModelSync_PropertyChanged);
+            Current = 0;
+
+            _operationMan = new FileOperationManager();
 
             Parallel.Invoke(() =>
             {
@@ -67,11 +69,6 @@ namespace WifiSyncDesktop.Windows
             _operationMan.WorkCompleted += new EventHandler(copyMan_WorkCompleted);
 
             this.Closing += new System.ComponentModel.CancelEventHandler(MainWindow_Closing);
-        }
-
-        void viewModelSync_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            Console.WriteLine(e.PropertyName);
         }
 
         #region System Menu Hooks

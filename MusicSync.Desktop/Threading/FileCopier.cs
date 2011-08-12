@@ -49,6 +49,15 @@ namespace WifiSyncDesktop.Threading
         public override void Work(FileOperation job)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(job.Destination));
+            if(File.Exists(job.Destination))
+            {
+                // Check if the sizes are the same and skip copying if it is.
+                FileInfo srcInfo = new FileInfo(job.Source);
+                FileInfo destInfo = new FileInfo(job.Destination);
+
+                if (srcInfo.Length == destInfo.Length) return;
+            }
+
             File.Copy(job.Source, job.Destination, true);
         }
 

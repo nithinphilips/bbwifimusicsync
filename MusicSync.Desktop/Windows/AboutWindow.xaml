@@ -1,7 +1,7 @@
 ﻿<Window x:Class="WifiSyncDesktop.Windows.AboutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Icon="../refresh-reload-sync-icon.ico"
+        Icon="../music-sync-desktop.ico"
         WindowStartupLocation="CenterOwner"
         Title="About" Background="#FF020202" Foreground="White" Width="554" SizeToContent="Height">
     <Grid>
@@ -16,13 +16,20 @@
     				<GradientStop Color="#FF3F6E72"/>
     				<GradientStop Color="White" Offset="1"/>
     			</RadialGradientBrush> 		
-			</StackPanel.Background>  	
-			
-			<Image Margin="5,10" HorizontalAlignment="Left"  Source="/WifiSyncDesktop;component/refresh-reload-sync-icon.ico" Width="64" VerticalAlignment="Center"/>
+			</StackPanel.Background>
+
+            <Image Margin="5,10" HorizontalAlignment="Left" Width="64" VerticalAlignment="Center" Source="/MusicSync.Desktop;component/music-sync-desktop.ico" />
 			<TextBlock Text="Music Sync" VerticalAlignment="Bottom" Margin="0,0,0,10" FontSize="32" FontWeight="Bold" Foreground="White"/>
 			
 		</StackPanel>
-    	<TextBlock HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top" Padding="5" FontFamily="Courier New"><Run FontSize="13.333" FontFamily="Segoe UI Semibold" Text="A suite of applications to sync music from an iTunes library with a Blackberry smartphone."/><LineBreak/><LineBreak/><Run FontFamily="Segoe UI Semibold" Text="Copyright (C) 2011 Nithin Philips &lt;nithin@nithinphilips.com&gt;"/><LineBreak/><LineBreak/><Run Text="This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version."/><LineBreak/><Run Text="This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details."/><LineBreak/><Run Text="You should have received a copy of the GNU General Public License along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;."/></TextBlock>
+        <TextBlock HorizontalAlignment="Left" Grid.Row="1" VerticalAlignment="Top" Padding="5" FontFamily="Courier New">
+            <Run FontSize="13.333" FontFamily="Segoe UI Semibold" Text="A suite of applications to sync music from an iTunes library with BlackBerry® smartphones."/>
+            <LineBreak/><LineBreak/><Run FontFamily="Segoe UI Semibold" Text="Copyright (C) 2011 Nithin Philips &lt;nithin@nithinphilips.com&gt;"/>
+            <LineBreak /><Hyperlink FontFamily="Segoe UI" Foreground="White" RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="http://bbwifimusicsync.sourceforge.net/">http://bbwifimusicsync.sourceforge.net/</Hyperlink>
+            <LineBreak/><LineBreak/><Run Text="This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details. You should have received a copy of the GNU General Public License along with this program.  If not, see"/>
+            <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="http://www.gnu.org/licenses/">&lt;http://www.gnu.org/licenses/&gt;</Hyperlink>
+            <LineBreak/><LineBreak/><Run FontSize="10" FontFamily="Segoe UI" Text="BlackBerry® is a trademark of Research In Motion."/>
+        </TextBlock>
 		<Button Margin="5" Content="OK" Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Right" IsDefault="True" IsCancel="True"/>		
 	</Grid>
 </Window>

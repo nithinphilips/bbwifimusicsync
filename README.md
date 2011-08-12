@@ -58,21 +58,22 @@ Get It
 ------
 
  * [Download the Latest Release](http://sourceforge.net/projects/bbwifimusicsync/files/)
- * [Fork it on GitHub](https://github.com/nithinphilips/bbwifimusicsync)
- * [Get Source Code](http://sourceforge.net/projects/bbwifimusicsync/develop)
- * [Install Blackberry Client OTA](http://bbwifimusicsync.sourceforge.net/Web/6.0.0/WifiMusicSync.jad)
+ * [Fork it on GitHub](https://github.com/nithinphilips/bbwifimusicsync) or 
+   [Get Source Code](http://sourceforge.net/projects/bbwifimusicsync/develop)
+ * [Install the Blackberry Client OTA](http://bbwifimusicsync.sourceforge.net/Web/6.0.0/WifiMusicSync.jad)
 
 Credits
 -------
 
  * [Steven M. Cohn](http://www.codeproject.com/script/Membership/View.aspx?mid=225718) for
-   [USBManager](http://www.codeproject.com/KB/cs/UsbManager.aspx).
+   [USBManager](http://www.codeproject.com/KB/cs/UsbManager.aspx). 
+   Also check out [iTuner](https://ituner.codeplex.com/).
  * [Nir Dobovizki](http://www.nbdtech.com/) for 
-   [WPF reflection control](http://www.nbdtech.com/Blog/archive/2007/11/21/WPF-Reflection-Control.aspx)
+   [WPF reflection control](http://www.nbdtech.com/Blog/archive/2007/11/21/WPF-Reflection-Control.aspx).
  * [Eric Daugherty](https://sourceforge.net/users/edaugherty) for 
-   [iTunesExport](https://sourceforge.net/projects/itunesexport) (the old C# version)
+   [iTunesExport](https://sourceforge.net/projects/itunesexport) (the old C# version).
  * [George Joseph](mailto:george.joseph@fairview5.com) for code used from 
-   [KeePass for BlackBerry](http://f5bbutils.fairview5.com/keepassbb2/)
+   [KeePass for BlackBerry](http://f5bbutils.fairview5.com/keepassbb2/).
  * Icons based on
    [Faenza](https://tiheum.deviantart.com/art/Faenza-Icons-173323228),
    [Elementary](https://launchpad.net/elementaryicons) or
@@ -81,6 +82,8 @@ Credits
 License
 -------
 
+    Copyright (C) 2011 Nithin Philips <nithin@nithinphilips.com>
+    
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
@@ -94,10 +97,9 @@ License
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-[Project Page at SourceForge](http://sourceforge.net/projects/bbwifimusicsync/)
-
--------------------------------------------------------------------
+[Visit the Project Page at SourceForge](http://sourceforge.net/projects/bbwifimusicsync/)
+<br />
 <a href="http://sourceforge.net/" title="visit SourceForge.net">
     <img alt="SourceForge.net Logo" src="http://sourceforge.net/sflogo.php?group_id=402939&amp;type=13"/>
 </a>
+

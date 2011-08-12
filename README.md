@@ -69,5 +69,3 @@ Links
 <a style="float: right;" href="http://sourceforge.net/" title="visit SourceForge.net">
     <img alt="SourceForge.net Logo" src="http://sourceforge.net/sflogo.php?group_id=402939&amp;type=13"/>
 </a>
-Page generated from [README.md](README.md).<br />
-_$Id$_

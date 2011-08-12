@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>QFilter Documentation</title>
+  <style type="text/css">
+    * { padding: 0; margin: 0; }
+
+    body {
+     font-family: Verdana, Arial, Helvetica, sans-serif;
+     font-size: 13px;
+     padding: 20px;
+    }
+
+    p {
+     padding: 0px;
+     margin: 10px 0px 0px 10px;
+    }
+    
+    h3 {
+      margin: 5px 0 5px 0;
+    }
+
+    #wrapper { 
+     margin: 0 auto;
+     width: 900px;
+    }
+
+    #content { 
+     float: left;
+     color: #333;
+     background: #FFFFFF;
+     width: 858px;
+     display: inline;
+     border: 1px solid #ccc;
+     padding: 20px;
+    }
+
+    #header {
+     color: white;
+     width: 860px;
+     float: left;
+     height: 35px;
+     padding: 20px;
+     text-align: right;
+     background: rgb(143,154,32);
+    }
+
+    #footer { 
+     text-align: center;
+     width: 880px;
+     clear: both;
+     color: white;
+     padding: 10px;
+     background: rgb(85,91,20);
+    }
+    
+    #footer p {
+      margin: 0;
+    }
+    
+    pre {
+      color: white;
+      background:#000000 none repeat scroll 0 0;
+      border:1px solid #6B6B52;
+      margin:0.5em 0 1.5em 10px;
+      opacity:0.5;
+      overflow:auto;
+      padding:17px 7px;
+    }
+    
+    dl{
+      margin-left: 10px;
+    }
+    
+    dt{
+      font-weight: bold;s
+    }
+    
+    dd {
+      margin-left: 15px;
+    }
+    
+    .keyword {
+      font-style: italic;
+      font-weight: bold;
+    }
+    
+    a {
+      color: white;
+      text-decoration: none;
+      border-bottom: 1px dotted white;
+    }
+    
+    .filename {
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+	<div id="wrapper">
+    <div id="header">
+      <h1>QFilter Documentation</h1>		 
+    </div>
+
+    <div id="content">
+      <h2>Description</h2>
+      <p>QFilter allows users to "filter" items using logical expressions.</p>
+      <h2>Description</h2>
+      <p>An expression:</p>
+      <pre>a and b or c and not (d or e)</pre>
+      <p>will produce the following tree:</p>
+      <img src="tree1.png" />
+      <h3>Sample evaluations:</h3>
+       <dl>
+        <dt>a</dt>
+        <dd>False. Because 'b' is required.</dd>
+        <dt>ab</dt>
+        <dd>True. Both 'a' and 'b' are present.</dd>
+        <dt>abc</dt>
+        <dd>True. Both 'a' and 'b' are present and 'c' is allowed.</dd>
+        <dt>c</dt>
+        <dd>True. Both 'a' and 'b' OR just 'c' is allowed.</dd>
+        <dt>abcd</dt>
+        <dd>False. 'd' is not allowed.</dd>
+        <dt>abce</dt>
+        <dd>False. 'e' is not allowed.</dd>
+        <dt>abcde</dt>
+        <dd>False. Neither 'd' nor 'e' are allowed.</dd>
+        <dt>wxyz</dt>
+        <dd>False. No matching criteria.</dd>
+       </dl>
+      <p>A more complex statement like:</p>
+      <pre>($.jpg or ^.png or `.gif` and !(zip|rar) and fullsize and !(thumbnail)) and "one more" and ("thing")</pre>
+      <p>will produce the following tree:</p>
+      <img src="tree2.png" />
+      <h3>Match Operators</h3>
+      <dl>
+        <dt>$</dt>
+        <dd>Specifies to match the end of the string.</dd>
+        <dt>^</dt>
+        <dd>Specifies to match the beginning of the string.</dd>
+        <dt>`</dt>
+        <dd>Specifies to treat keyword as a regex.</dd>
+      </dl>
+      
+      <h3>Logical Operators</h3>
+      <dl>
+        <dt>and,&</dt>
+        <dd>Logical and.</dd>
+        <dt>or,|</dt>
+        <dd>Logical or</dd>
+        <dt>not,!</dt>
+        <dd>Not operator. Can only appear in front of a group</dd>
+      </dl>
+      
+      <h3>Keywords and Groups</h3>
+      <dl>
+        <dt>keyword</dt>
+        <dd>Any sequence of letters that are not an operator</dd>
+        <dt>"a keyword"</dt>
+        <dd>If the keyword contains a space or an operator, enclose it in double quotes. For example, to search for the string '<span class="keyword">and</span>' enter <span class="keyword">"and"</span>.</dd>
+        <dt>(...)</dt>
+        <dd>A group. Allows users to override operator predence. Also allows negation. For example, <span class="keyword">!(zip|rar)</span> will match any string that does not contain the words <span class="keyword">zip</span> or <span class="keyword">rar</span>.</dd>
+      </dl>
+      
+      <p><span class="keyword">Note:</span> All operators are case-sensitive. However, the default string comarison method is case-insensitive.</p>
+      
+      <h2>Resources</h2>
+      <p>The grammar for QFilter can be found in the file <span class="filename">QFilter.tpg</span> in the <span class="filename">Resources\QFilter</span> folder in the source directory.</p>
+    </div>
+		 
+    <div id="footer">
+      <p>(c) 2008 Nithin Philips. Part of <a href="http://trac.nithinphilips.com/QDownloader">QDownloader</a> documentation project.</p>		   
+    </div>
+  </div>
+
+   
+</body>
+</html>

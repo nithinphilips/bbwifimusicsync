@@ -1,0 +1,125 @@
+<% @TinyPG Namespace="LibQdownloader.Scripting" Language="C#" OutputPath="F:\Work\Projects\Qdownloader-2\src\libQdownloader\Scripting\Parser\" %>
+
+SCAN -> @"scan";
+WITHFILTER -> @"with filter|filter";
+SAVETO -> "save to|save";
+EXTRACT -> @"extract";
+WORD -> @"(\""[^\""\\]*(?:\\.[^\""\\]*)*\"")|([^\s]*)";
+RESULTS -> "results";
+LINKS -> "links";
+AND -> "and";
+RESOURCES -> "resources";
+RENAMEAS -> "rename as|rename";
+
+[Skip] POUNDCOMMENTLINE -> "\#.*$";
+[Skip] COMMENTLINE  -> @"//[^\n]*\n?";
+[Skip] COMMENTBLOCK -> @"/\*[^*]*\*+(?:[^/*][^*]*\*+)*/";
+[Skip] WHITESPACE   -> @"(\s|\n)+";
+
+EOF -> @"^$";
+
+Start 	   -> (ScanChain)* EOF {
+	ScriptCollection script = new ScriptCollection();
+	int i = 0;
+	while ($ScanChain[i] != null) {
+		script.Add((Script)$ScanChain[i]);
+		i++;
+	}
+	return script;
+};
+ScanChain -> ScanAtom SaveAtom (RenameAtom)? {
+	Script scriptAtom = new Script();
+	scriptAtom.RootScanCommand = (ScanCommand)$ScanAtom;
+	scriptAtom.SaveCommand = new SaveCommand((string)$SaveAtom);	
+	if($RenameAtom != null){
+		scriptAtom.RenameCommand = new RenameCommand((string)$RenameAtom);
+	}else{
+		scriptAtom.RenameCommand = new RenameCommand("");
+	}
+
+	return scriptAtom;
+};
+
+ScanAtom -> ScanRootAtom (ScanChildAtom)* {
+	// Done
+	ScanCommand rootCommand = null;
+	ScanCommand current = null;
+	ScanCommand previous = null;
+
+	rootCommand = new ScanCommand(); 
+	rootCommand .Url = (string)((object[])$ScanRootAtom)[0];
+	rootCommand .Filter = (string)((object[])$ScanRootAtom)[1];
+	rootCommand .ExtractMode = (ExtractMode )((object[])$ScanRootAtom)[2];
+	rootCommand.Parent = null;
+	previous = rootCommand;
+
+	int i = 0;
+	while ($ScanChildAtom[i] != null) {
+		current = new ScanCommand(); 
+		current.Url = (string)((object[])$ScanChildAtom[i])[0];
+		current.Filter = (string)((object[])$ScanChildAtom[i])[1];
+		current.ExtractMode = (ExtractMode )((object[])$ScanChildAtom[i])[2];
+
+		// attach child
+		current.Parent = previous;
+		previous.Child = current;
+		
+		previous = current;
+		i++;
+	} 
+	
+	return rootCommand;
+};
+ScanRootAtom -> SCAN WORD (FilterAtom)? (ExtractAtom)? {
+	// Done
+	object[] result = new object[3];
+
+	result[0] = $WORD;									// string
+	result[1] = ($FilterAtom != null) ? $FilterAtom : "";				// string or null
+	result[2] = ($ExtractAtom != null) ? $ExtractAtom : ExtractMode.Both;	// Enum or null
+	return result;
+};
+ScanChildAtom -> SCAN RESULTS (FilterAtom)? (ExtractAtom)? {
+	// Done
+	object[] result = new object[3];
+
+	result[0] = "qdownloader://chainPrevious";					// string
+	result[1] = ($FilterAtom != null) ? $FilterAtom : "";				// string or ""
+	result[2] = ($ExtractAtom != null) ? $ExtractAtom : ExtractMode.Both;	// Enum or ExtractMode.Both
+	return result;
+};
+
+RenameAtom -> RENAMEAS WORD {
+	// Done
+	return $WORD;
+};
+SaveAtom -> SAVETO WORD {
+	// Done
+	return $WORD;
+};
+
+FilterAtom -> WITHFILTER WORD {
+	// Done
+	return $WORD;
+};
+ExtractAtom -> EXTRACT ExtractData {
+	// Done
+	return $ExtractData;
+};
+ExtractData -> LinksOrResources(AND LinksOrResources)? {
+	// Done
+	ExtractMode extractMode;
+	extractMode = (ExtractMode)$LinksOrResources[0];
+	if($AND != null){
+		extractMode |= (ExtractMode)$LinksOrResources[1];
+	}
+	return extractMode;
+};
+
+LinksOrResources -> LINKS|RESOURCES {
+	if($LINKS != null){
+		return ExtractMode.Links;
+	}else{
+		return ExtractMode.Resources;
+	}
+};

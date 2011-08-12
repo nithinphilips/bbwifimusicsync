@@ -1,0 +1,31 @@
+<% @TinyPG Namespace="QDownloader.Scripting" Language="C#" %>
+
+SCAN -> @"scan";
+WITHFILTER -> @"with filter|filter";
+SAVETO -> "save to|save";
+EXTRACT -> @"extract";
+WORD -> @"(\""[^\""\\]*(?:\\.[^\""\\]*)*\"")|([^\s]*)";
+RESULTS -> "results";
+LINKS -> "links";
+AND -> "and";
+RESOURCES -> "resources";
+RENAMEAS -> "rename as|rename";
+
+[Skip] POUNDCOMMENTLINE -> "\#.*$";
+[Skip] COMMENTLINE  -> @"//[^\n]*\n?";
+[Skip] COMMENTBLOCK -> @"/\*[^*]*\*+(?:[^/*][^*]*\*+)*/";
+[Skip] WHITESPACE   -> @"(\s|\n)+";
+
+EOF -> @"^$";
+
+Start 	   -> (ScanChain)* EOF;
+ScanChain -> ScanAtom SaveAtom (RenameAtom)? ;
+ScanAtom -> ScanRootAtom (ScanChildAtom)*;
+ScanChildAtom -> SCAN RESULTS (FilterAtom)? (ExtractAtom)?;
+ScanRootAtom -> SCAN WORD (FilterAtom)? (ExtractAtom)?;
+RenameAtom -> RENAMEAS WORD;
+SaveAtom -> SAVETO WORD;
+FilterAtom -> WITHFILTER WORD;
+ExtractAtom -> EXTRACT ExtractData;
+ExtractData -> LinksOrResources(AND LinksOrResources)?;
+LinksOrResources -> LINKS|RESOURCES;

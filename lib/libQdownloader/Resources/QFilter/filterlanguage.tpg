@@ -1,0 +1,205 @@
+<% @TinyPG Namespace="LibQdownloader.Search"  Language="cs" OutputPath="F:\Work\Projects\Qdownloader-2\src\libQdownloader\Search\Parser\" %>
+
+MATCHSTARTOP	-> @"\^";
+MATCHENDOP	-> @"\$";
+REGEXOP	-> "`";
+
+// Logical operators can be symbols or words
+OROP		-> @"\||or";
+ANDOP		-> @"&|and";
+NOTOP		-> @"!|not";
+
+QUOTEDWORD	-> @"@?\""(\""\""|[^\""])*\""";
+// Just to be safe, we are excluding all other terminals from WORD
+// We are excluding: <space>,`,^,$,(,),|,&,!
+WORD		-> @"[^ `\^\$\(\)\|&!]+";
+
+BROPEN 	-> @"\(";
+BRCLOSE 	-> @"\)";
+EOF         	-> @"^$";
+SPACE		-> " ";
+
+[Skip] WHITESPACE  -> @"\s+";
+
+Start -> (Search)? EOF {
+	if($Search != null){
+		return $Search;
+	}else{
+		return null;
+	}
+};
+
+Search	-> (GroupsOrWords)* {
+	if($GroupsOrWords[1] == null){
+		// Only one item
+		return $GroupsOrWords;
+	}else{
+		SearchGroup group = new SearchGroup();
+		int i = 0;
+		while ($GroupsOrWords[i] != null) {
+			group.Add((ISearchEvaluator)$GroupsOrWords[i]);
+			i++;
+		}
+		return group;
+	}
+};
+
+GroupsOrWords -> Groups|Words {
+	if($Groups != null){
+		return $Groups;
+	}else{
+		return $Words;
+	}
+};
+
+Groups -> Group (MoreGroupOrWord)* {
+	// This code is nearly identical to Words production.
+	if($MoreGroupOrWord == null){
+		// No nesting, simply return what we got
+		return $Group;
+	}else{	
+
+		ISearchEvaluator rootItem = (ISearchEvaluator)$Group;
+		SearchOperator lastOp = SearchOperator.None;
+		SearchGroup group = null;
+
+		// We read left to right
+		// when we encounter like operators, we append to a group
+		// when we encounter unlike operators, we create a new group and append the previous group to it.
+		int i = 0;
+		while ($MoreGroupOrWord[i] != null) {
+			object[] result = (object[])$MoreGroupOrWord[i];
+			SearchOperator op = (SearchOperator)result[0];
+			ISearchEvaluator evaluator = (ISearchEvaluator)result[1];
+
+
+			if(op != lastOp){
+				// Branch
+				SearchGroup newGroup = new SearchGroup();
+				newGroup.SearchOperator = op;
+				if(group != null){
+					newGroup.Add(group);
+				}else{
+					// this is probably the first run
+					newGroup.Add(rootItem);
+				}
+				group = newGroup;
+				lastOp = op;
+			}
+			group.Add(evaluator);
+			i++;
+		}
+
+		return group;
+	}
+};
+
+
+Group	-> NOTOP? BROPEN (Group|Words) BRCLOSE {
+	if($NOTOP != null) { 
+		SearchGroup group;
+		ISearchEvaluator evaluator = (ISearchEvaluator)(($Group != null) ? $Group : $Words);
+		group = evaluator as SearchGroup; // try casting
+
+		if(group == null){
+			group = new SearchGroup();
+			group.Add((ISearchEvaluator)$Words);
+		}
+
+		// We don't have to create a wrapper when the type is a SerchGroup because this is the 
+		// only place where NOTOP can be present.
+		// So, Just let the existing one be negated.
+		
+		group.Negate = true;
+		return group;
+	}else if($Group != null) {
+		// just a group in brackets
+		return $Group;
+	}else{
+		// just some words in brackets
+		return $Words;
+	}
+	
+};
+
+Words -> Word (MoreGroupOrWord)* {
+	// This code is nearly identical to Groups production.
+	if($MoreGroupOrWord == null){
+		// No nesting, simply return what we got
+		return $Word;
+	}else{	
+
+		ISearchEvaluator rootItem = (ISearchEvaluator)$Word;
+		SearchOperator lastOp = SearchOperator.None;
+		SearchGroup group = null;
+
+		// We read left to right
+		// when we encounter like operators, we append to a group
+		// when we encounter unlike operators, we create a new group and append the previous group to it.
+		int i = 0;
+		while ($MoreGroupOrWord[i] != null) {
+			object[] result = (object[])$MoreGroupOrWord[i];
+			SearchOperator op = (SearchOperator)result[0];
+			ISearchEvaluator evaluator = (ISearchEvaluator)result[1];
+
+
+			if(op != lastOp){
+				// Branch
+				SearchGroup newGroup = new SearchGroup();
+				newGroup.SearchOperator = op;
+				if(group != null){
+					newGroup.Add(group);
+				}else{
+					// this is probably the first run
+					newGroup.Add(rootItem);
+				}
+				lastOp = op;
+				group = newGroup;
+			}
+			group.Add(evaluator);
+			i++;
+		}
+
+		return group;
+	}
+};
+
+// This production rule is necessary because without it we won't be able
+// to pair a logical operator with the correct group or word that follows it
+MoreGroupOrWord -> LogicalOperator (Group | Word) {
+	object[] result = new object[2];
+	result[0] = $LogicalOperator;
+	result[1] = ($Group != null) ? $Group : $Word;
+	return result;
+};
+
+Word -> MatchOperator? (QUOTEDWORD | WORD) MatchOperator? {
+	// We don't care about the second MatchOperator. It doesn't even have to be the same.
+	// We could throw an exception if they don't match. But it doesn't really matter.
+	MatchOperator matchOp = ($MatchOperator == null) ? MatchOperator.Contains : (MatchOperator)$MatchOperator;
+	if($QUOTEDWORD != null){
+		return new SearchWord((string)$QUOTEDWORD, matchOp , true);
+	}else{
+		return new SearchWord((string)$WORD, matchOp, false);
+	}
+};
+
+LogicalOperator -> ANDOP | OROP {
+	if($ANDOP != null){
+		return SearchOperator.And;
+	}else{
+		return SearchOperator.Or;
+	}
+};
+MatchOperator -> MATCHSTARTOP | MATCHENDOP | REGEXOP {
+	if($MATCHSTARTOP != null){
+		return MatchOperator.StartsWith;
+	}else if($MATCHENDOP != null){
+		return MatchOperator.EndsWith;
+	}else if($REGEXOP  != null){
+		return MatchOperator.Regex;
+	}else{
+		// This block will never run!
+		return MatchOperator.Contains;
+	}
+};

@@ -1,0 +1,179 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>QScript Documentation</title>
+  <style type="text/css">
+    * { padding: 0; margin: 0; }
+
+    body {
+     font-family: Verdana, Arial, Helvetica, sans-serif;
+     font-size: 13px;
+     padding: 20px;
+    }
+
+    p {
+     padding: 0px;
+     margin: 10px 0px 0px 10px;
+    }
+
+    #wrapper { 
+     margin: 0 auto;
+     width: 900px;
+    }
+
+    #content { 
+     float: left;
+     color: #333;
+     background: #FFFFFF;
+     width: 858px;
+     display: inline;
+     border: 1px solid #ccc;
+     padding: 20px;
+    }
+
+    #header {
+     color: white;
+     width: 860px;
+     float: left;
+     height: 35px;
+     padding: 20px;
+     text-align: right;
+     background: rgb(143,154,32);
+    }
+
+    #footer { 
+     text-align: center;
+     width: 880px;
+     clear: both;
+     color: white;
+     padding: 10px;
+     background: rgb(85,91,20);
+    }
+    
+    #footer p {
+      margin: 0;
+    }
+    
+    pre {
+      color: white;
+      background:#000000 none repeat scroll 0 0;
+      border:1px solid #6B6B52;
+      margin:0.5em 0 1.5em 10px;
+      opacity:0.5;
+      overflow:auto;
+      padding:17px 7px;
+    }
+    
+    dl{
+      margin-left: 10px;
+    }
+    
+    dt{
+      font-weight: bold;s
+    }
+    
+    dd {
+      margin-left: 15px;
+    }
+    
+    .keyword {
+      font-style: italic;
+      font-weight: bold;
+    }
+    
+    a {
+      color: white;
+      text-decoration: none;
+      border-bottom: 1px dotted white;
+    }
+    
+    .filename {
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+	<div id="wrapper">
+    <div id="header">
+      <h1>QScript Documentation</h1>		 
+    </div>
+
+    <div id="content">
+      <h2>Conventions</h2>
+      <p>[]: Items in brackets are optional.<br />
+      "": Double quotes are required where shown.</p>
+      
+      <h2>Description</h2>
+      <p>This is a single level scan command:</p>
+      <pre>Scan "http://www.example.com/" [with filter ".jpg"] 
+[extract links and resources] [&lt;CHAIN&gt;] save to "C:\Downloads" [rename as "{name}.ext"]</pre>
+  
+      <dl>
+        <dt>Scan "&lt;url&gt;"</dt>
+        <dd>Specifies the URL to scan.</dd>
+        
+        <dt>[with] filter "&lt;filter&gt;"</dt>
+        <dd>A filter to use on the results. Currently only a substring search on the url is supported. The <span class="keyword">with</span> part is optional.</dd>
+        
+        <dt>extract links and resources</dt>
+        <dd>Choose what to extract. Links point to other pages. Resources are things that are shown in the page, like images.<br/>
+    You can enter <span class="keyword">links</span> or <span class="keyword">resources</span> or <span class="keyword">links and resources</span> or <span class="keyword">resources and links</span>.</dd>
+        
+        <dt>save to "&lt;folder&gt;"</dt>
+        <dd>Choose the folder to save to final results.</dd>
+        
+        <dt>rename as "&lt;pattern&gt;"</dt>
+        <dd>The pattern with which to rename files. Currently supported variables are <span class="keyword">{name}</span>, file name without extension and <span class="keyword">{ext}</span>, the file extension.</dd>
+        
+        <dt>&lt;CHAIN&gt;</dt>
+        <dd>You can chain multiple scan commands. A chain should look like this:
+          <pre>Scan results [with filter ".jpg"] [extract links and resources]</pre>
+          Same rules as the root scan command applies. Only difference is that you have to enter the keyword <span class="keyword">results</span> instead of a url.
+        </dd>
+      </dl>
+      
+      
+      <h2>Comments</h2>
+      <p style="color: green;">// This is a single line comment</p>
+      
+      <p style="color: green;">/*<br/>
+   &nbsp;* This is a multi line comment<br/>
+   &nbsp;*/</p>
+    
+    
+    <p>You can also have multiple scan commands in a single script file.</p>
+    
+    <h2>Example</h2>
+    <p>This is a sample script file</p>
+    <pre>/*
+ * This Script tests all possible options.
+ *
+ */
+ 
+ 
+// Simple script
+scan "http://www.example.com/example.html" with filter ".oneFile" extract links save to "C:\Downloads"
+
+// Nested script
+scan "http://www.example.com/example.html" with filter ".oneFile" extract links
+	scan results with filter "link" extract links
+		scan results with filter "jpg" extract links and resources
+			scan results with filter "jpg" extract resources save to "C:\Downloads" rename "{name}.{ext}"
+
+// Another nested script with minimal arguments
+scan "http://www.example.com/example.html" save to "C:\Downloads"</pre>
+
+
+      <h2>Resources</h2>
+      <p>The grammar for QScript can be found in the file <span class="filename">QScript.tpg</span> in the <span class="filename">QScript</span> folder in the source directory.</p>
+    </div>
+		 
+    <div id="footer">
+      <p>(c) 2008 Nithin Philips. Part of <a href="http://trac.nithinphilips.com/QDownloader">QDownloader</a> documentation project.</p>		   
+    </div>
+  </div>
+
+   
+</body>
+</html>

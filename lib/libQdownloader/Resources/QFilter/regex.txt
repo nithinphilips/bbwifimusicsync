@@ -1,0 +1,7 @@
+// handles everything except quoted
+(?<operator>^[\^@$])?(?<word>[^ $]+)+
+
+
+// handles quotes
+string operatorRegex = @"(?<operator>^[\^@$])?";
+string searchRegex = @"((?<quotedword>\"[^\"]+\")|(?<word>[^ ]+))+";

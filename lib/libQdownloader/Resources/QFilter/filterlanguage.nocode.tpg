@@ -1,0 +1,36 @@
+<% @TinyPG Namespace="LibQdownloader.Search"  Language="cs" %>
+
+MATCHSTARTOP	-> @"\^";
+MATCHENDOP	-> @"\$";
+REGEXOP	-> "`";
+
+OROP		-> @"\||or";
+ANDOP		-> @"&|and";
+NOTOP		-> @"!|not";
+
+QUOTEDWORD	-> @"@?\""(\""\""|[^\""])*\""";
+WORD		-> @"[^ `\^\$\(\)\|&!]+";
+
+BROPEN 	-> @"\(";
+BRCLOSE 	-> @"\)";
+EOF         	-> @"^$";
+SPACE		-> " ";
+
+[Skip] WHITESPACE  -> @"\s+";
+
+Start -> (Search)? EOF;
+
+Search	-> (GroupsOrWords)*;
+
+GroupsOrWords -> Groups|Words;
+
+Groups -> Group (MoreGroupOrWord)*;
+Group	-> NOTOP? BROPEN (Group|Words) BRCLOSE;
+
+Words -> Word (MoreGroupOrWord)*;
+Word -> MatchOperator? (QUOTEDWORD | WORD) MatchOperator?;
+
+MoreGroupOrWord -> LogicalOperator (Group | Word);
+
+LogicalOperator -> ANDOP | OROP;
+MatchOperator -> MATCHSTARTOP | MATCHENDOP | REGEXOP;

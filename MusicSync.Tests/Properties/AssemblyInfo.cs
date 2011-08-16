@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("MusicSyncTests")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Tests for Music Sync")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Microsoft")]
-[assembly: AssemblyProduct("MusicSyncTests")]
-[assembly: AssemblyCopyright("Copyright © Microsoft 2011")]
+[assembly: AssemblyCompany("Nithin Philips")]
+[assembly: AssemblyProduct("Wifi Music Sync")]
+[assembly: AssemblyCopyright("(C) 2011 Nithin Philips")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

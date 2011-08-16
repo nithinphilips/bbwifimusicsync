@@ -146,7 +146,7 @@ namespace WifiSyncServer.iTunes
 
             foreach (IITPlaylist item in library.Playlists)
             {
-                IPlaylist pls = new Playlist(item.playlistID, item.Name, false, new IITTrackEnumerator(item));
+                IPlaylist pls = new Playlist(item.playlistID, item.Name, false, PlaylistKind.Playlist, new IITTrackEnumerator(item));
                 playlists.Add(pls);
                 playlistLookupTable.Add(pls.GetSafeName(), item);
             }

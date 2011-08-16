@@ -47,9 +47,17 @@ namespace WifiSyncServer
 
         [Path("/")]
         [Path("/help")]
-        public string Help()
+        public IEnumerable<object> Help()
         {
-            return "WifiMusicServer is up and running.\nFirst you must add your device to the device whitelist.";
+            yield return Response.Write(@"<html>
+            <head>
+                <title>MusicSync.Server</title>                
+            </head>
+            <body>
+                <p>MusicSync.Server is up and running.</p>
+                <p>First you must add your device to the device whitelist.</p>
+            </body>");
+
         }
 
         [Path("/hello")]

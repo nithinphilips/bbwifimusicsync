@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="DiffTest.cs" />
     <Compile Include="NotifyPropertyChangesTests.cs" />
+    <Compile Include="PlaylistNameTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

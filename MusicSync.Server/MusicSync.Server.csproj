@@ -41,9 +41,6 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="HttpMachine">
-      <HintPath>..\packages\HttpMachine.0.9.0.0\lib\HttpMachine.dll</HintPath>
-    </Reference>
     <Reference Include="log4net">
       <HintPath>..\lib\log4net\log4net.dll</HintPath>
     </Reference>
@@ -133,7 +130,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="music-sync-server.ico" />
+    <Content Include="music-sync-server.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

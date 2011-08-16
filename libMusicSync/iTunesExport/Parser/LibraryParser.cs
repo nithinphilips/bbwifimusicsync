@@ -75,7 +75,11 @@ namespace libMusicSync.iTunesExport.Parser
                     artistView.Add(track.AlbumArtist, new List<ITrack> {track});
             }
 
-            return artistView.Keys.Select(artist => new Playlist(-1, artist, false, artistView[artist]));
+            var list =
+                artistView.Keys.Select(
+                    artist => new Playlist(-1, artist, false, PlaylistKind.Artist, artistView[artist])).ToList();
+            list.Sort();
+            return list;
         }
 
 
@@ -92,7 +96,9 @@ namespace libMusicSync.iTunesExport.Parser
                 
             }
 
-            return albumView.Keys.Select(album => new Playlist(-1, album, false, albumView[album]));
+            var list = albumView.Keys.Select(album => new Playlist(-1, album, false, PlaylistKind.Album, albumView[album])).ToList();
+            list.Sort();
+            return list;
         }
 
         #region Public Static Methods
@@ -358,7 +364,7 @@ namespace libMusicSync.iTunesExport.Parser
 
             if( id != -1 && name != null && tracks.Count > 0 )
             {
-                _playlists.Add( id, new Playlist( id, name, folder, GetTracks( tracks ) ) );
+                _playlists.Add( id, new Playlist( id, name, folder, PlaylistKind.Playlist, GetTracks( tracks ) ) );
             }
         }
 

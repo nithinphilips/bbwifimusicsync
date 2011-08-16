@@ -25,6 +25,17 @@ namespace libMusicSync.Extensions
 {
     public static class Extensions
     {
+        public static string GetPlaylistFileName(this IPlaylist playlist)
+        {
+            if (playlist.Kind == PlaylistKind.Album)
+                return playlist.GetAlbumPlaylistSafeName() + ".hpl";
+            else if (playlist.Kind == PlaylistKind.Artist)
+                return playlist.GetArtistPlaylistSafeName() + ".hpl";
+            else
+                return playlist.GetSafeName() + ".m3u";
+            
+        }
+
         public static string GetSafeName(this IPlaylist playlist)
         {
             return Helper.MakeFileNameSafe(playlist.Name);

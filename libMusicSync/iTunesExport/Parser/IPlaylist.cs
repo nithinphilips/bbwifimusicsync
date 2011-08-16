@@ -10,6 +10,7 @@ namespace libMusicSync.iTunesExport.Parser
         bool Folder { get; }
         int Id { get; }
         string Name { get; }
+        PlaylistKind Kind { get; }
         IEnumerable<ITrack> Tracks { get; }
     }
 }

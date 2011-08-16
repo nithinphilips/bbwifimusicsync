@@ -3,6 +3,8 @@
 //
 //************************************************************************************************
 
+using System.Collections;
+
 namespace iTuner
 {
 	using System;
@@ -17,6 +19,15 @@ namespace iTuner
 
 	public class UsbDiskCollection : ObservableCollection<UsbDisk>
 	{
+
+        public UsbDiskCollection()
+            :base() {}
+
+        public UsbDiskCollection(IEnumerable<UsbDisk> collection)
+            :base(collection){}
+
+        public UsbDiskCollection(List<UsbDisk> list)
+            : base(list) { }
 
 		/// <summary>
 		/// Determines if the named disk is contained in this collection.

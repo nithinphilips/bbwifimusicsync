@@ -269,13 +269,16 @@ namespace iTuner
 							logical["Name"])).First();
                         try
                         {
-                            UsbDisk disk = new UsbDisk(logical["Name"].ToString());
-                            disk.Model = drive["Model"].ToString();
-                            disk.Volume = volume["VolumeName"].ToString();
-                            disk.FreeSpace = (ulong) volume["FreeSpace"];
-                            disk.Size = (ulong) volume["Size"];
+                            if (volume["VolumeName"] != null)
+                            {
+                                UsbDisk disk = new UsbDisk(logical["Name"].ToString());
+                                disk.Model = drive["Model"].ToString();
+                                disk.VolumeLabel = volume["VolumeName"].ToString();
+                                disk.AvailableFreeSpace = (ulong) volume["FreeSpace"];
+                                disk.TotalSize = (ulong) volume["Size"];
 
-                            disks.Add(disk);
+                                disks.Add(disk);
+                            }
                         }catch(NullReferenceException)
                         {
                             
@@ -347,9 +350,9 @@ namespace iTuner
 
 				if (volume != null)
 				{
-					disk.Volume = volume["VolumeName"].ToString();
-					disk.FreeSpace = (ulong)volume["FreeSpace"];
-					disk.Size = (ulong)volume["Size"];
+					disk.VolumeLabel = volume["VolumeName"].ToString();
+					disk.AvailableFreeSpace = (ulong)volume["FreeSpace"];
+					disk.TotalSize = (ulong)volume["Size"];
 				}
 			}
 		}

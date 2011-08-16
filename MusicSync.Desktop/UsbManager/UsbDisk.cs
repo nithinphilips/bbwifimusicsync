@@ -25,13 +25,17 @@ namespace iTuner
 		/// </summary>
 		/// <param name="name">The Windows drive letter assigned to this device.</param>
 
-		internal UsbDisk (string name)
+        internal UsbDisk()
+		{
+		}
+
+	    internal UsbDisk (string name)
 		{
 			this.Name = name;
 			this.Model = String.Empty;
-			this.Volume = String.Empty;
-			this.FreeSpace = 0;
-			this.Size = 0;
+			this.VolumeLabel = String.Empty;
+			this.AvailableFreeSpace = 0;
+			this.TotalSize = 0;
 		}
 
 
@@ -39,7 +43,7 @@ namespace iTuner
 		/// Gets the available free space on the disk, specified in bytes.
 		/// </summary>
 
-		public ulong FreeSpace
+		public ulong AvailableFreeSpace
 		{
 			get;
 			internal set;
@@ -68,7 +72,7 @@ namespace iTuner
 		public string Name
 		{
 			get;
-			private set;
+			internal set;
 		}
 
 
@@ -76,12 +80,11 @@ namespace iTuner
 		/// Gets the total size of the disk, specified in bytes.
 		/// </summary>
 
-		public ulong Size
+		public ulong TotalSize
 		{
 			get;
 			internal set;
 		}
-
 
 		/// <summary>
 		/// Get the volume name of this disk.  This is the friently name ("Stick").
@@ -91,7 +94,7 @@ namespace iTuner
 		/// property is set to String.Empty.
 		/// </remarks>
 
-		public string Volume
+		public string VolumeLabel
 		{
 			get;
 			internal set;
@@ -106,15 +109,27 @@ namespace iTuner
 		public override string ToString ()
 		{
 			StringBuilder builder = new StringBuilder();
-			builder.Append(Name);
-			builder.Append(" ");
-			builder.Append(Volume);
-			builder.Append(" (");
-			builder.Append(Model);
-			builder.Append(") ");
-			builder.Append(FormatByteCount(FreeSpace));
+            if (!string.IsNullOrEmpty(Name))
+            {
+                builder.Append(Name);
+                builder.Append(" ");
+            }
+
+		    builder.Append(VolumeLabel);
+
+            if (!string.IsNullOrEmpty(Model))
+            {
+                builder.Append(" (");
+                builder.Append(Model);
+                builder.Append(") ");
+            }
+            else
+            {
+                builder.Append(" ");
+            }
+		    builder.Append(FormatByteCount(AvailableFreeSpace));
 			builder.Append(" free of ");
-			builder.Append(FormatByteCount(Size));
+			builder.Append(FormatByteCount(TotalSize));
 
 			return builder.ToString();
 		}

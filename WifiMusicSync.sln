@@ -54,10 +54,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libQdownloader", "lib\libQdownloader\libQdownloader.csproj", "{6703AF3C-3731-4066-A180-7980810E32A7}"
 EndProject
 Global
-	GlobalSection(SubversionScc) = preSolution
-		Svn-Managed = True
-		Manager = AnkhSVN - Subversion Support for Visual Studio
-	EndGlobalSection
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = WifiMusicSync.vsmdi
 	EndGlobalSection

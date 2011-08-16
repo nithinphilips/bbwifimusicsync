@@ -208,5 +208,6 @@ namespace WifiSyncDesktop.Windows
         {
             HookSystemMenu();
         }
+
     }
 }

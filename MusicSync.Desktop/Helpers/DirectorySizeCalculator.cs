@@ -13,19 +13,17 @@ namespace WifiSyncDesktop.Helpers
 
         public static long GetDirectorySize(string root)
         {
-            if(cachedSizes.ContainsKey(root))
+            if (cachedSizes.ContainsKey(root))
             {
                 return cachedSizes[root];
             }
             else
             {
+                if (!Directory.Exists(root))
+                {
+                    return 0;
+                }
                 long size = GetDirectorySizeRecursive(root);
-                FileSystemWatcher watcher = new FileSystemWatcher(root);
-                watcher.IncludeSubdirectories = true;
-                watcher.Changed += new FileSystemEventHandler(watcher_Changed);
-                watcher.EnableRaisingEvents = true;
-                
-                watchers.Add(root, watcher);
                 cachedSizes.Add(root, size);
                 return size;
             }
@@ -33,28 +31,22 @@ namespace WifiSyncDesktop.Helpers
 
         static void watcher_Changed(object sender, FileSystemEventArgs e)
         {
-            foreach (string key in cachedSizes.Keys)
+            var keys = (from k in cachedSizes.Keys
+                       where k.StartsWith(e.FullPath)
+                       select k).ToList();
+
+            foreach (var key in keys)
             {
-                if(e.FullPath.StartsWith(key))
-                {
-                    // invalidate cache
-                    cachedSizes.Remove(key);
-                    watchers[key].Dispose();
-                    watchers.Remove(key);
-                }
+                cachedSizes.Remove(key);
+                watchers[key].Dispose();
+                watchers.Remove(key);
             }
-        }
+    }
 
         static long GetDirectorySizeRecursive(string path)
         {
-            long size = 0;
             string[] allFiles = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
-            for (int i = 0; i < allFiles.Length; i++)
-            {
-                FileInfo f = new FileInfo(allFiles[i]);
-                size += f.Length;
-            }
-            return size;
+            return allFiles.Select(t => new FileInfo(t)).Select(f => f.Length).Sum();
         }
     }
 }

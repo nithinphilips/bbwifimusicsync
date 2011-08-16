@@ -31,6 +31,13 @@ namespace WifiSyncDesktop
         public App()
         {
             XmlConfigurator.Configure(new FileInfo("log.config"));
+
+            Application.Current.DispatcherUnhandledException += new System.Windows.Threading.DispatcherUnhandledExceptionEventHandler(Current_DispatcherUnhandledException);
+        }
+
+        void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            throw e.Exception;
         }
     }
 }

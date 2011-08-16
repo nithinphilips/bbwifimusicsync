@@ -23,6 +23,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.ComponentModel;
 using System.IO;
+using System.Windows.Data;
 using iTuner;
 using libMusicSync.Extensions;
 using libMusicSync.Helpers;
@@ -38,17 +39,32 @@ namespace WifiSyncDesktop.Model
     {
         UsbManager man = new UsbManager();
 
-        public SyncSettings()
-        {    
-            
-        }
-
         public void LoadDrives()
         {
+#if DRIVE_DEBUG
+            var drives = from drive in DriveInfo.GetDrives()
+                          where drive.IsReady
+                         select new UsbDisk { 
+                             Name = drive.Name, 
+                             AvailableFreeSpace = (ulong)drive.AvailableFreeSpace, 
+                             Model = "", 
+                             TotalSize = (ulong)drive.TotalSize, 
+                             VolumeLabel = drive.VolumeLabel
+                         };
+
+            this.Drives = new UsbDiskCollection();
+            foreach (var usbDisk in drives)
+            {
+                this.Drives.Add(usbDisk);
+            }
+
+            UpdateCurrentPath();
+#else
             this.Drives = man.GetAvailableDisks();
             UpdateCurrentPath();
 
             man.StateChanged += man_StateChanged;
+#endif
         }
 
         void man_StateChanged(UsbStateChangedEventArgs e)
@@ -83,22 +99,49 @@ namespace WifiSyncDesktop.Model
 
         readonly CachedXmliTunesLibrary _cachedXmlLibrary = new CachedXmliTunesLibrary();
 
+        public IEnumerable<PlaylistInfo> GetAllSelectedLists()
+        {
+            return GetSelectedPlaylists().Union(GetSelectedArtists()).Union(GetSelectedAlbums());
+        }
+
         public IEnumerable<PlaylistInfo> GetSelectedPlaylists()
         {
-            if (Playlists != null)
-            {
-                return from p in Playlists
-                       where (!p.Checked.HasValue) || (p.Checked.Value == true)
-                       select p;
-            }
-            
-            return new List<PlaylistInfo>();
+            if (Playlists == null) return new List<PlaylistInfo>();
+
+            return from p in Playlists
+                                    where (!p.Checked.HasValue) || (p.Checked.Value == true)
+                                    select p;
+        }
+
+        public IEnumerable<PlaylistInfo> GetSelectedAlbums()
+        {
+            if (Albums == null) return new List<PlaylistInfo>();
+
+            return from p in Albums
+                   where (!p.Checked.HasValue) || (p.Checked.Value == true)
+                   select p;
+        }
+
+        public IEnumerable<PlaylistInfo> GetSelectedArtists()
+        {
+            if (Artists == null) return new List<PlaylistInfo>();
+
+            return from p in Artists
+                   where (!p.Checked.HasValue) || (p.Checked.Value == true)
+                   select p;
         }
 
         public void LoadPlaylists()
         {
-            List<PlaylistInfo> result = new List<PlaylistInfo>();
-            foreach (var playlist in _cachedXmlLibrary.Library.Playlists)
+            Playlists = ConvertIPlaylistToPlaylistInfo(_cachedXmlLibrary.Library.Playlists);
+            Albums = ConvertIPlaylistToPlaylistInfo(_cachedXmlLibrary.Library.Albums);
+            Artists = ConvertIPlaylistToPlaylistInfo(_cachedXmlLibrary.Library.Artists);
+        }
+
+        ObservableCollection<PlaylistInfo> ConvertIPlaylistToPlaylistInfo(IEnumerable<IPlaylist> source)
+        {
+            ObservableCollection<PlaylistInfo> result = new ObservableCollection<PlaylistInfo>();
+            foreach (var playlist in source)
             {
                 PlaylistInfo playlistInfo = new PlaylistInfo
                 {
@@ -106,16 +149,39 @@ namespace WifiSyncDesktop.Model
                     Checked = false,
                     Playlist = playlist,
                 };
+
                 // Monitor status so we can update ourselves.
                 ((INotifyPropertyChanged)playlistInfo).PropertyChanged += new PropertyChangedEventHandler(SyncSettings_PropertyChanged);
                 result.Add(playlistInfo);
             }
-            Playlists = result;
+            return result;
         }
 
         void SyncSettings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if(e.PropertyName == "Checked") CalculatePlaylistSize();
+            if (e.PropertyName == "Checked") CalculatePlaylistSize();
+        }
+
+        public void ApplyFilter()
+        {
+            if (string.IsNullOrWhiteSpace(FilterText))
+            {
+                ((ListCollectionView)CollectionViewSource.GetDefaultView(this.Artists)).Filter = null;
+                ((ListCollectionView)CollectionViewSource.GetDefaultView(this.Albums)).Filter = null;
+                ((ListCollectionView)CollectionViewSource.GetDefaultView(this.Playlists)).Filter = null;
+            }
+            else
+            {
+                Console.WriteLine("Filtering to: {0}", FilterText);
+                ((ListCollectionView) CollectionViewSource.GetDefaultView(this.Artists)).Filter = TextFilterPredicate;
+                ((ListCollectionView) CollectionViewSource.GetDefaultView(this.Albums)).Filter = TextFilterPredicate;
+                ((ListCollectionView) CollectionViewSource.GetDefaultView(this.Playlists)).Filter = TextFilterPredicate;
+            }
+        }
+
+        private bool TextFilterPredicate(object o)
+        {
+            return ((PlaylistInfo) o).Playlist.Name.IndexOf(FilterText, StringComparison.CurrentCultureIgnoreCase) >= 0;
         }
 
         public void CalculatePlaylistSize()
@@ -124,8 +190,8 @@ namespace WifiSyncDesktop.Model
             
             // Use the hash set to make sure we tally a track's size only once.
             HashSet<int> uniqueTracks = new HashSet<int>();
-           
-            foreach (var track in GetSelectedPlaylists().SelectMany(playlist => playlist.Playlist.Tracks))
+
+            foreach (var track in GetAllSelectedLists().SelectMany(playlist => playlist.Playlist.Tracks))
             {
                 if(uniqueTracks.Contains(track.Id)) continue; // Skip duplicates
                 totalTrackSize += track.Size; 
@@ -143,15 +209,13 @@ namespace WifiSyncDesktop.Model
             }
             else
             {
-                DriveInfo di = new DriveInfo(this.Path.Name);
-
                 // Get the size of the MusicSync directory
                 long currentSize = DirectorySizeCalculator.GetDirectorySize(this.SyncPath);
 
                 long sizeVariance = totalTrackSize - currentSize;
 
-                this.Capacity = di.TotalSize;
-                this.Size = (di.TotalSize - di.AvailableFreeSpace) + sizeVariance;
+                this.Capacity = (long)this.Path.TotalSize;
+                this.Size = (long)(this.Path.TotalSize - this.Path.AvailableFreeSpace) + sizeVariance;
 
                 if( sizeVariance == 0)
                     Status = "No songs to copy."; 
@@ -167,12 +231,29 @@ namespace WifiSyncDesktop.Model
             OnPropertyChanged("HasCapacityExceeded");
         }
 
-        public IEnumerable<PlaylistInfo> Playlists { get; set; }
+        public ObservableCollection<PlaylistInfo> Playlists { get; set; }
+        public ObservableCollection<PlaylistInfo> Albums { get; set; }
+        public ObservableCollection<PlaylistInfo> Artists { get; set; }
+
         public string Status { get; set; }
         public long Size { get; set; }
         public long Capacity { get; set; }
         public long SelectedTracksSize { get; set; }
         public UsbDiskCollection Drives { get; set; }
+
+        private string _filterText;
+        public string FilterText
+        {
+            get { return _filterText; }
+            set
+            {
+                if (_filterText != value)
+                {
+                    _filterText = value;
+                    ApplyFilter();
+                }
+            }
+        }
 
         UsbDisk _path;
         public UsbDisk Path

@@ -17,13 +17,26 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate>
-                                <TextBlock HorizontalAlignment="Center">Loading iTunes Playlists...</TextBlock>
+                                <TextBlock HorizontalAlignment="Center">No Playlists found.</TextBlock>
                             </ControlTemplate>
                         </Setter.Value>
                     </Setter>
                 </DataTrigger>
             </Style.Triggers>
         </Style>
+        <VisualBrush x:Key="SearchHint" TileMode="None" Stretch="None" AlignmentX="Left">
+            <VisualBrush.Transform>
+                <TranslateTransform X="5" Y="0" />
+            </VisualBrush.Transform>
+            <VisualBrush.Visual>
+                <Grid>
+                    <TextBlock FontStyle="Italic"
+                      Foreground="Black"
+                      Opacity="0.3"
+                      Text="Search playlists…"/>
+                </Grid>
+            </VisualBrush.Visual>
+        </VisualBrush>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="NextPage" CanExecute="sync_CanExecute" Executed="sync_Executed" />
@@ -108,7 +121,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
-                        <!-- <RowDefinition Height="Auto" /> -->
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
@@ -118,7 +131,25 @@
                            SelectedItem="{Binding Path=Path}"
                     />
 
-                    <TabControl Grid.Row="2" >
+                    <TextBox x:Name="filterTextBox"  Grid.Row="2" Margin="0,5" Text="{Binding Path=FilterText, UpdateSourceTrigger=PropertyChanged}" >
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter Property="Background" Value="{StaticResource SearchHint}"/>
+                                    </Trigger>
+                                    <Trigger Property="Text" Value="{x:Null}">
+                                        <Setter Property="Background" Value="{StaticResource SearchHint}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsFocused" Value="True">
+                                        <Setter Property="Background" Value="{x:Null}" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    
+                    <TabControl Grid.Row="3" >
                         <TabItem Header="Playlists">
                             <DockPanel LastChildFill="True">
                                 <Label DockPanel.Dock="Top" Margin="0" Padding="0,5">Choose Playlists to Sync</Label>
@@ -131,8 +162,29 @@
                                 </ListBox>
                             </DockPanel>
                         </TabItem>
-                        <TabItem Header="All Music">
-                            
+                        <TabItem Header="Artists">
+                            <DockPanel LastChildFill="True">
+                                <Label DockPanel.Dock="Top" Margin="0" Padding="0,5">Choose Artists to Sync</Label>
+                                <ListBox  ItemsSource="{Binding Path=Artists}">
+                                    <ListBox.ItemTemplate>
+                                        <HierarchicalDataTemplate>
+                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding Checked}" IsThreeState="{Binding ExistsAtDestination}" />
+                                        </HierarchicalDataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </DockPanel>
+                        </TabItem>
+                        <TabItem Header="Albums">
+                            <DockPanel LastChildFill="True">
+                                <Label DockPanel.Dock="Top" Margin="0" Padding="0,5">Choose Albums to Sync</Label>
+                                <ListBox  ItemsSource="{Binding Path=Albums}">
+                                    <ListBox.ItemTemplate>
+                                        <HierarchicalDataTemplate>
+                                            <CheckBox Content="{Binding Name}" IsChecked="{Binding Checked}" IsThreeState="{Binding ExistsAtDestination}" />
+                                        </HierarchicalDataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                            </DockPanel>
                         </TabItem>
                     </TabControl>
                 </Grid>

@@ -40,7 +40,7 @@ namespace WifiSyncDesktop.Helpers
         /// <returns>Selected Tracks</returns>
         public static IEnumerable<ITrack> GetSelectedTracksDistinct(this SyncSettings s)
         {
-            var trackSelector = from track in s.GetSelectedPlaylists().SelectMany(p => p.Playlist.Tracks)
+            var trackSelector = from track in s.GetAllSelectedLists().SelectMany(p => p.Playlist.Tracks)
                                 select track;
 
             return trackSelector.Distinct();
@@ -93,25 +93,34 @@ namespace WifiSyncDesktop.Helpers
         /// </summary>
         public static void CheckExistingPlaylists(this SyncSettings s)
         {
-            if (s.Playlists == null) return;
+            if (string.IsNullOrWhiteSpace(s.SyncPath) || !Directory.Exists(s.SyncPath)) return;
 
-            if (!string.IsNullOrWhiteSpace(s.SyncPath) && Directory.Exists(s.SyncPath))
+
+
+
+            var existingPlaylistNames =
+                from f in Utilities.Utility.GetFiles(s.SyncPath, SearchOption.TopDirectoryOnly, "*.m3u", "*.hpl")
+                select Path.GetFileName(f);
+
+
+            if (s.Playlists != null) CheckExistingPlaylists2(s.Playlists, existingPlaylistNames);
+            if (s.Albums != null) CheckExistingPlaylists2(s.Albums, existingPlaylistNames);
+            if (s.Artists != null) CheckExistingPlaylists2(s.Artists, existingPlaylistNames);
+        }
+
+        private static void CheckExistingPlaylists2(IEnumerable<PlaylistInfo> playlists, IEnumerable<string> existingPlaylistNames)
+        {
+            foreach (var librayPlaylist in playlists)
             {
-                IEnumerable<string> existingPlaylistNames = (from f in Directory.GetFiles(s.SyncPath, "*.m3u")
-                                                             select Path.GetFileNameWithoutExtension(f)).ToList();
-
-                foreach (var librayPlaylist in s.Playlists)
+                if (!librayPlaylist.Checked.HasValue) librayPlaylist.Checked = false;
+                librayPlaylist.ExistsAtDestination = false;
+                foreach (var existingPlaylist in existingPlaylistNames)
                 {
-                    if (!librayPlaylist.Checked.HasValue) librayPlaylist.Checked = false;
-                    librayPlaylist.ExistsAtDestination = false;
-                    foreach (var existingPlaylist in existingPlaylistNames)
-                    {                        
-                        if (librayPlaylist.Playlist.GetSafeName() == existingPlaylist)
-                        {
-                            // Set to indeterminate only if the user has not checked it
-                            if(librayPlaylist.Checked.HasValue && librayPlaylist.Checked.Value == false) librayPlaylist.Checked = null;
-                            librayPlaylist.ExistsAtDestination = true;
-                        }
+                    if (librayPlaylist.Playlist.GetPlaylistFileName() == existingPlaylist)
+                    {
+                        // Set to indeterminate only if the user has not checked it
+                        if(librayPlaylist.Checked.HasValue && librayPlaylist.Checked.Value == false) librayPlaylist.Checked = null;
+                        librayPlaylist.ExistsAtDestination = true;
                     }
                 }
             }
@@ -124,9 +133,14 @@ namespace WifiSyncDesktop.Helpers
                 File.Delete(file);
             }
 
-            foreach (var item in s.GetSelectedPlaylists())
+            foreach (string file in Utilities.Utility.GetFiles(s.SyncPath, SearchOption.TopDirectoryOnly, "*.hpl"))
             {
-                string playlistPath = System.IO.Path.Combine(s.SyncPath, item.Playlist.GetSafeName() + ".m3u");
+                File.Delete(file);
+            }
+
+            foreach (var item in s.GetAllSelectedLists())
+            {
+                string playlistPath = System.IO.Path.Combine(s.SyncPath, item.Playlist.GetPlaylistFileName());
                 string tRoot = Helper.ToBlackberryPath(s.SyncPath);
 
                 List<string> playlist = new List<string>();

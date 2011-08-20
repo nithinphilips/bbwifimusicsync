@@ -45,19 +45,66 @@ namespace WifiSyncServer
         static readonly Dictionary<string, string> PlaylistDb = new Dictionary<string, string>();
         static readonly CachedXmliTunesLibrary CachedXmlLibrary = new CachedXmliTunesLibrary();
 
+        private static readonly Dictionary<string, string> mimeTypes = new Dictionary<string, string>();
+
+        static ServerService()
+        {
+            mimeTypes.Add(".jad", "text/vnd.sun.j2me.app-descriptor");
+            mimeTypes.Add(".cod", "application/vnd.rim.cod");
+            mimeTypes.Add(".jar", "application/java-archive");
+        }
+
+
         [Path("/")]
         [Path("/help")]
         public IEnumerable<object> Help()
         {
-            yield return Response.Write(@"<html>
+            yield return Response.Write(string.Format(@"<html>
             <head>
-                <title>MusicSync.Server</title>                
+                <title>Wireless Music Sync for BlackBerry&reg;</title>                
             </head>
             <body>
-                <p>MusicSync.Server is up and running.</p>
-                <p>First you must add your device to the device whitelist.</p>
-            </body>");
+                <p>Congratulations. <a href='https://sourceforge.net/projects/bbwifimusicsync/'>Wireless Music Sync for BlackBerry&reg;</a> server is up and running.</p>
+                <p>You are running version {0}.</p>
+                <p>You can install the BlackBerry&reg; app <a href='/app'>here</a>.</p>
+            </body>", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version));
 
+        }
+
+        [Path("/app")]
+        public IEnumerable<object> AppIndex()
+        {
+            yield return Response.Write(string.Format(@"<html>
+            <head>
+                <title>Wireless Music Sync for BlackBerry&reg;</title>                
+            </head>
+            <body>
+                <p><a href='app/6.0.0/WifiMusicSync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 6</a>.</p>
+                <p><a href='app/5.0.0/WifiMusicSync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 5</a>.</p>
+            </body>"));
+        }
+
+        [Path("/app/{version}/{filename}")]
+        public FileInfo InstallApp(string version, string filename)
+        {
+            // Note: We're looking for the app relative to the working directory.
+            string file = "app/" + version + "/" + filename;
+            if (File.Exists(file))
+            {
+                Log.Info("Sending file: " + file);
+
+                string ext = Path.GetExtension(file);
+                if(ext != null && mimeTypes.ContainsKey(ext))
+                {
+                    Response.Headers.Add("Content-Type",  mimeTypes[ext]);   
+                }
+                return new FileInfo(file);
+            }
+
+            // Failure
+            Log.Warn("File Not Found: " + file);
+            Response.SetStatusToNotFound();
+            return null;
         }
 
         [Path("/hello")]

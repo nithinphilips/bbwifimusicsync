@@ -11,7 +11,7 @@ public class WifiMusicSyncProperties implements Persistable
     public final static int         LOCAL_STORE_TYPE_SDCARD = 1;
 
     public final static String      LOCAL_STORE_SD_PATH     = "file:///SDCard/Blackberry/music/WiFiSync/";
-    public final static String      LOCAL_STORE_MEMORY_PATH = "file:///store/Blackberry/music/WiFiSync/";
+    public final static String      LOCAL_STORE_MEMORY_PATH = "file:///store/home/user/music/WiFiSync/";
 
     private String                  serverIp;
     private String                  serverPort;

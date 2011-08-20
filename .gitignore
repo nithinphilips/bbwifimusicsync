@@ -1,6 +1,9 @@
 
 bin/
 obj/
+deliverables/
+.preprocessed/
+.metadata/
 *_ReSharper*/
 *.suo
 *.user

@@ -1,96 +1,73 @@
 package com.nithinphilips.wifimusicsync;
 
 import net.rim.device.api.ui.Color;
-import net.rim.device.api.ui.Font;
+import net.rim.device.api.ui.DrawStyle;
 import net.rim.device.api.ui.Graphics;
-import net.rim.device.api.ui.component.CheckboxField;
-import net.rim.device.api.ui.component.EditField;
-import net.rim.device.api.ui.component.RichTextField;
-import net.rim.device.api.ui.component.SeparatorField;
-import net.rim.device.api.ui.component.StandardTitleBar;
+import net.rim.device.api.ui.component.Dialog;
+import net.rim.device.api.ui.component.KeywordFilterField;
 import net.rim.device.api.ui.container.MainScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 import net.rim.device.api.ui.decor.BackgroundFactory;
 
+import com.nithinphilips.wifimusicsync.components.PlaylistInfoList;
 import com.nithinphilips.wifimusicsync.model.PlaylistInfo;
 
 public class SyncItemsSelectionScreen extends MainScreen
 {
-
-    int             result;
-    CheckboxField[] checkBoxes;
-    PlaylistInfo[]  choices;
-    EditField searchQueryEdit;
+    KeywordFilterField keywordFilterField;
+    PlaylistInfoList   playlistInfos;
+    
+    boolean dirty = false;
 
     public SyncItemsSelectionScreen(PlaylistInfo[] choices, String title)
     {
-        
-        StandardTitleBar _titleBar = new StandardTitleBar();
-        _titleBar.addTitle(title);
-        _titleBar.addNotifications();
-        _titleBar.addSignalIndicator();
-        this.setTitle(_titleBar);
-        
-        searchQueryEdit = new EditField("Search:", "");
-        
-        
-        this.choices = choices;
 
-        ((VerticalFieldManager) getMainManager()).setBackground(BackgroundFactory.createSolidBackground(Color.BLACK));
-        
-        VerticalFieldManager checkBoxContainer = new VerticalFieldManager(VerticalFieldManager.NO_VERTICAL_SCROLL) {
-            public void paint(Graphics graphics)
-            {
-                graphics.setColor(Color.WHITE);
-                super.paint(graphics);
-            }
-        };
-        
-        VerticalFieldManager checkItemsContainer = new VerticalFieldManager() {
-            public void paint(Graphics graphics)
-            {
-                graphics.setColor(Color.WHITE);
-                super.paint(graphics);
-            }
-        };
-        
-        VerticalFieldManager container = new VerticalFieldManager() {
-            public void paint(Graphics graphics)
-            {
-                graphics.setColor(Color.WHITE);
-                super.paint(graphics);
-            }
-        };
-        
-        checkBoxes = new CheckboxField[choices.length];
+        playlistInfos = new PlaylistInfoList();
         for (int i = 0; i < choices.length; i++)
         {
-            checkBoxes[i] = new CheckboxField(choices[i].toString(), choices[i].isSelected());
-            if(choices[i].isSelected()){
-                checkItemsContainer.add(checkBoxes[i]);
-            }else{
-                container.add(checkBoxes[i]);
-            }
+            playlistInfos.addElement(choices[i]);
         }
 
-        checkBoxContainer.add(checkItemsContainer);
-        checkBoxContainer.add(container);
+        this.keywordFilterField = new KeywordFilterField() {
+
+            public void paint(Graphics graphics)
+            {
+                graphics.setColor(Color.WHITE);
+                super.paint(graphics);
+            }
+
+            protected boolean trackwheelUnclick(int status, int time)
+            {
+                // Get the index of the selected row.
+                int index = getSelectedIndex();
+
+                // Get the ChecklistData for this row.
+                PlaylistInfo playlistInfo = (PlaylistInfo) keywordFilterField.getElementAt(index);
+
+                // Toggle its status.
+                playlistInfo.setSelected(!playlistInfo.isSelected());
+
+                // Invalidate the modified row of the ListField.
+                invalidate(index);
+
+                dirty = true;
+                
+                return true;
+            }
+        };
         
-        add(searchQueryEdit);
-        add(checkBoxContainer);
-        
+        this.keywordFilterField.setEmptyString("No items found.", DrawStyle.HCENTER);
+        this.keywordFilterField.setLabel("Search " + title);
+        this.keywordFilterField.setSourceList(playlistInfos, playlistInfos);
+    
+        ((VerticalFieldManager) getMainManager()).setBackground(BackgroundFactory.createSolidBackground(Color.BLACK));
+
+        setTitle(keywordFilterField.getKeywordField());
+        add(keywordFilterField);
     }
 
     public int getResult()
     {
-        return result;
-    }
-
-    public void save()
-    {
-        for (int i = 0; i < checkBoxes.length; i++)
-        {
-            choices[i].setSelected(checkBoxes[i].getChecked());
-        }
+        return dirty ? Dialog.OK : Dialog.CANCEL;
     }
 }

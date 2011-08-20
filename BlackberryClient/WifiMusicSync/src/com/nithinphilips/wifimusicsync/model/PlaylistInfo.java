@@ -5,6 +5,8 @@ import java.io.IOException;
 import javax.microedition.io.Connector;
 import javax.microedition.io.file.FileConnection;
 
+import net.rim.device.api.system.Characters;
+
 import org.json.me.JSONException;
 import org.json.me.JSONObject;
 
@@ -56,14 +58,18 @@ public class PlaylistInfo
 
     public boolean existsOnFileSystem(String root) throws IOException
     {
-        FileConnection file = (FileConnection) Connector.open(getPath(root), Connector.READ);
+        FileConnection file = null;
         try
         {
+            file = (FileConnection) Connector.open(getPath(root), Connector.READ);
             return file.exists();
+        }/*catch(Exception ex){
+            return false;
         }
+        */
         finally
         {
-            file.close();
+            if(file != null) file.close();
         }
     }
 
@@ -125,6 +131,13 @@ public class PlaylistInfo
     public String toString()
     {
         StringBuffer sb = new StringBuffer();
+        sb.append(Characters.SPACE);
+        if(isSelected())
+            sb.append(Characters.BALLOT_BOX_WITH_CHECK);
+        else
+            sb.append(Characters.BALLOT_BOX);
+        sb.append(Characters.SPACE);
+        
         sb.append(displayName);
         sb.append(" (");
         sb.append(trackCount);

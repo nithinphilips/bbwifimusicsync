@@ -232,7 +232,7 @@ public class WifiMusicSyncScreen extends MainScreen
         menu.add(menuItemSync);
         menu.add(menuItemAbout);
         menu.add(menuItemOptions);
-        menu.add(menuItemTest);
+        if(Debug.DEBUG) menu.add(menuItemTest);
         
         super.makeMenu(menu, instance);
     }
@@ -291,54 +291,9 @@ public class WifiMusicSyncScreen extends MainScreen
          PlaylistInfo[] choices = new PlaylistInfo[20];
               
          for (int i = 0; i < choices.length; i++)
-         choices[i] = new PlaylistInfo("", "Test" + i, i);
+         choices[i] = new PlaylistInfo("", "Test " + i, i);
               
-         pushChoicesScreen(choices, "Hello");
-        
-
-//        Thread t = new Thread() {
-//            public void run()
-//            {
-//                final SyncAction addaction = new SyncAction();
-//                final SyncAction remaction = new SyncAction();
-//
-//                addaction.setDeviceLocation("file:///SDCard/add.mp3");
-//                addaction.setType(SyncAction.ADD);
-//
-//                remaction.setDeviceLocation("file:///SDCard/test2/remove.mp3");
-//                remaction.setType(SyncAction.REMOVE);
-//
-//                addaction.setStatus("Downloading");
-//                remaction.setStatus("Queued");
-//
-//                UiApplication.getUiApplication().invokeLater(new Runnable() {
-//                    public void run()
-//                    {
-//                        WifiMusicSyncScreen.this.myListModel.insert(addaction);
-//                        WifiMusicSyncScreen.this.myListModel.insert(remaction);
-//                    }
-//                });
-//
-//                TimerTask task = new TimerTask() {
-//
-//                    public void run()
-//                    {
-//                        UiApplication.getUiApplication().invokeLater(new Runnable() {
-//                            public void run()
-//                            {
-//                                addaction.setStatus("Completed");
-//                                remaction.setStatus("Completed");
-//                            }
-//                        });
-//                    }
-//                };
-//
-//                Timer timer = new Timer();
-//                timer.schedule(task, 10000);
-//
-//            }
-//        };
-//        t.start();
+         pushChoicesScreen(choices, "Tests");
     }
 
     void pushSettingsScreen()
@@ -435,17 +390,17 @@ public class WifiMusicSyncScreen extends MainScreen
                     if (sourceType == SUBSCRIBE_ALBUMS)
                     {
                         playlists = subscriber.getAlbums();
-                        title = "Select Albums to Sync";
+                        title = "Albums";
                     }
                     else if (sourceType == SUBSCRIBE_ARTISTS)
                     {
                         playlists = subscriber.getArtists();
-                        title = "Select Artists to Sync";
+                        title = "Artists";
                     }
                     else
                     {
                         playlists = subscriber.getPlaylists();
-                        title = "Select Playlists to Sync";
+                        title = "Playlists";
                     }
 
                     ProgressDialog.closeProgress();
@@ -457,52 +412,56 @@ public class WifiMusicSyncScreen extends MainScreen
                             {
                                 try
                                 {
-                                    if (pushChoicesScreen(playlists, title))
-                                    {
-                                        for (int i = 0; i < playlists.length; i++)
-                                        {
-                                            if (playlists[i].isSelected()) playlists[i].createOnFileSystem(props.getLocalStoreRoot());
-                                            else playlists[i].deleteOnFileSystem(props.getLocalStoreRoot());
-                                        }
-
-                                        final SyncResponse response = subscriber.updateSubscription();                                        
-                                        
-                                        if (response != null)
-                                        {
-                                            final SyncAction[] actions = response.getActions();
-
-                                            WifiMusicSyncScreen.this.myListModel.erase();
-
-                                            for (int i = 0; i < actions.length; i++)
-                                            {
-                                                WifiMusicSyncScreen.this.myListModel.insert(actions[i]);
-                                            }
-                                            
-                                            Thread u = new Thread() {
-                                                // The actions are not intensive, but may still cause the UI to hang.
-                                                // so, we're running in another thread.
-                                                public void run() {
-                                                    try
-                                                    {
-                                                        PlaylistDownloader.executeActions(response.getActions());
-                                                    }
-                                                    catch (Exception e)
-                                                    {
-                                                        if (Debug.DEBUG) setStatusMessage(e.toString() + e.getMessage());
-                                                        else setStatusMessage("Critical error. Subscription failed.");
-                                                    }
-                                                };
-                                            };
-                                            u.start();
-                                        }
-                                        else
-                                        {
-                                            setStatusMessage("Error updating subscriptions.");
-                                        }
-                                        
+                                    if (!pushChoicesScreen(playlists, title)){
+                                        setStatusMessage("Nothing changed.");
+                                        return;
                                     }
+                                    
+                                    setStatusMessage("Updating subscription...");
+                                    
+                                    for (int i = 0; i < playlists.length; i++)
+                                    {
+                                        if (playlists[i].isSelected()) playlists[i].createOnFileSystem(props.getLocalStoreRoot());
+                                        else playlists[i].deleteOnFileSystem(props.getLocalStoreRoot());
+                                    }
+
+                                    final SyncResponse response = subscriber.updateSubscription();
+
+                                    if (response != null)
+                                    {
+                                        final SyncAction[] actions = response.getActions();
+
+                                        WifiMusicSyncScreen.this.myListModel.erase();
+                                        for (int i = 0; i < actions.length; i++)
+                                        {
+                                            WifiMusicSyncScreen.this.myListModel.insert(actions[i]);
+                                        }
+
+                                        Thread u = new Thread() {
+                                            // The actions are not intensive, but may still cause the UI to hang.
+                                            // so, we're running in another thread.
+                                            public void run()
+                                            {
+                                                try
+                                                {
+                                                    PlaylistDownloader.executeActions(actions);
+                                                }
+                                                catch (Throwable e)
+                                                {
+                                                    if (Debug.DEBUG) setStatusMessage(e.toString() + e.getMessage());
+                                                    else setStatusMessage("Critical error. Subscription failed.");
+                                                }
+                                            };
+                                        };
+                                        u.start();
+                                    }
+                                    else
+                                    {
+                                        setStatusMessage("Error updating subscriptions.");
+                                    }
+
                                 }
-                                catch (Exception e)
+                                catch (Throwable e)
                                 {
                                     if (Debug.DEBUG) setStatusMessage(e.toString() + e.getMessage());
                                     else setStatusMessage("Critical error. Subscription failed.");
@@ -512,7 +471,7 @@ public class WifiMusicSyncScreen extends MainScreen
                     }
                     else setStatusMessage("Error. No response from server.");
                 }
-                catch (Exception e)
+                catch (Throwable e)
                 {
                     if (Debug.DEBUG) setStatusMessage(e.toString() + e.getMessage());
                     else setStatusMessage("Critical error. Subscription failed.");
@@ -584,7 +543,7 @@ public class WifiMusicSyncScreen extends MainScreen
                     }
                     else setStatusMessage("No playlists found");
                 } 
-                catch (Exception e)
+                catch (Throwable e)
                 {
                     if (Debug.DEBUG) setStatusMessage(e.toString() + e.getMessage());
                     else setStatusMessage("Critical error. Sync failed.");
@@ -603,6 +562,13 @@ public class WifiMusicSyncScreen extends MainScreen
 
     void resetStatusMessage()
     {
+        UiApplication.getUiApplication().invokeLater(new Runnable() {
+            public void run()
+            {
+                myListView.setEmptyString("Choose 'Sync' to start syncing.", DrawStyle.HCENTER);
+            }
+        });
+        
         TimerTask task = new TimerTask() {
 
             public void run()
@@ -611,7 +577,6 @@ public class WifiMusicSyncScreen extends MainScreen
                     public void run()
                     {
                         setStatusMessage("");
-                        myListView.setEmptyString("Choose 'Sync' to start syncing.", DrawStyle.HCENTER);
                         myListModel.erase();
                     }
                 });

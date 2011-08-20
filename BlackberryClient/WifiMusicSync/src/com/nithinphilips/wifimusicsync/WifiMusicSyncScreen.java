@@ -1,3 +1,4 @@
+//#preprocess
 package com.nithinphilips.wifimusicsync;
 
 import java.io.IOException;
@@ -7,12 +8,22 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 import org.json.me.JSONException;
-
-// #ifdef BlackBerry6.0.0
 import net.rim.device.api.applicationcontrol.ApplicationPermissions;
 import net.rim.device.api.applicationcontrol.ApplicationPermissionsManager;
+
+//#ifdef BlackBerrySDK6.0.0
 import net.rim.device.api.command.CommandHandler;
-import net.rim.device.api.command.ReadOnlyCommandMetadata; // #endif
+import net.rim.device.api.command.ReadOnlyCommandMetadata;
+import net.rim.device.api.ui.component.progressindicator.ActivityIndicatorController;
+import net.rim.device.api.ui.component.progressindicator.ActivityIndicatorModel;
+import net.rim.device.api.ui.component.progressindicator.ActivityIndicatorView;
+import net.rim.device.api.ui.component.StandardTitleBar; 
+import net.rim.device.api.ui.menu.CommandItem;
+import net.rim.device.api.ui.menu.CommandItemProvider;
+import net.rim.device.api.ui.menu.DefaultContextMenuProvider;
+import net.rim.device.api.ui.menu.SubMenu;
+import net.rim.device.api.util.StringProvider; 
+//#endif
 import net.rim.device.api.system.ApplicationDescriptor;
 import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.ui.Color;
@@ -26,23 +37,14 @@ import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.ui.UiEngineInstance;
 import net.rim.device.api.ui.component.Dialog;
 import net.rim.device.api.ui.component.LabelField;
-import net.rim.device.api.ui.component.ListField; // #ifdef BlackBerry6.0.0
+import net.rim.device.api.ui.component.ListField; 
 import net.rim.device.api.ui.component.Menu;
-import net.rim.device.api.ui.component.StandardTitleBar; // #endif
-import net.rim.device.api.ui.component.progressindicator.ActivityIndicatorController;
-import net.rim.device.api.ui.component.progressindicator.ActivityIndicatorModel;
-import net.rim.device.api.ui.component.progressindicator.ActivityIndicatorView;
 import net.rim.device.api.ui.container.HorizontalFieldManager;
 import net.rim.device.api.ui.container.MainScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 import net.rim.device.api.ui.decor.BackgroundFactory;
 import net.rim.device.api.ui.image.Image;
-import net.rim.device.api.ui.image.ImageFactory; // #ifdef BlackBerry6.0.0
-import net.rim.device.api.ui.menu.CommandItem;
-import net.rim.device.api.ui.menu.CommandItemProvider;
-import net.rim.device.api.ui.menu.DefaultContextMenuProvider;
-import net.rim.device.api.ui.menu.SubMenu;
-import net.rim.device.api.util.StringProvider; // #endif
+import net.rim.device.api.ui.image.ImageFactory; 
 
 import com.fairview5.keepassbb2.common.ui.ProgressDialog;
 import com.nithinphilips.Debug;
@@ -70,18 +72,21 @@ public class WifiMusicSyncScreen extends MainScreen
     public static final int           SUBSCRIBE_ALBUMS    = 2;
 
     final MenuItem                    menuItemSync;
-    final SubMenu                     subMenuChoose;
-    final MenuItem                    menuItemChoosePlaylists;
+
+    final MenuItem                    menuItemChoosePlaylists ;
     final MenuItem                    menuItemChooseAlbums;
     final MenuItem                    menuItemChooseArtists;
     final MenuItem                    menuItemOptions;
     final MenuItem                    menuItemAbout;
     final MenuItem                    menuItemTest;
 
+//#ifdef BlackBerrySDK6.0.0
+    final SubMenu                     subMenuChoose;
     final ActivityIndicatorView       view                = new ActivityIndicatorView(FIELD_VCENTER);
     final ActivityIndicatorModel      model               = new ActivityIndicatorModel();
     final ActivityIndicatorController controller          = new ActivityIndicatorController();
-    
+//#endif
+
     HorizontalFieldManager statusContainer = new HorizontalFieldManager(Field.USE_ALL_WIDTH) {
         public void paint(Graphics graphics)
         {
@@ -93,23 +98,27 @@ public class WifiMusicSyncScreen extends MainScreen
     public WifiMusicSyncScreen()
     {
         super(VERTICAL_SCROLL);
-        
+
         checkPermissions();
 
         ((VerticalFieldManager) getMainManager()).setBackground(BackgroundFactory.createSolidBackground(Color.BLACK));
 
+//#ifdef BlackBerrySDK6.0.0
         StandardTitleBar _titleBar = new StandardTitleBar();
         _titleBar.addTitle("Music Sync");
         _titleBar.addNotifications();
         _titleBar.addSignalIndicator();
         this.setTitle(_titleBar);
-
-        // this.setTitle(new LabelField("Music Sync"));
+//#else
+        this.setTitle(new LabelField("Music Sync"));
+//#endif
 
         this.myListView = new ListField();
         this.myListView.setEmptyString("Choose 'Sync' to start syncing.", DrawStyle.HCENTER);
         this.myListModel = new ProgressListModel(this.myListView, new Vector());
-        
+        Bitmap bitmap = Bitmap.getBitmapResource("progress-spinner.png");
+
+//#ifdef BlackBerrySDK6.0.0
         view.setController(controller);
         view.setModel(model);
 
@@ -117,22 +126,20 @@ public class WifiMusicSyncScreen extends MainScreen
         controller.setView(view);
 
         model.setController(controller);        
-
-        // Define the indicator image and create a field from it 
-        Bitmap bitmap = Bitmap.getBitmapResource("progress-spinner.png");
         view.createActivityImageField(bitmap, 5, Field.FIELD_LEFT);
-        //view.createLabel("Progressing...");
+//#endif
 
         add(this.myListView);
 
         statusLabel = new LabelField("", LabelField.USE_ALL_WIDTH);
         //statusLabel.setBackground(BackgroundFactory.createSolidBackground(Color.BLACK));
-        
-       
+
+
         statusContainer.setBackground(BackgroundFactory.createSolidBackground(Color.BLACK));
         statusContainer.add(statusLabel);
         setStatus(statusContainer);
 
+//#ifdef BlackBerrySDK6.0.0
         setContextMenuProvider(new DefaultContextMenuProvider());
         CommandItemProvider provider = new CommandItemProvider() {
 
@@ -151,10 +158,10 @@ public class WifiMusicSyncScreen extends MainScreen
 
                 Image subscribePlaylistsIcon = ImageFactory.createImage(Bitmap.getBitmapResource("choose-playlist.png"));
                 items.addElement(new CommandItem(new StringProvider("Choose Playlists"), subscribePlaylistsIcon, new net.rim.device.api.command.Command(subscribePlaylistsCommand)));
-                
+
                 Image subscribeAlbumIcon = ImageFactory.createImage(Bitmap.getBitmapResource("choose-album.png"));
                 items.addElement(new CommandItem(new StringProvider("Choose Albums"), subscribeAlbumIcon, new net.rim.device.api.command.Command(subscribeAlbumsCommand)));
-                
+
                 Image subscribeArtistIcon = ImageFactory.createImage(Bitmap.getBitmapResource("choose-artist.png"));
                 items.addElement(new CommandItem(new StringProvider("Choose Artists"), subscribeArtistIcon, new net.rim.device.api.command.Command(subscribeArtistsCommand)));
 
@@ -166,16 +173,16 @@ public class WifiMusicSyncScreen extends MainScreen
 
         menuItemSync = new MenuItem(new StringProvider("Sync"), 10000000, 100);
         menuItemSync.setCommand(new net.rim.device.api.command.Command(syncCommand));
-        
+
         menuItemChoosePlaylists = new MenuItem(new StringProvider("Playlists"), 100, 100);
         menuItemChoosePlaylists.setCommand(new net.rim.device.api.command.Command(subscribePlaylistsCommand));
-        
+
         menuItemChooseAlbums = new MenuItem(new StringProvider("Albums"), 200, 100);
         menuItemChooseAlbums.setCommand(new net.rim.device.api.command.Command(subscribeAlbumsCommand));
-        
+
         menuItemChooseArtists = new MenuItem(new StringProvider("Artists"), 300, 100);
         menuItemChooseArtists.setCommand(new net.rim.device.api.command.Command(subscribeArtistsCommand));
-        
+
         subMenuChoose = new SubMenu(new MenuItem[]{ menuItemChoosePlaylists, menuItemChooseAlbums, menuItemChooseArtists }, "Sync Selection", 10000000, 100);
 
         menuItemOptions = new MenuItem(new StringProvider("Options"), 100000, 100);
@@ -186,57 +193,76 @@ public class WifiMusicSyncScreen extends MainScreen
 
         menuItemTest = new MenuItem(new StringProvider("Test"), 10000, 100);
         menuItemTest.setCommand(new net.rim.device.api.command.Command(runTestCommand));
-        
+//#else
+        menuItemSync = new MenuItem("Sync", 10000000, 100) {
+            public void run()
+            {
+                sync();
+            }
+        };
 
-        // Uncomment below for OS5
+        menuItemChoosePlaylists = new MenuItem("Choose Playlists", 100000, 100) {
+            public void run()
+            {
+                subscribe(SUBSCRIBE_PLAYLISTS);
+            }
+        };
 
-        // menuItemSync = new MenuItem("Sync", 10000000, 100){
-        // public void run()
-        // {
-        // sync();
-        // }
-        // };
-        //
-        // menuItemMakePlaylist = new MenuItem("Choose Playlists", 100000, 100){
-        // public void run()
-        // {
-        // subscribe();
-        // }
-        // };
-        //
-        // menuItemOptions = new MenuItem("Options", 100000, 100){
-        // public void run()
-        // {
-        // pushSettingsScreen();
-        // }
-        // };
-        //
-        // menuItemAbout = new MenuItem("About", 100000, 100){
-        // public void run()
-        // {
-        // pushAboutScreen();
-        // }
-        // };
-        //        
-        // menuItemTest = new MenuItem("Test", 100000, 100){
-        // public void run()
-        // {
-        // runTest();
-        // }
-        // };
+        menuItemChooseAlbums = new MenuItem("Choose Albums", 100000, 100) {
+            public void run()
+            {
+                subscribe(SUBSCRIBE_ALBUMS);
+            }
+        };
+
+        menuItemChooseArtists = new MenuItem("Choose Artists", 100000, 100) {
+            public void run()
+            {
+                subscribe(SUBSCRIBE_ARTISTS);
+            }
+        };
+
+        menuItemOptions = new MenuItem("Options", 100000, 100) {
+            public void run()
+            {
+                pushSettingsScreen();
+            }
+        };
+
+        menuItemAbout = new MenuItem("About", 100000, 100) {
+            public void run()
+            {
+                pushAboutScreen();
+            }
+        };
+
+        menuItemTest = new MenuItem("Test", 100000, 100) {
+            public void run()
+            {
+                runTest();
+            }
+        };
+//#endif
     }
-    
+
     protected void makeMenu( Menu menu, int instance )
     {
+//#ifdef BlackBerrySDK6.0.0
         menu.add(subMenuChoose);
+//#else
+        menu.add(menuItemChoosePlaylists);
+        menu.add(menuItemChooseAlbums);
+        menu.add(menuItemChooseArtists);
+//#endif
         menu.add(menuItemSync);
         menu.add(menuItemAbout);
         menu.add(menuItemOptions);
         if(Debug.DEBUG) menu.add(menuItemTest);
-        
+
         super.makeMenu(menu, instance);
     }
-    
+
+//#ifdef BlackBerrySDK6.0.0
     final CommandHandler optionsCommand = new CommandHandler() {
         public void execute(ReadOnlyCommandMetadata metadata, Object context)
         {
@@ -257,14 +283,14 @@ public class WifiMusicSyncScreen extends MainScreen
             subscribe(SUBSCRIBE_PLAYLISTS);
         }
     };
-    
+
     final CommandHandler subscribeArtistsCommand = new CommandHandler() {
         public void execute(ReadOnlyCommandMetadata metadata, Object context)
         {
             subscribe(SUBSCRIBE_ARTISTS);
         }
     };
-    
+
     final CommandHandler subscribeAlbumsCommand = new CommandHandler() {
         public void execute(ReadOnlyCommandMetadata metadata, Object context)
         {
@@ -285,14 +311,15 @@ public class WifiMusicSyncScreen extends MainScreen
             runTest();
         }
     };
-
+//#endif
+    
     void runTest()
     {
          PlaylistInfo[] choices = new PlaylistInfo[20];
-              
+
          for (int i = 0; i < choices.length; i++)
          choices[i] = new PlaylistInfo("", "Test " + i, i);
-              
+
          pushChoicesScreen(choices, "Tests");
     }
 
@@ -416,9 +443,9 @@ public class WifiMusicSyncScreen extends MainScreen
                                         setStatusMessage("Nothing changed.");
                                         return;
                                     }
-                                    
+
                                     setStatusMessage("Updating subscription...");
-                                    
+
                                     for (int i = 0; i < playlists.length; i++)
                                     {
                                         if (playlists[i].isSelected()) playlists[i].createOnFileSystem(props.getLocalStoreRoot());
@@ -500,7 +527,7 @@ public class WifiMusicSyncScreen extends MainScreen
                 {
                     WifiMusicSyncProperties props = WifiMusicSyncProperties.fetch();
                     Vector playlists = Subscriber.findPlaylists(props.getLocalStoreRoot());
-                    
+
                     if (playlists != null)
                     {
                         for (int i = 0; i < playlists.size(); i++)
@@ -531,7 +558,7 @@ public class WifiMusicSyncScreen extends MainScreen
                                         }
                                     }
                                 });
-                                
+
                                 downloader.handleResponse();
                             }
                             else
@@ -568,7 +595,7 @@ public class WifiMusicSyncScreen extends MainScreen
                 myListView.setEmptyString("Choose 'Sync' to start syncing.", DrawStyle.HCENTER);
             }
         });
-        
+
         TimerTask task = new TimerTask() {
 
             public void run()
@@ -587,13 +614,15 @@ public class WifiMusicSyncScreen extends MainScreen
         timer.schedule(task, 10000);
         endProgressTask();
     }
-    
+
     void beginProgressTask()
     {
         if (UiApplication.getUiApplication().isEventThread())
         {
             statusContainer.deleteAll();
-            statusContainer.add(view);
+//#ifdef BlackBerrySDK6.0.0
+          statusContainer.add(view);
+//#endif
             statusContainer.add(statusLabel);
             return;
         }
@@ -601,12 +630,14 @@ public class WifiMusicSyncScreen extends MainScreen
             public void run()
             {
                 statusContainer.deleteAll();
-                statusContainer.add(view);
+//#ifdef BlackBerrySDK6.0.0
+             statusContainer.add(view);
+//#endif
                 statusContainer.add(statusLabel);
             }
         });
     }
-    
+
     void endProgressTask()
     {
         if (UiApplication.getUiApplication().isEventThread())
@@ -638,8 +669,8 @@ public class WifiMusicSyncScreen extends MainScreen
             }
         });
     }
-    
- 
+
+
     private void checkPermissions()
     {
         // Capture the current state of permissions and check against the requirements
@@ -670,7 +701,7 @@ public class WifiMusicSyncScreen extends MainScreen
         permRequest.addPermission(ApplicationPermissions.PERMISSION_WIFI);
         permRequest.addPermission(ApplicationPermissions.PERMISSION_DEVICE_SETTINGS);
         permRequest.addPermission(ApplicationPermissions.PERMISSION_CROSS_APPLICATION_COMMUNICATION);
-        
+
 
         boolean acceptance = ApplicationPermissionsManager.getInstance().invokePermissionsRequest(permRequest);
 

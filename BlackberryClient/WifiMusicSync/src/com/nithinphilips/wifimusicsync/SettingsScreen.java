@@ -1,3 +1,4 @@
+//#preprocess
 package com.nithinphilips.wifimusicsync;
 
 import java.util.Enumeration;
@@ -14,11 +15,13 @@ import net.rim.device.api.ui.component.ChoiceField;
 import net.rim.device.api.ui.component.EditField;
 import net.rim.device.api.ui.component.LabelField;
 import net.rim.device.api.ui.component.ObjectChoiceField;
-import net.rim.device.api.ui.component.StandardTitleBar;
 import net.rim.device.api.ui.container.GridFieldManager;
 import net.rim.device.api.ui.container.MainScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 import net.rim.device.api.ui.decor.BackgroundFactory;
+//#ifdef BlackBerrySDK6.0.0
+import net.rim.device.api.ui.component.StandardTitleBar;
+//#endif
 
 import com.nithinphilips.UiFactory;
 import com.nithinphilips.wifimusicsync.components.WifiMusicSyncProperties;
@@ -37,15 +40,16 @@ public class SettingsScreen extends MainScreen{
     public SettingsScreen(){
     	super(VERTICAL_SCROLL);
 		
-
-        StandardTitleBar _titleBar = new StandardTitleBar();
+//#ifdef BlackBerrySDK6.0.0
+    	StandardTitleBar _titleBar = new StandardTitleBar();
         _titleBar.addTitle("Settings");
         _titleBar.addNotifications();
         _titleBar.addSignalIndicator();
         this.setTitle(_titleBar);
+//#else    	
+        this.setTitle(new LabelField("Settings")); 
+//#endif
         
-        //this.setTitle(new LabelField("Settings")); 
-		
 		((VerticalFieldManager) getMainManager()).setBackground(BackgroundFactory.createSolidBackground(UiFactory.COLOR_SCREEN_BACKGROUND));
 
     	populateMainScreen(this);
@@ -106,7 +110,8 @@ public class SettingsScreen extends MainScreen{
         
         VerticalFieldManager deviceIdGroup = UiFactory.createVerticalFieldGroup("Device ID");
         deviceIdGroup.add(new LabelField("Sync Client ID: " + optionProperties.getClientId()));
-        deviceIdGroup.add(new LabelField("This ID uniquely identifies your device. You should only add known and trusted devices to your server's allowed clients list."));
+        //deviceIdGroup.add(new LabelField("This ID uniquely identifies your device. You should only add known and trusted devices to your server's allowed clients list."));
+        deviceIdGroup.add(new LabelField("This ID uniquely identifies your device."));
         
         mainScreen.add(serverGroup);
         mainScreen.add(storageGroup);

@@ -15,7 +15,6 @@ import net.rim.device.api.ui.container.HorizontalFieldManager;
 import net.rim.device.api.ui.container.MainScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 import net.rim.device.api.ui.decor.BackgroundFactory;
-import net.rim.device.api.util.StringProvider;
 
 public class AboutScreen extends MainScreen
 {
@@ -29,29 +28,28 @@ public class AboutScreen extends MainScreen
         net.rim.device.api.ui.Font medFont = defaultFont.derive(0, defaultFont.getHeight() - 3);
         
         
-        
-        MenuItem readGplItem = new MenuItem(new StringProvider("Read GPL License"), 1000000, 1){
+        MenuItem readGplItem = new MenuItem("Read GPL License", 1000000, 1){
             public void run()
             {
                 Browser.getDefaultSession().displayPage("http://www.gnu.org/licenses/gpl.html");
             }
         };
         
-        MenuItem visitUltimateGnomeItem = new MenuItem(new StringProvider("Visit Ultimate-Gnome Icons Website"), 100000, 100){
+        MenuItem visitUltimateGnomeItem = new MenuItem("Visit Ultimate-Gnome Icons Website", 100000, 100){
             public void run()
             {
                 Browser.getDefaultSession().displayPage("https://code.google.com/p/ultimate-gnome/");
             }
         };
         
-        MenuItem visitFaenzaItem = new MenuItem(new StringProvider("Visit Faenza Icons Website"), 100000, 100){
+        MenuItem visitFaenzaItem = new MenuItem("Visit Faenza Icons Website", 100000, 100){
             public void run()
             {
                 Browser.getDefaultSession().displayPage("http://tiheum.deviantart.com/art/Faenza-Icons-173323228");
             }
         };
         
-        MenuItem visitElementaryItem = new MenuItem(new StringProvider("Visit Elementary Icons Website"), 100000, 100){
+        MenuItem visitElementaryItem = new MenuItem("Visit Elementary Icons Website", 100000, 100){
             public void run()
             {
                 Browser.getDefaultSession().displayPage("http://danrabbit.deviantart.com/art/elementary-Icons-65437279");

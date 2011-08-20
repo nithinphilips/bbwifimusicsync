@@ -9,6 +9,7 @@ import net.rim.device.api.system.Characters;
 
 import org.json.me.JSONException;
 import org.json.me.JSONObject;
+import org.openqa.selenium.remote.me.util.Logger;
 
 import com.nithinphilips.wifimusicsync.controller.PlaylistDownloader;
 
@@ -63,10 +64,10 @@ public class PlaylistInfo
         {
             file = (FileConnection) Connector.open(getPath(root), Connector.READ);
             return file.exists();
-        }/*catch(Exception ex){
+        }catch(Exception ex){
+            Logger.error(ex.getMessage());
             return false;
         }
-        */
         finally
         {
             if(file != null) file.close();

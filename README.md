@@ -1,16 +1,17 @@
 <!--!# { "pagewidth": "850px" } -->
-BB WiFi Music Sync
-==================
-BBWifiMusicSync keeps the music on your BlackBerry devices in sync with your
-Desktop music library wirelessly. It presently works with iTunes on Windows.
-It's advantages over the RIM's Wireless Media Sync application is that it still
-works when the iTunes library contains a large number of songs.
+Wireless Music Sync for BlackBerry®
+===================================
+Wireless Music Sync for BlackBerry® keeps the music on your BlackBerry® devices
+in sync with your Desktop music library wirelessly. It presently works with
+iTunes on Windows.  It's advantages over the RIM's Wireless Media Sync
+application is that it still works when the iTunes library contains a large
+number of songs.
 
-BBWifiMusicSync has three components:
+Wireless Music Sync for BlackBerry® has three components:
 
  1. **Server**: Runs in the background. Fulfills requests from clients.
  2. **Desktop Client**: For initial loading or large periodic transfers.
- 3. **Client**: Blackberry app. Lets you select Playlists, Albums or Artists to
+ 3. **Client**: BlackBerry® app. Lets you select Playlists, Albums or Artists to
     sync and Performs sync.
 
 ###Features
@@ -23,15 +24,15 @@ BBWifiMusicSync has three components:
 
 ###Planned Features
 
- * BlackBerry OS 5 support.
+ * BlackBerry® OS 5 support.
  * File based backend support.
  * Support for other popular music players.
  * Linux server.
 
 Using WiFi Music Sync
 ---------------------
-There are several ways to get started with BBWifiMusicSync. The recommended way
-is to initially load music on to your Blackberry device using the **Desktop
+There are several ways to get started with Wireless Music Sync for BlackBerry®. The recommended way
+is to initially load music on to your BlackBerry® device using the **Desktop
 Client**.  You can then start the Wifi Sync application on your phone and the
 synced playlists will be kept updated.
 
@@ -45,7 +46,7 @@ To run the server application you need:
 
 ###Build Dependencies
 
-To build Wifi Music Sync you need:
+To build Wireless Music Sync for BlackBerry® you need:
 
  * [.NET Framework](http://msdn.microsoft.com/en-us/netframework/default) + Tools (>= 4.0)
  * [Kayak Server Framework](https://github.com/kayak/kayak) (source included)
@@ -60,7 +61,7 @@ Get It
  * [Download the Latest Release](http://sourceforge.net/projects/bbwifimusicsync/files/)
  * [Fork it on GitHub](https://github.com/nithinphilips/bbwifimusicsync) or 
    [Get Source Code](http://sourceforge.net/projects/bbwifimusicsync/develop)
- * [Install the Blackberry Client OTA](http://bbwifimusicsync.sourceforge.net/Web/6.0.0/WifiMusicSync.jad)
+ * [Install the BlackBerry Client OTA](http://bbwifimusicsync.sourceforge.net/Web/6.0.0/WifiMusicSync.jad)
 
 Credits
 -------
@@ -103,3 +104,4 @@ License
     <img alt="SourceForge.net Logo" src="http://sourceforge.net/sflogo.php?group_id=402939&amp;type=13"/>
 </a>
 
+BlackBerry® is a [registered trademark](http://us.blackberry.com/legal/trademarks.jsp) of Research in Motion.

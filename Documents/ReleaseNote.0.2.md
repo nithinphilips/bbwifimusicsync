@@ -1,5 +1,5 @@
-Wireless Music Sync for BlackBerry&reg;
-=======================================
+Wireless Music Sync for BlackBerry®
+===================================
 Wireless Music Sync for BlackBerry® keeps the music on your BlackBerry® devices
 in sync with your Desktop music library wirelessly. It presently works with
 iTunes on Windows. It's advantages over the RIM's Wireless Media Sync
@@ -9,6 +9,11 @@ number of songs.
 Release 0.2 (2011-08-21)
 ------------------------
 This release bring improved stability and more features to Wireless Music Sync for BlackBerry&reg;.
+
+###Source Code
+
+  + [@GitHub](https://github.com/nithinphilips/bbwifimusicsync/tree/7f91359b08f2a3321b4dc66a99f48ebcac5f02b3)
+  + or [@SourceForge](http://bbwifimusicsync.git.sourceforge.net/git/gitweb.cgi?p=bbwifimusicsync/bbwifimusicsync;a=tree;h=0f1707f58a7bf52b8cad191b9517cc984c062600;hb=7f91359b08f2a3321b4dc66a99f48ebcac5f02b3)
 
 ###New Features
 

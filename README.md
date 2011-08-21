@@ -61,7 +61,8 @@ Get It
  * [Download the Latest Release](http://sourceforge.net/projects/bbwifimusicsync/files/)
  * [Fork it on GitHub](https://github.com/nithinphilips/bbwifimusicsync) or 
    [Get Source Code](http://sourceforge.net/projects/bbwifimusicsync/develop)
- * [Install the BlackBerry Client OTA](http://bbwifimusicsync.sourceforge.net/Web/6.0.0/WifiMusicSync.jad)
+ * Install the BlackBerry Client OTA [OS 6](http://bbwifimusicsync.sourceforge.net/Web/6.0.0/WifiMusicSync.jad)
+   or [OS 5](http://bbwifimusicsync.sourceforge.net/Web/5.0.0/WifiMusicSync.jad)
 
 Credits
 -------

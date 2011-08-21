@@ -94,7 +94,8 @@ var ICONS_GROUP
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
-!define MUI_FINISHPAGE_RUN "$INSTDIR\MusicSync.Server\${PRODUCT_EXECUTABLE}"
+!define MUI_FINISHPAGE_RUN
+!define MUI_FINISHPAGE_RUN_FUNCTION "LaunchLink"
 !define MUI_FINISHPAGE_RUN_TEXT "Launch ${PRODUCT_NAME} v${PRODUCT_VERSION}"
 ;!define MUI_FINISHPAGE_RUN_FUNCTION RunAutoConf
 !define MUI_FINISHPAGE_LINK "Visit Home Page"
@@ -170,6 +171,9 @@ SectionIn RO
         File "..\MusicSync.Server\bin\Release\System.Reactive.dll"
         File "..\MusicSync.Server\bin\Release\System.Threading.dll"
 
+        CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
+        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Install Wifi Music Sync App OTA.lnk" "http://localhost:9000/app"
+        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Server.lnk" "$INSTDIR\MusicSync.Server\MusicSync.Server.exe"
 
         SetOutPath "$INSTDIR\MusicSync.Server\app\5.0.0"
         SetOverwrite ifnewer
@@ -195,10 +199,6 @@ SectionIn RO
         File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync-1.cod"
         File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync-1.debug"
 
-
-        CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
-        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Install Wifi Music Sync App OTA.lnk" "http://localhost:9000/app"
-        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Server.lnk" "$INSTDIR\MusicSync.Server\MusicSync.Server.exe"
 SectionEnd
 
 Section "!BlackBerry App" SEC03
@@ -239,6 +239,10 @@ SectionEnd
     !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "BlackBerry app for installation via Desktop Manager"
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
+Function LaunchLink
+  SetOutPath "$INSTDIR\MusicSync.Server"
+  Exec '"$INSTDIR\MusicSync.Server\${PRODUCT_EXECUTABLE}"'
+FunctionEnd
 
 Section Uninstall
         ReadRegStr $ICONS_GROUP ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "${PRODUCT_STARTMENU_REGVAL}"

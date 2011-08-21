@@ -1,12 +1,10 @@
 package com.nithinphilips.wifimusicsync.components;
 
-import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.system.Characters;
 import net.rim.device.api.ui.Field;
 import net.rim.device.api.ui.FieldChangeListener;
 import net.rim.device.api.ui.Font;
 import net.rim.device.api.ui.component.*;
-import net.rim.device.api.ui.container.DialogFieldManager;
 import net.rim.device.api.ui.container.HorizontalFieldManager;
 import net.rim.device.api.ui.container.PopupScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
@@ -80,7 +78,7 @@ public class InputDialog extends PopupScreen {
 		}
 		return super.keyChar(c, status, time);
 	}
-	
+
 	public String getName()
 	{
 		return nameField.getText();

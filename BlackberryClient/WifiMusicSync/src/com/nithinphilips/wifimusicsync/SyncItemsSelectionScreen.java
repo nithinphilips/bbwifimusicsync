@@ -16,8 +16,8 @@ public class SyncItemsSelectionScreen extends MainScreen
 {
     KeywordFilterField keywordFilterField;
     PlaylistInfoList   playlistInfos;
-    
-    boolean dirty = false;
+
+    int result = Dialog.CANCEL;
 
     public SyncItemsSelectionScreen(PlaylistInfo[] choices, String title)
     {
@@ -50,16 +50,16 @@ public class SyncItemsSelectionScreen extends MainScreen
                 // Invalidate the modified row of the ListField.
                 invalidate(index);
 
-                dirty = true;
-                
+                setDirty(true);
+
                 return true;
             }
         };
-        
+
         this.keywordFilterField.setEmptyString("No items found.", DrawStyle.HCENTER);
         this.keywordFilterField.setLabel("Search " + title);
         this.keywordFilterField.setSourceList(playlistInfos, playlistInfos);
-    
+
         ((VerticalFieldManager) getMainManager()).setBackground(BackgroundFactory.createSolidBackground(Color.BLACK));
 
         setTitle(keywordFilterField.getKeywordField());
@@ -68,6 +68,11 @@ public class SyncItemsSelectionScreen extends MainScreen
 
     public int getResult()
     {
-        return dirty ? Dialog.OK : Dialog.CANCEL;
+        return result;
+    }
+
+    public void save()
+    {
+        result = Dialog.OK;
     }
 }

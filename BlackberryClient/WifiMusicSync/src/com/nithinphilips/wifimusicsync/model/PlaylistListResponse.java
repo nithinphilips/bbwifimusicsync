@@ -1,11 +1,9 @@
 package com.nithinphilips.wifimusicsync.model;
 
-import org.json.me.JSONArray;
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
+import org.json.me.*;
 
 public class PlaylistListResponse {
-	
+
 	public PlaylistInfo[] playlists;
 
 	public PlaylistInfo[] getPlaylists() {
@@ -20,14 +18,14 @@ public class PlaylistListResponse {
 	public static PlaylistListResponse fromJson(JSONObject json) throws JSONException{
 		JSONArray tracks = json.getJSONArray("Playlists");
 		PlaylistInfo[] playlists = new PlaylistInfo[tracks.length()];
-		
+
 		for (int i = 0; i < playlists.length; i++) {
 			playlists[i] = PlaylistInfo.fromJson(tracks.getJSONObject(i));
 		}
-		
+
 		return new PlaylistListResponse(playlists);
 	}
-	
+
 	public String toString(){
 		StringBuffer sb = new StringBuffer();
         for (int i = 0; i < playlists.length; i++) {
@@ -36,5 +34,5 @@ public class PlaylistListResponse {
 		}
         return sb.toString();
 	}
-	
+
 }

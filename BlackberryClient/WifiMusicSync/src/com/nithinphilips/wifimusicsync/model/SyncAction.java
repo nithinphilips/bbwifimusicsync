@@ -1,7 +1,6 @@
 package com.nithinphilips.wifimusicsync.model;
 
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
+import org.json.me.*;
 
 import com.nithinphilips.wifimusicsync.components.SyncActionChangedCallBack;
 
@@ -11,7 +10,7 @@ public class SyncAction
     public static final int   NONE   = 0;
     public static final int   ADD    = 1;
     public static final int   REMOVE = 2;
-    
+
     int                       index  = 0;
     int                       type   = NONE;
     String                    deviceLocation;
@@ -93,7 +92,7 @@ public class SyncAction
     {
         this.type = type;
     }
-    
+
     public static SyncAction fromJson(JSONObject json, UrlBuilder server) throws JSONException
     {
         SyncAction result = new SyncAction();

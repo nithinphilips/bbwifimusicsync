@@ -362,7 +362,7 @@ public class JSONArray {
     public boolean optBoolean(int index)  {
         return optBoolean(index, false);
     }
-    
+
     /**
      * Get the optional boolean value associated with an index.
      * It returns the defaultValue if there is no value at that index or if
@@ -554,7 +554,7 @@ public class JSONArray {
         put(new JSONArray(value));
         return this;
     }
-    
+
 
 
      /**
@@ -607,8 +607,8 @@ public class JSONArray {
 //#         put(new JSONObject(value));
 //#         return this;
 //#     }
-//#endif    
-    
+//#endif
+
     /**
      * Append an object value. This increases the array's length by one.
      * @param value An object value.  The value should be a
@@ -639,7 +639,7 @@ public class JSONArray {
 
      return this;
     }
-    
+
     /**
      * Put a value in the JSONArray, where the value will be a
      * JSONArray which is produced from a Collection.
@@ -654,7 +654,7 @@ public class JSONArray {
         return this;
     }
 
-    
+
 
      /**
       * Put or replace a double value. If the index is greater than the length of
@@ -716,8 +716,8 @@ public class JSONArray {
 //#         put(index, new JSONObject(value));
 //#         return this;
 //#     }
-//#endif    
-    
+//#endif
+
     /**
      * Put or replace an object value in the JSONArray. If the index is greater
      *  than the length of the JSONArray, then null elements will be added as

@@ -1,13 +1,12 @@
 //#preprocess
 package com.nithinphilips.wifimusicsync;
 
-import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
 
-import org.json.me.JSONException;
+import org.openqa.selenium.remote.me.util.StringUtils;
+
 import net.rim.device.api.applicationcontrol.ApplicationPermissions;
 import net.rim.device.api.applicationcontrol.ApplicationPermissionsManager;
 
@@ -17,12 +16,12 @@ import net.rim.device.api.command.ReadOnlyCommandMetadata;
 import net.rim.device.api.ui.component.progressindicator.ActivityIndicatorController;
 import net.rim.device.api.ui.component.progressindicator.ActivityIndicatorModel;
 import net.rim.device.api.ui.component.progressindicator.ActivityIndicatorView;
-import net.rim.device.api.ui.component.StandardTitleBar; 
+import net.rim.device.api.ui.component.StandardTitleBar;
 import net.rim.device.api.ui.menu.CommandItem;
 import net.rim.device.api.ui.menu.CommandItemProvider;
 import net.rim.device.api.ui.menu.DefaultContextMenuProvider;
 import net.rim.device.api.ui.menu.SubMenu;
-import net.rim.device.api.util.StringProvider; 
+import net.rim.device.api.util.StringProvider;
 //#endif
 import net.rim.device.api.system.ApplicationDescriptor;
 import net.rim.device.api.system.Bitmap;
@@ -37,14 +36,14 @@ import net.rim.device.api.ui.UiApplication;
 import net.rim.device.api.ui.UiEngineInstance;
 import net.rim.device.api.ui.component.Dialog;
 import net.rim.device.api.ui.component.LabelField;
-import net.rim.device.api.ui.component.ListField; 
+import net.rim.device.api.ui.component.ListField;
 import net.rim.device.api.ui.component.Menu;
 import net.rim.device.api.ui.container.HorizontalFieldManager;
 import net.rim.device.api.ui.container.MainScreen;
 import net.rim.device.api.ui.container.VerticalFieldManager;
 import net.rim.device.api.ui.decor.BackgroundFactory;
 import net.rim.device.api.ui.image.Image;
-import net.rim.device.api.ui.image.ImageFactory; 
+import net.rim.device.api.ui.image.ImageFactory;
 
 import com.fairview5.keepassbb2.common.ui.ProgressDialog;
 import com.nithinphilips.Debug;
@@ -125,7 +124,7 @@ public class WifiMusicSyncScreen extends MainScreen
         controller.setModel(model);
         controller.setView(view);
 
-        model.setController(controller);        
+        model.setController(controller);
         view.createActivityImageField(bitmap, 5, Field.FIELD_LEFT);
 //#endif
 
@@ -152,7 +151,7 @@ public class WifiMusicSyncScreen extends MainScreen
             {
                 Vector items = new Vector();
 
-                // from <https://code.google.com/p/ultimate-gnome/> and 
+                // from <https://code.google.com/p/ultimate-gnome/> and
                 Image syncIcon = ImageFactory.createImage(Bitmap.getBitmapResource("sync.png"));
                 items.addElement(new CommandItem(new StringProvider("Sync"), syncIcon, new net.rim.device.api.command.Command(syncCommand)));
 
@@ -262,6 +261,21 @@ public class WifiMusicSyncScreen extends MainScreen
         super.makeMenu(menu, instance);
     }
 
+    protected void onUiEngineAttached(boolean attached)
+    {
+        if(attached && StringUtils.isEmpty(WifiMusicSyncProperties.fetch().getServerIp())){
+            UiApplication.getUiApplication().invokeLater(new Runnable() {
+                public void run() {
+                    if(Dialog.ask(Dialog.D_YES_NO, "You must configure the server first. Do you want to do that now?") == Dialog.YES){
+                        pushSettingsScreen();
+                    }else{
+                        System.exit(0);
+                    }
+                }
+            });
+        }
+    }
+
 //#ifdef BlackBerrySDK6.0.0
     final CommandHandler optionsCommand = new CommandHandler() {
         public void execute(ReadOnlyCommandMetadata metadata, Object context)
@@ -312,7 +326,7 @@ public class WifiMusicSyncScreen extends MainScreen
         }
     };
 //#endif
-    
+
     void runTest()
     {
          PlaylistInfo[] choices = new PlaylistInfo[20];
@@ -569,7 +583,7 @@ public class WifiMusicSyncScreen extends MainScreen
                         setStatusMessage("Sync Complete");
                     }
                     else setStatusMessage("No playlists found");
-                } 
+                }
                 catch (Throwable e)
                 {
                     if (Debug.DEBUG) setStatusMessage(e.toString() + e.getMessage());
@@ -693,7 +707,7 @@ public class WifiMusicSyncScreen extends MainScreen
 
         // Create a permission request for each of the permissions your application
         // needs. Note that you do not want to list all of the possible permission
-        // values since that provides little value for the application or the user.  
+        // values since that provides little value for the application or the user.
         // Please only request the permissions needed for your application.
         ApplicationPermissions permRequest = new ApplicationPermissions();
         permRequest.addPermission(ApplicationPermissions.PERMISSION_FILE_API);
@@ -712,12 +726,12 @@ public class WifiMusicSyncScreen extends MainScreen
         }
         else
         {
-            // The user has only accepted some or none of the permissions 
-            // requested. In this sample, we will not perform any additional 
-            // actions based on this information. However, there are several 
+            // The user has only accepted some or none of the permissions
+            // requested. In this sample, we will not perform any additional
+            // actions based on this information. However, there are several
             // scenarios where this information could be used. For example,
-            // if the user denied networking capabilities then the application 
-            // could disable that functionality if it was not core to the 
+            // if the user denied networking capabilities then the application
+            // could disable that functionality if it was not core to the
             // operation of the application.
         }
     }

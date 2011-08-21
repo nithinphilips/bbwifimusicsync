@@ -8,8 +8,7 @@ import javax.microedition.io.Connector;
 import javax.microedition.io.HttpConnection;
 import javax.microedition.io.file.FileConnection;
 
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
+import org.json.me.*;
 
 import com.nithinphilips.JsonHttpHelper;
 import com.nithinphilips.wifimusicsync.WifiMusicSync;
@@ -170,7 +169,7 @@ public class PlaylistDownloader
             httpConnection.setRequestProperty("Connection", "close");
 
             int status = httpConnection.getResponseCode();
-            
+
 
             if (status == HttpConnection.HTTP_OK)
             {
@@ -216,12 +215,12 @@ public class PlaylistDownloader
                 fileOutStream = fileConnection.openOutputStream();
 
                 long totalRead = 0;
-                
+
                 byte[] readBuf = new byte[BUFFER_SIZE];
                 while (true)
                 {
                     int read = httpInStream.read(readBuf);
-                    
+
                     totalRead += read;
                     if (read == -1) break;
                     fileOutStream.write(readBuf, 0, read);
@@ -268,12 +267,12 @@ public class PlaylistDownloader
             }
         }
     }
-    
+
     public static int calculatePercent(long value, long total)
     {
         return calculatePercent((double)value, (double)total);
     }
-    
+
     public static int calculatePercent(double value, double total)
     {
         return (int)((value / total) * 100.00);

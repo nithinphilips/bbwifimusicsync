@@ -7,8 +7,7 @@ import javax.microedition.io.file.FileConnection;
 
 import net.rim.device.api.system.Characters;
 
-import org.json.me.JSONException;
-import org.json.me.JSONObject;
+import org.json.me.*;
 import org.openqa.selenium.remote.me.util.Logger;
 
 import com.nithinphilips.wifimusicsync.controller.PlaylistDownloader;
@@ -107,7 +106,7 @@ public class PlaylistInfo
         this.displayName = displayName;
         this.trackCount = trackCount;
     }
-    
+
     public static String getFriendlyPlaylistName(String name)
     {
         String _name = name.substring(0, name.length() - 4);
@@ -121,7 +120,7 @@ public class PlaylistInfo
         }
 
         return _name;
-        
+
     }
 
     public static PlaylistInfo fromJson(JSONObject json) throws JSONException
@@ -138,7 +137,7 @@ public class PlaylistInfo
         else
             sb.append(Characters.BALLOT_BOX);
         sb.append(Characters.SPACE);
-        
+
         sb.append(displayName);
         sb.append(" (");
         sb.append(trackCount);

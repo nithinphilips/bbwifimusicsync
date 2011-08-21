@@ -1,52 +1,35 @@
 package com.nithinphilips.wifimusicsync;
 
-import java.io.IOException;
-import java.util.Enumeration;
 import java.util.Vector;
 
-import javax.microedition.content.ActionNameMap;
-import javax.microedition.content.ContentHandler;
-import javax.microedition.content.Registry;
-
-import net.rim.device.api.system.ApplicationDescriptor;
-import net.rim.device.api.system.ApplicationManager;
-import net.rim.device.api.system.DeviceInfo;
-import net.rim.device.api.system.RuntimeStore;
-import net.rim.device.api.system.WLANInfo;
 import net.rim.device.api.ui.UiApplication;
-
-import org.json.me.JSONException;
-
-import com.nithinphilips.wifimusicsync.components.WifiMusicSyncProperties;
-import com.nithinphilips.wifimusicsync.controller.PlaylistDownloader;
-import com.nithinphilips.wifimusicsync.controller.Subscriber;
 
 public final class WifiMusicSync extends UiApplication
 {
 
-    public static void checkScheduleSync()
-    {
-        WifiMusicSyncProperties props = WifiMusicSyncProperties.fetch();
-        // check available memory FileConnection.availableSize();
-
-        // Check battery level
-        if (((DeviceInfo.getBatteryStatus() & DeviceInfo.BSTAT_CHARGING) == DeviceInfo.BSTAT_CHARGING) || (DeviceInfo.getBatteryLevel() >= 10)) 
-        // Check wifi status
-        if (WLANInfo.getWLANState() == WLANInfo.WLAN_STATE_CONNECTED)
-        {
-            WLANInfo.WLANAPInfo apInfo = WLANInfo.getAPInfo();
-            //if (apInfo != null) if (apInfo.getSSID() == props.getHomeWifiName()) sync();
-        }
-
-        // Schedule run
-        long runInterval = 3600000; // 1 hr
-
-        ApplicationDescriptor current = ApplicationDescriptor.currentApplicationDescriptor();
-        current.setPowerOnBehavior(ApplicationDescriptor.DO_NOT_POWER_ON);
-        ApplicationManager manager = ApplicationManager.getApplicationManager();
-        manager.scheduleApplication(current, System.currentTimeMillis() + runInterval, true);
-
-    }
+//    public static void checkScheduleSync()
+//    {
+//        WifiMusicSyncProperties props = WifiMusicSyncProperties.fetch();
+//        // check available memory FileConnection.availableSize();
+//
+//        // Check battery level
+//        if (((DeviceInfo.getBatteryStatus() & DeviceInfo.BSTAT_CHARGING) == DeviceInfo.BSTAT_CHARGING) || (DeviceInfo.getBatteryLevel() >= 10))
+//        // Check wifi status
+//        if (WLANInfo.getWLANState() == WLANInfo.WLAN_STATE_CONNECTED)
+//        {
+//            WLANInfo.WLANAPInfo apInfo = WLANInfo.getAPInfo();
+//            //if (apInfo != null) if (apInfo.getSSID() == props.getHomeWifiName()) sync();
+//        }
+//
+//        // Schedule run
+//        long runInterval = 3600000; // 1 hr
+//
+//        ApplicationDescriptor current = ApplicationDescriptor.currentApplicationDescriptor();
+//        current.setPowerOnBehavior(ApplicationDescriptor.DO_NOT_POWER_ON);
+//        ApplicationManager manager = ApplicationManager.getApplicationManager();
+//        manager.scheduleApplication(current, System.currentTimeMillis() + runInterval, true);
+//
+//    }
 
     public static String[] getDirectories(String root, String path)
     {

@@ -2,18 +2,15 @@ package com.nithinphilips.wifimusicsync.components;
 
 import java.util.Vector;
 
-import com.nithinphilips.wifimusicsync.model.SyncAction;
-
-import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.system.Display;
 import net.rim.device.api.ui.Color;
 import net.rim.device.api.ui.DrawStyle;
 import net.rim.device.api.ui.Font;
-import net.rim.device.api.ui.FontManager;
 import net.rim.device.api.ui.Graphics;
-import net.rim.device.api.ui.MenuItem;
 import net.rim.device.api.ui.component.ListField;
 import net.rim.device.api.ui.component.ListFieldCallback;
+
+import com.nithinphilips.wifimusicsync.model.SyncAction;
 
 /** custom listmodel that sync's and auto-binds with the listfield */
 public class ProgressListModel implements ListFieldCallback, SyncActionChangedCallBack
@@ -22,7 +19,6 @@ public class ProgressListModel implements ListFieldCallback, SyncActionChangedCa
     private Vector    _data             = new Vector();
     private ListField _view;
     private int       _defaultRowHeight = Font.getDefault().getHeight() * 2 + 2;
-    private int       _defaultRowWidth  = 0;
 
     /** constructor that saves a ref to the model's view - {@link ListField}, and binds this model to the view */
     public ProgressListModel(ListField list, Vector data)
@@ -44,7 +40,7 @@ public class ProgressListModel implements ListFieldCallback, SyncActionChangedCa
     // implement ListFieldCallback interface
     // XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 
-    
+
     public static final int COLOR_NORMAL_INDEX   = 0x00aaaaaa;
     public static final int COLOR_SELECTED_INDEX = 0x00dddddd;
 
@@ -53,6 +49,7 @@ public class ProgressListModel implements ListFieldCallback, SyncActionChangedCa
 
     public static final int COLOR_NAME_TEXT      = Color.WHITE;
     public static final int COLOR_STATUS_TEXT    = Color.GRAY;
+    public static final int COLOR_SELECTED_STATUS_TEXT    = 0x00dddddd;
 
     /** list row renderer */
     public void drawListRow(ListField list, Graphics g, int index, int y, int w)
@@ -60,10 +57,14 @@ public class ProgressListModel implements ListFieldCallback, SyncActionChangedCa
 
         int text_X = 9;
         int indexColor = COLOR_NORMAL_INDEX;
+        int statusColor = COLOR_STATUS_TEXT;
 
         if (list.getSelectedIndex() == index)
+        {
             indexColor = COLOR_SELECTED_INDEX;
-        
+            statusColor = COLOR_SELECTED_STATUS_TEXT;
+        }
+
         g.setColor(indexColor);
         g.setFont(Font.getDefault().derive(0, _defaultRowHeight + 5));
 
@@ -77,7 +78,7 @@ public class ProgressListModel implements ListFieldCallback, SyncActionChangedCa
             g.setColor(COLOR_ADD_BAR_FILL);
         else
             g.setColor(COLOR_REM_BAR_FILL);
-        
+
         g.fillRect(0, y, text_X - 2, _defaultRowHeight);
 
         if (index == 0)
@@ -93,7 +94,7 @@ public class ProgressListModel implements ListFieldCallback, SyncActionChangedCa
         g.drawText(syncAction.getFileName(), text_X, y, DrawStyle.LEADING | DrawStyle.ELLIPSIS, w);
 
         // Status Line
-        g.setColor(COLOR_STATUS_TEXT);
+        g.setColor(statusColor);
         g.setFont(Font.getDefault().derive(0, Font.getDefault().getHeight() - 3));
         g.drawText(syncAction.getStatus(), text_X, y + Font.getDefault().getHeight() + 2, DrawStyle.LEADING | DrawStyle.ELLIPSIS, w);
 
@@ -140,7 +141,7 @@ public class ProgressListModel implements ListFieldCallback, SyncActionChangedCa
 
         // update the view
         _view.insert(index);
-        
+
         toInsert.setNotifier(this);
         toInsert.setIndex(index);
     }

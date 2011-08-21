@@ -44,8 +44,8 @@ public class WifiMusicSyncProperties implements Persistable
     // Constructs a properties set with default values.
     private WifiMusicSyncProperties()
     {
-        serverIp = "192.168.0.104";
-        serverPort = "9000";
+        serverIp = "";
+        serverPort = "";
         homeWifiName = "";
 
         localStoreRoot = LOCAL_STORE_SD_PATH;

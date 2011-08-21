@@ -18,13 +18,13 @@ Wireless Music Sync for BlackBerry&reg; has three components:
 
  * Sync a Playlist, an Album or an Artist.
  * Fast, On-Demand sync.
+ * Supports both OS 5 and 6.
  * Server uses minimal amount of memory while idle.
  * Two-Way syncing of playlists (for iTunes).
  * Open protocol and code, modify it to your heart's content.
 
 ###Planned Features
 
- * BlackBerry&reg; OS 5 support.
  * File based backend support.
  * Support for other popular music players.
  * Linux server.

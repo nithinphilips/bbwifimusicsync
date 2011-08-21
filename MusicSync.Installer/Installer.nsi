@@ -10,8 +10,8 @@
 !define PRODUCT_NAME "Wireless Music Sync for BlackBerry"
 
 !define PRODUCT_PUBLISHER "Nithin Philips"
-!define PRODUCT_EXECUTABLE "MusicSync.Desktop.exe"
-!define PRODUCT_EXECUTABLE_WOEXT "MusicSync.Desktop"
+!define PRODUCT_EXECUTABLE "MusicSync.Server.exe"
+!define PRODUCT_EXECUTABLE_WOEXT "MusicSync.Server"
 !define PRODUCT_WEB_SITE "http://bbwifimusicsync.sourceforge.net/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\${PRODUCT_EXECUTABLE}"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
@@ -94,7 +94,7 @@ var ICONS_GROUP
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
-!define MUI_FINISHPAGE_RUN "$INSTDIR\${PRODUCT_EXECUTABLE}"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\MusicSync.Server\${PRODUCT_EXECUTABLE}"
 !define MUI_FINISHPAGE_RUN_TEXT "Launch ${PRODUCT_NAME} v${PRODUCT_VERSION}"
 ;!define MUI_FINISHPAGE_RUN_FUNCTION RunAutoConf
 !define MUI_FINISHPAGE_LINK "Visit Home Page"
@@ -132,122 +132,132 @@ InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails hide
 ShowUnInstDetails hide
 
-Section "!Application" SEC01
-  SectionIn RO
+Section "!Desktop Client" SEC01
+SectionIn RO
 
-  SetOutPath "$INSTDIR"
-  SetOverwrite ifnewer
-  File "..\bin\Release\FlashCardMaster.exe"
-  File "..\bin\Release\LibFlashcard.dll"
-  File "..\bin\Release\LibNUpdater.dll"
-  File "..\bin\Release\MagicLocalLibrary.dll"
-  File "..\bin\Release\LumenWorks.Framework.IO.dll"
-  File "..\bin\Release\VistaControls.dll"
+        SetOutPath "$INSTDIR"
+        SetOverwrite ifnewer
+        File "..\README.md"
+        File "..\COPYING.txt"
 
-  File "..\Resources\Help.chm"
-  File "..\Resources\Icons\Type.Card.ico"
-  File "..\Resources\Icons\Type.Cml.ico"
-  File "..\Resources\Icons\Type.Csv.ico"
-  File "..\Resources\Icons\Type.Folder.ico"
-  File "..\Resources\Icons\Type.Html.ico"
-  File "..\Resources\Icons\Type.Pro.ico"
+        SetOutPath "$INSTDIR\MusicSync.Desktop"
+        SetOverwrite ifnewer
+        File "..\MusicSync.Desktop\bin\Release\Afterthought.dll"
+        File "..\MusicSync.Desktop\bin\Release\libMusicSync.dll"
+        File "..\MusicSync.Desktop\bin\Release\libQdownloader.dll"
+        File "..\MusicSync.Desktop\bin\Release\log4net.dll"
+        File "..\MusicSync.Desktop\bin\Release\MusicSync.Desktop.exe"
+        File "..\MusicSync.Desktop\bin\Release\NotifyPropertyChanged.dll"
 
-
-  File "..\README"
-  File "..\CHANGES"
-  File "..\COPYING"
-
-  CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
-  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\${PRODUCT_NAME}.lnk" "$INSTDIR\${PRODUCT_EXECUTABLE}"
+        CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
+        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Desktop Client.lnk" "$INSTDIR\MusicSync.Desktop\MusicSync.Desktop.exe"
 SectionEnd
 
-Section "Samples" SEC02
-  SetOutPath "$DOCUMENTS\My Flashcards"
-  SetOverwrite off
-  File "..\Resources\Samples\*.*"
+Section "!Server" SEC02
+SectionIn RO
+
+        SetOutPath "$INSTDIR\MusicSync.Server"
+        SetOverwrite ifnewer
+        File "..\MusicSync.Server\bin\Release\Kayak.dll"
+        File "..\MusicSync.Server\bin\Release\Kayak.Framework.dll"
+        File "..\MusicSync.Server\bin\Release\libMusicSync.dll"
+        File "..\MusicSync.Server\bin\Release\log4net.dll"
+        File "..\MusicSync.Server\bin\Release\log4net.xml"
+        File "..\MusicSync.Server\bin\Release\MusicSync.Server.exe"
+        File "..\MusicSync.Server\bin\Release\music-sync-server.ico"
+        File "..\MusicSync.Server\bin\Release\System.CoreEx.dll"
+        File "..\MusicSync.Server\bin\Release\System.Observable.dll"
+        File "..\MusicSync.Server\bin\Release\System.Reactive.dll"
+        File "..\MusicSync.Server\bin\Release\System.Threading.dll"
+
+
+        SetOutPath "$INSTDIR\MusicSync.Server\app\5.0.0"
+        SetOverwrite ifnewer
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.cod"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.csl"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.cso"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.debug"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.jad"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.jar"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.rapc"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync-1.cod"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync-1.debug"
+
+        SetOutPath "$INSTDIR\MusicSync.Server\app\6.0.0"
+        SetOverwrite ifnewer
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.cod"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.csl"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.cso"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.debug"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.jad"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.jar"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.rapc"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync-1.cod"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync-1.debug"
+
+
+        CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
+        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Install Wifi Music Sync App OTA.lnk" "http://localhost:9000/app"
+        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Server.lnk" "$INSTDIR\MusicSync.Server\MusicSync.Server.exe"
 SectionEnd
 
-SectionGroup Translations
+Section "!BlackBerry App" SEC03
+SectionIn RO
 
-Section "Türkçe" SEC03
-  SetOutPath "$INSTDIR\tr"
-  SetOverwrite ifnewer
-  File "..\bin\Release\tr\*.*"
+        SetOutPath "$INSTDIR\MusicSync.BlackBerryApp"
+        SetOverwrite ifnewer
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\WifiMusicSync.alx"
+
+        SetOutPath "$INSTDIR\MusicSync.BlackBerryApp\5.0.0"
+        SetOverwrite ifnewer
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.cod"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.csl"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.cso"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.debug"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.jad"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.jar"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.rapc"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync-1.debug"
+
+        SetOutPath "$INSTDIR\MusicSync.BlackBerryApp\6.0.0"
+        SetOverwrite ifnewer
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.cod"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.csl"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.cso"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.debug"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.jad"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.jar"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.rapc"
+        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync-1.debug"
+
 SectionEnd
-
-Section "Malayalam" SEC04
-  SetOutPath "$INSTDIR\ml-IN"
-  SetOverwrite ifnewer
-  File "..\bin\Release\ml-IN\*.*"
-SectionEnd
-
-Section "Español" SEC05
-  SetOutPath "$INSTDIR\es"
-  SetOverwrite ifnewer
-  File "..\bin\Release\es\*.*"
-SectionEnd
-
-SectionGroupEnd
 
 ;Assign descriptions to sections
   !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-    !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "Application files (required)."
-    !insertmacro MUI_DESCRIPTION_TEXT ${SEC02} "Sample flashcards. (will be copied to $DOCUMENTS\My FlashCards)"
-    !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "Install Türkçe Translation"
-    !insertmacro MUI_DESCRIPTION_TEXT ${SEC04} "Install Malayalam Translation"
-    !insertmacro MUI_DESCRIPTION_TEXT ${SEC05} "Install Español Translation"
+    !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "Desktop Client."
+    !insertmacro MUI_DESCRIPTION_TEXT ${SEC02} "Server"
+    !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "BlackBerry app for installation via Desktop Manager"
   !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 
 Section Uninstall
-  ReadRegStr $ICONS_GROUP ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "${PRODUCT_STARTMENU_REGVAL}"
+        ReadRegStr $ICONS_GROUP ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "${PRODUCT_STARTMENU_REGVAL}"
 
-  Delete "$INSTDIR\uninst.exe"
-  Delete "$INSTDIR\FlashCardMaster.exe"
-  Delete "$INSTDIR\MagicLocalLibrary.dll"
-  Delete "$INSTDIR\LumenWorks.Framework.IO.dll"
-  Delete "$INSTDIR\VistaControls.dll"
-  Delete "$INSTDIR\LibFlashcard.dll"
-  Delete "$INSTDIR\LibNUpdater.dll"
+        RMDir /r "$INSTDIR"
 
-  Delete "$INSTDIR\Help.chm"
-  Delete "$INSTDIR\Type.Card.ico"
-  Delete "$INSTDIR\Type.Cml.ico"
-  Delete "$INSTDIR\Type.Csv.ico"
-  Delete "$INSTDIR\Type.Folder.ico"
-  Delete "$INSTDIR\Type.Html.ico"
-  Delete "$INSTDIR\Type.Pro.ico"
+        Delete "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Desktop Client.lnk"
+        Delete "$SMPROGRAMS\$ICONS_GROUP\Install Wifi Music Sync App OTA.lnk"
+        Delete "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Server.lnk"
 
-  Delete "$INSTDIR\README"
-  Delete "$INSTDIR\CHANGES"
-  Delete "$INSTDIR\COPYING"
+        Delete "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"
+        Delete "$SMPROGRAMS\$ICONS_GROUP\Visit Website.lnk"
 
-  Delete "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"
-  Delete "$SMPROGRAMS\$ICONS_GROUP\Visit Website.lnk"
-  Delete "$SMPROGRAMS\$ICONS_GROUP\${PRODUCT_NAME}.lnk"
+        RMDir "$SMPROGRAMS\$ICONS_GROUP"
 
-  RMDir /r "$INSTDIR\tr"
-  RMDir /r "$INSTDIR\ml-IN"
-  RMDir /r "$INSTDIR\es"
+        DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
+        DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
 
-  RMDir "$SMPROGRAMS\$ICONS_GROUP"
-
-  RMDir "$INSTDIR"
-
-  DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
-  DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
-
-  DeleteRegKey HKEY_CLASSES_ROOT ".card"
-  DeleteRegKey HKEY_CLASSES_ROOT "CardDeck"
-
-  DeleteRegKey HKEY_CLASSES_ROOT ".cml"
-  DeleteRegKey HKEY_CLASSES_ROOT "XMLCardDeck"
-
-  ; Using the system.dll plugin to call the SHChangeNotify Win32 API function so we
-  ; can update the shell.
-  System::Call "shell32::SHChangeNotify(i,i,i,i) (${SHCNE_ASSOCCHANGED}, ${SHCNF_FLUSH}, 0, 0)
-
-  SetAutoClose true
+        SetAutoClose true
 SectionEnd
 
 Section -AdditionalIcons
@@ -266,29 +276,9 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 
-  WriteRegStr HKEY_CLASSES_ROOT ".card" "" "CardDeck"
-  WriteRegStr HKEY_CLASSES_ROOT ".card" "Content Type" "application/flashcardmaster"
-  WriteRegStr HKEY_CLASSES_ROOT "CardDeck" "" "Flashcard Deck"
-  WriteRegStr HKEY_CLASSES_ROOT "CardDeck\DefaultIcon" "" "$INSTDIR\Type.Card.ico"
-  WriteRegStr HKEY_CLASSES_ROOT "CardDeck\Shell" "" ""
-  WriteRegStr HKEY_CLASSES_ROOT "CardDeck\Shell\Open" "" ""
-  WriteRegStr HKEY_CLASSES_ROOT "CardDeck\Shell\Open\Command" "" '"$INSTDIR\${PRODUCT_EXECUTABLE}" "%1"'
-
-  WriteRegStr HKEY_CLASSES_ROOT ".cml" "" "XMLCardDeck"
-  WriteRegStr HKEY_CLASSES_ROOT ".cml" "Content Type" "text/xml"
-  WriteRegStr HKEY_CLASSES_ROOT "XMLCardDeck" "" "Flashcard Deck"
-  WriteRegStr HKEY_CLASSES_ROOT "XMLCardDeck\DefaultIcon" "" "$INSTDIR\Type.Cml.ico"
-  WriteRegStr HKEY_CLASSES_ROOT "XMLCardDeck\Shell" "" ""
-  WriteRegStr HKEY_CLASSES_ROOT "XMLCardDeck\Shell\Open" "" ""
-  WriteRegStr HKEY_CLASSES_ROOT "XMLCardDeck\Shell\Open\Command" "" '"$INSTDIR\${PRODUCT_EXECUTABLE}" "%1"'
-
-  ; Using the system.dll plugin to call the SHChangeNotify Win32 API function so we
-  ; can update the shell.
-  System::Call "shell32::SHChangeNotify(i,i,i,i) (${SHCNE_ASSOCCHANGED}, ${SHCNF_FLUSH}, 0, 0)"
-
 SectionEnd
 
-!define DOT_MAJOR 2
+!define DOT_MAJOR 4
 !define DOT_MINOR 0
 
 Function .onInit
@@ -422,7 +412,7 @@ Function ${undot}CheckForExeInstance
     FindProcDLL::FindProc "${PRODUCT_EXECUTABLE}"
     StrCmp 1 $R0 warnWait allOK
   warnWait:
-    MessageBox MB_ICONEXCLAMATION|MB_RETRYCANCEL|MB_DEFBUTTON1 "${PRODUCT_EXECUTABLE} must to be closed before the ${un}installer can continue. Please close ${PRODUCT_NAME}." IDRETRY checkExeInstance IDCANCEL abortInstall
+    MessageBox MB_ICONEXCLAMATION|MB_RETRYCANCEL|MB_DEFBUTTON1 "${PRODUCT_EXECUTABLE} must to be closed before the ${un}installer can continue. You can close Music Sync Server from the system notification area." IDRETRY checkExeInstance IDCANCEL abortInstall
   abortInstall:
     Abort
   allOK:

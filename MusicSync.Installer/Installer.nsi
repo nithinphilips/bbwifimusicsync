@@ -7,12 +7,12 @@
 
 ;!define DEBUG ; Set this to make installer more verbose
 
-!define PRODUCT_NAME "Flashcard Master"
+!define PRODUCT_NAME "Wireless Music Sync for BlackBerry"
 
 !define PRODUCT_PUBLISHER "Nithin Philips"
-!define PRODUCT_EXECUTABLE "FlashCardMaster.exe"
-!define PRODUCT_EXECUTABLE_WOEXT "FlashCardMaster"
-!define PRODUCT_WEB_SITE "http://flashcardmaster.sourceforge.net/"
+!define PRODUCT_EXECUTABLE "MusicSync.Desktop.exe"
+!define PRODUCT_EXECUTABLE_WOEXT "MusicSync.Desktop"
+!define PRODUCT_WEB_SITE "http://bbwifimusicsync.sourceforge.net/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\${PRODUCT_EXECUTABLE}"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -27,8 +27,8 @@ SetCompressor lzma
 
 ; These fields add properties to the generated installer exe.
 !ifndef PRODUCT_VERSION 
-    !define PRODUCT_VERSION "latest"
-    VIProductVersion "0.0.0.0"
+    !define PRODUCT_VERSION "0.2.0.0"
+    VIProductVersion "0.2.0.0"
 !else
     VIProductVersion "${PRODUCT_VERSION}"
 !endif
@@ -74,7 +74,7 @@ VIAddVersionKey FileDescription "Installer for ${PRODUCT_NAME}"
 !define MUI_LANGDLL_REGISTRY_ROOT ${PRODUCT_UNINST_ROOT_KEY}
 !define MUI_LANGDLL_REGISTRY_KEY "${PRODUCT_UNINST_KEY}" 
 !define MUI_LANGDLL_REGISTRY_VALUENAME "Installer Language"
-  
+
 ; Welcome page
 ;!insertmacro MUI_PAGE_WELCOME
 ; License page
@@ -123,9 +123,9 @@ LicenseData $(myLicenseData)
 
 Name "${PRODUCT_NAME}"
 !ifdef OUT_FILE
-	OutFile "${OUT_FILE}"
+    OutFile "${OUT_FILE}"
 !else
-	OutFile "${PRODUCT_NAME}-${PRODUCT_VERSION}-setup.exe"
+    OutFile "${PRODUCT_NAME}-${PRODUCT_VERSION}-setup.exe"
 !endif
 InstallDir "$PROGRAMFILES\${PRODUCT_NAME}"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
@@ -134,7 +134,7 @@ ShowUnInstDetails hide
 
 Section "!Application" SEC01
   SectionIn RO
-  
+
   SetOutPath "$INSTDIR"
   SetOverwrite ifnewer
   File "..\bin\Release\FlashCardMaster.exe"
@@ -143,7 +143,7 @@ Section "!Application" SEC01
   File "..\bin\Release\MagicLocalLibrary.dll"
   File "..\bin\Release\LumenWorks.Framework.IO.dll"
   File "..\bin\Release\VistaControls.dll"
-  
+
   File "..\Resources\Help.chm"
   File "..\Resources\Icons\Type.Card.ico"
   File "..\Resources\Icons\Type.Cml.ico"
@@ -151,12 +151,12 @@ Section "!Application" SEC01
   File "..\Resources\Icons\Type.Folder.ico"
   File "..\Resources\Icons\Type.Html.ico"
   File "..\Resources\Icons\Type.Pro.ico"
-  
-  
+
+
   File "..\README"
   File "..\CHANGES"
   File "..\COPYING"
-  
+
   CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
   CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\${PRODUCT_NAME}.lnk" "$INSTDIR\${PRODUCT_EXECUTABLE}"
 SectionEnd
@@ -201,7 +201,7 @@ SectionGroupEnd
 
 Section Uninstall
   ReadRegStr $ICONS_GROUP ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "${PRODUCT_STARTMENU_REGVAL}"
-  
+
   Delete "$INSTDIR\uninst.exe"
   Delete "$INSTDIR\FlashCardMaster.exe"
   Delete "$INSTDIR\MagicLocalLibrary.dll"
@@ -209,7 +209,7 @@ Section Uninstall
   Delete "$INSTDIR\VistaControls.dll"
   Delete "$INSTDIR\LibFlashcard.dll"
   Delete "$INSTDIR\LibNUpdater.dll"
-  
+
   Delete "$INSTDIR\Help.chm"
   Delete "$INSTDIR\Type.Card.ico"
   Delete "$INSTDIR\Type.Cml.ico"
@@ -217,26 +217,26 @@ Section Uninstall
   Delete "$INSTDIR\Type.Folder.ico"
   Delete "$INSTDIR\Type.Html.ico"
   Delete "$INSTDIR\Type.Pro.ico"
-    
+
   Delete "$INSTDIR\README"
   Delete "$INSTDIR\CHANGES"
   Delete "$INSTDIR\COPYING"
-  
+
   Delete "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\Visit Website.lnk"
   Delete "$SMPROGRAMS\$ICONS_GROUP\${PRODUCT_NAME}.lnk"
-  
+
   RMDir /r "$INSTDIR\tr"
   RMDir /r "$INSTDIR\ml-IN"
   RMDir /r "$INSTDIR\es"
 
   RMDir "$SMPROGRAMS\$ICONS_GROUP"
-  
+
   RMDir "$INSTDIR"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
-  
+
   DeleteRegKey HKEY_CLASSES_ROOT ".card"
   DeleteRegKey HKEY_CLASSES_ROOT "CardDeck"
 
@@ -285,7 +285,7 @@ Section -Post
   ; Using the system.dll plugin to call the SHChangeNotify Win32 API function so we
   ; can update the shell.
   System::Call "shell32::SHChangeNotify(i,i,i,i) (${SHCNE_ASSOCCHANGED}, ${SHCNF_FLUSH}, 0, 0)"
-  
+
 SectionEnd
 
 !define DOT_MAJOR 2
@@ -316,18 +316,18 @@ Function .onInit
 FunctionEnd
 
 Function UninstallPrev
- 
+
   ReadRegStr $R0 ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" 
   StrCmp $R0 "" done
- 
+
   MessageBox MB_OKCANCEL|MB_ICONEXCLAMATION "Another version of ${PRODUCT_NAME} is already installed. $\n$\nClick 'OK' to remove the previous version or 'Cancel' to cancel this upgrade."  /SD IDOK IDOK uninst
   Abort
-  
+
 ;Run the uninstaller
 uninst:
   ClearErrors
   ExecWait '$R0 /S _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
- 
+
   IfErrors abortL
     ;You can either use Delete /REBOOTOK in the uninstaller or add some code
     ;here to remove the uninstaller. Use a registry key to check
@@ -340,7 +340,7 @@ done:
    Return
 abortL:
    Abort
-   
+
 FunctionEnd
 
 ; Usage
@@ -362,10 +362,10 @@ Function IsDotNetInstalled
   StartEnum:
     ;Enumerate the versions installed.
     EnumRegKey $3 HKLM "$1\policy" $2
-    
+
     ;If we don't find any versions installed, it's not here.
     StrCmp $3 "" noDotNet notEmpty
-    
+
     ;We found something.
     notEmpty:
       ;Find out if the RegKey starts with 'v'.  
@@ -373,7 +373,7 @@ Function IsDotNetInstalled
       StrCpy $4 $3 1 0
       StrCmp $4 "v" +1 goNext
       StrCpy $4 $3 1 1
-      
+
       ;It starts with 'v'.  Now check to see how the installed major version
       ;relates to our required major version.
       ;If it's equal check the minor version, if it's greater, 
@@ -412,7 +412,7 @@ Function IsDotNetInstalled
 
   yesDotNet:
     ;Everything checks out.  Go on with the rest of the installation.
-    
+
 FunctionEnd
 
 !macro CheckForExeInstance undot un
@@ -450,33 +450,33 @@ FunctionEnd
 ; Return: [dir] (eg. "C:\WINNT\Microsoft.NET\Framework\v2.0.50727")
 Function GetDotNetDir
   ClearErrors
-	Exch $R0 ; Set R0 to .net version major
-	Push $R1
-	Push $R2
- 
-	; set R1 to minor version number of the installed .NET runtime
-	EnumRegValue $R1 HKLM \
-		"Software\Microsoft\.NetFramework\policy\$R0" 0
-	IfErrors getdotnetdir_err
- 
-	; set R2 to .NET install dir root
-	ReadRegStr $R2 HKLM \
-		"Software\Microsoft\.NetFramework" "InstallRoot"
-	IfErrors getdotnetdir_err
- 
-	; set R0 to the .NET install dir full
-	StrCpy $R0 "$R2$R0.$R1"
- 
+    Exch $R0 ; Set R0 to .net version major
+    Push $R1
+    Push $R2
+
+    ; set R1 to minor version number of the installed .NET runtime
+    EnumRegValue $R1 HKLM \
+        "Software\Microsoft\.NetFramework\policy\$R0" 0
+    IfErrors getdotnetdir_err
+
+    ; set R2 to .NET install dir root
+    ReadRegStr $R2 HKLM \
+        "Software\Microsoft\.NetFramework" "InstallRoot"
+    IfErrors getdotnetdir_err
+
+    ; set R0 to the .NET install dir full
+    StrCpy $R0 "$R2$R0.$R1"
+
 getdotnetdir_end:
-	Pop $R2
-	Pop $R1
-	Exch $R0 ; return .net install dir full
-	Return
- 
+    Pop $R2
+    Pop $R1
+    Exch $R0 ; return .net install dir full
+    Return
+
 getdotnetdir_err:
-	StrCpy $R0 ""
-	Goto getdotnetdir_end
- 
+    StrCpy $R0 ""
+    Goto getdotnetdir_end
+
 FunctionEnd
 
 ; Given a .NET version number, this function returns that .NET framework's
@@ -485,31 +485,31 @@ FunctionEnd
 ; Return: [dir] (eg. "C:\WINNT\Microsoft.NET\Framework\v2.0.50727")
 Function un.GetDotNetDir
   ClearErrors
-	Exch $R0 ; Set R0 to .net version major
-	Push $R1
-	Push $R2
- 
-	; set R1 to minor version number of the installed .NET runtime
-	EnumRegValue $R1 HKLM \
-		"Software\Microsoft\.NetFramework\policy\$R0" 0
-	IfErrors getdotnetdir_err
- 
-	; set R2 to .NET install dir root
-	ReadRegStr $R2 HKLM \
-		"Software\Microsoft\.NetFramework" "InstallRoot"
-	IfErrors getdotnetdir_err
- 
-	; set R0 to the .NET install dir full
-	StrCpy $R0 "$R2$R0.$R1"
- 
+    Exch $R0 ; Set R0 to .net version major
+    Push $R1
+    Push $R2
+
+    ; set R1 to minor version number of the installed .NET runtime
+    EnumRegValue $R1 HKLM \
+        "Software\Microsoft\.NetFramework\policy\$R0" 0
+    IfErrors getdotnetdir_err
+
+    ; set R2 to .NET install dir root
+    ReadRegStr $R2 HKLM \
+        "Software\Microsoft\.NetFramework" "InstallRoot"
+    IfErrors getdotnetdir_err
+
+    ; set R0 to the .NET install dir full
+    StrCpy $R0 "$R2$R0.$R1"
+
 getdotnetdir_end:
-	Pop $R2
-	Pop $R1
-	Exch $R0 ; return .net install dir full
-	Return
- 
+    Pop $R2
+    Pop $R1
+    Exch $R0 ; return .net install dir full
+    Return
+
 getdotnetdir_err:
-	StrCpy $R0 ""
-	Goto getdotnetdir_end
- 
+    StrCpy $R0 ""
+    Goto getdotnetdir_end
+
 FunctionEnd

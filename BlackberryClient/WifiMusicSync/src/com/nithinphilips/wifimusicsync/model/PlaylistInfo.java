@@ -97,7 +97,11 @@ public class PlaylistInfo
 
     String getPath(String root)
     {
-        return root + name + extension;
+        StringBuffer sb = new StringBuffer();
+        sb.append(root);
+        sb.append(name);
+        sb.append(extension);
+        return sb.toString();
     }
 
     public PlaylistInfo(String name, String displayName, int trackCount)

@@ -453,54 +453,66 @@ public class WifiMusicSyncScreen extends MainScreen
                             {
                                 try
                                 {
-                                    if (!pushChoicesScreen(playlists, title)){
+                                    if (!pushChoicesScreen(playlists, title))
+                                    {
                                         setStatusMessage("Nothing changed.");
+                                        resetStatusMessage();
                                         return;
                                     }
 
-                                    setStatusMessage("Updating subscription...");
+                                    ProgressDialog.prepareModal("Getting cleanup info...");
+                                    setStatusMessage("Getting cleanup information...");
 
-                                    for (int i = 0; i < playlists.length; i++)
-                                    {
-                                        if (playlists[i].isSelected()) playlists[i].createOnFileSystem(props.getLocalStoreRoot());
-                                        else playlists[i].deleteOnFileSystem(props.getLocalStoreRoot());
-                                    }
-
-                                    final SyncResponse response = subscriber.updateSubscription();
-
-                                    if (response != null)
-                                    {
-                                        final SyncAction[] actions = response.getActions();
-
-                                        WifiMusicSyncScreen.this.myListModel.erase();
-                                        for (int i = 0; i < actions.length; i++)
+                                    Thread u = new Thread() {
+                                        // The actions are not intensive, but may still cause the UI to hang.
+                                        // so, we're running in another thread.
+                                        public void run()
                                         {
-                                            WifiMusicSyncScreen.this.myListModel.insert(actions[i]);
-                                        }
-
-                                        Thread u = new Thread() {
-                                            // The actions are not intensive, but may still cause the UI to hang.
-                                            // so, we're running in another thread.
-                                            public void run()
+                                            try
                                             {
-                                                try
+                                                for (int i = 0; i < playlists.length; i++)
                                                 {
+                                                    if (playlists[i].isSelected()) playlists[i].createOnFileSystem(props.getLocalStoreRoot());
+                                                    else playlists[i].deleteOnFileSystem(props.getLocalStoreRoot());
+                                                }
+
+                                                final SyncResponse response = subscriber.updateSubscription();
+
+                                                ProgressDialog.closeProgress();
+
+                                                if (response != null)
+                                                {
+                                                    final SyncAction[] actions = response.getActions();
+
+                                                    UiApplication.getUiApplication().invokeLater(new Runnable() {
+                                                        public void run()
+                                                        {
+                                                            myListModel.erase();
+                                                            for (int i = 0; i < actions.length; i++)
+                                                            {
+                                                                myListModel.insert(actions[i]);
+                                                            }
+                                                        }
+                                                    });
+
                                                     PlaylistDownloader.executeActions(actions);
                                                 }
-                                                catch (Throwable e)
+                                                else
                                                 {
-                                                    if (Debug.DEBUG) setStatusMessage(e.toString() + e.getMessage());
-                                                    else setStatusMessage("Critical error. Subscription failed.");
+                                                    setStatusMessage("Error updating subscriptions.");
                                                 }
-                                            };
+                                            }
+                                            catch (Throwable e)
+                                            {
+                                                if (Debug.DEBUG) setStatusMessage(e.toString() + e.getMessage());
+                                                else setStatusMessage("Critical error. Subscription failed.");
+                                            }finally{
+                                                resetStatusMessage();
+                                            }
                                         };
-                                        u.start();
-                                    }
-                                    else
-                                    {
-                                        setStatusMessage("Error updating subscriptions.");
-                                    }
-
+                                    };
+                                    u.start();
+                                    ProgressDialog.doModal();
                                 }
                                 catch (Throwable e)
                                 {

@@ -106,7 +106,7 @@ public class SettingsScreen extends MainScreen{
         VerticalFieldManager deviceIdGroup = UiFactory.createVerticalFieldGroup("Device ID");
         deviceIdGroup.add(new LabelField("Sync Client ID: " + optionProperties.getClientId()));
         //deviceIdGroup.add(new LabelField("This ID uniquely identifies your device. You should only add known and trusted devices to your server's allowed clients list."));
-        deviceIdGroup.add(new LabelField("This ID uniquely identifies your device."));
+        deviceIdGroup.add(new LabelField("This string uniquely identifies your device."));
 
         mainScreen.add(serverGroup);
         mainScreen.add(storageGroup);

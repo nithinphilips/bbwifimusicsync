@@ -18,6 +18,7 @@ public class SyncItemsSelectionScreen extends MainScreen
     PlaylistInfoList   playlistInfos;
 
     int result = Dialog.CANCEL;
+    boolean statusChanged = false;
 
     public SyncItemsSelectionScreen(PlaylistInfo[] choices, String title)
     {
@@ -50,7 +51,9 @@ public class SyncItemsSelectionScreen extends MainScreen
                 // Invalidate the modified row of the ListField.
                 invalidate(index);
 
-                setDirty(true);
+                // We can't just call setDirty(...) because it sometimes
+                // goes to the field and never gets to the Screen!
+                statusChanged();
 
                 return true;
             }
@@ -64,6 +67,16 @@ public class SyncItemsSelectionScreen extends MainScreen
 
         setTitle(keywordFilterField.getKeywordField());
         add(keywordFilterField);
+    }
+
+    public boolean onClose() {
+        setDirty(statusChanged);
+        return super.onClose();
+    }
+
+    public void statusChanged()
+    {
+        statusChanged = true;
     }
 
     public int getResult()

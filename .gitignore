@@ -1,4 +1,5 @@
-
+build/
+TestResults/
 bin/
 obj/
 deliverables/

@@ -1,0 +1,15 @@
+New Arch for Handling Playlists
+===============================
+
+**The Issue**: Using file names as playlist names fails in cases where
+               the playlist names include characters encoded in sets that
+               are not suported by the FAT file system, especially foreign
+               language scripts.
+
+**A Solution**: Use an internal list of objects to track synced playlists.
+                Maybe even just seralize `PlaylistInfo`.
+
+**Considerations**: File based sytem is elegant, so it'd be nice to handle
+                    cases where the playlist file is deleted or one is added
+                    to the file system by the user.
+

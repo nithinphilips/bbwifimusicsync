@@ -27,10 +27,10 @@ SetCompressor lzma
 
 ; These fields add properties to the generated installer exe.
 !ifndef PRODUCT_VERSION 
-    !define PRODUCT_VERSION "0.2.0.0"
-    VIProductVersion "0.2.0.0"
+    !define PRODUCT_VERSION "latest"
+    VIProductVersion "0.0.0.0"
 !else
-    VIProductVersion "${PRODUCT_VERSION}"
+    VIProductVersion "${PRODUCT_VERSION}.0"
 !endif
 
 VIAddVersionKey Comments "${PRODUCT_NAME} Installer"
@@ -165,7 +165,7 @@ SectionIn RO
         File "..\MusicSync.Server\bin\Release\log4net.dll"
         File "..\MusicSync.Server\bin\Release\log4net.xml"
         File "..\MusicSync.Server\bin\Release\MusicSync.Server.exe"
-        File "..\MusicSync.Server\bin\Release\music-sync-server.ico"
+        File "..\MusicSync.Server\music-sync-server.ico"
         File "..\MusicSync.Server\bin\Release\System.CoreEx.dll"
         File "..\MusicSync.Server\bin\Release\System.Observable.dll"
         File "..\MusicSync.Server\bin\Release\System.Reactive.dll"

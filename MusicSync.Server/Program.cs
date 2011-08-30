@@ -100,7 +100,7 @@ namespace WifiSyncServer
                                                              Application.Exit();
                                                          });
 
-            notifyIcon.Icon = new Icon("music-sync-server.ico");
+            notifyIcon.Icon = Resources.music_sync_server;
             notifyIcon.ContextMenu = new ContextMenu(new MenuItem[] { exitMenu });
             notifyIcon.Text = "Music Sync Server Running";
             notifyIcon.Visible = true;

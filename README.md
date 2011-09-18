@@ -1,4 +1,3 @@
-<!--!# { "pagewidth": "850px" } -->
 Wireless Music Sync for BlackBerry&reg;
 =======================================
 Wireless Music Sync for BlackBerry&reg; keeps the music on your BlackBerry&reg; devices

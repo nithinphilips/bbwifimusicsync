@@ -1,26 +1,13 @@
 Blackberry Client
 -----------------
- * A StatusBar with "1.1 GB Free. Syncing..."
- * A Toolbar(?) with the name of the current playlist
-   * OR: Dynamically create OS6 Group lists for each playlist and populate it.
-     >> 1. Start!
-     >> 2. Get all playlists
-     >> 3. Sync
-     >> 4. Generate Headers/Lists
-     >> 5. Send->Recieve->Populate->Sync-->Update
-     >> 6. Auto switch to active tab-->Do 5.
- * Inform user (non-modal) when all sync is completed (Statusbar: "1.1 GB Free. Sync Complete.")
-
-Blackberry iTunes Remote
-------------------------
- * Basic play/pause/fwd/rev/diplay media info.
- * Context menu integration (Play any synced mp3 media file)
- * Choose and play any playlists in iTunes.
+ * Sync newly created playlist on Device to Desktop.
+   * Must track renames or deletions on deskop.
+ * Monitor Disk space.
+   * For each download, check if enough space is available
+     at destination. If not, warn, then abort.
 
 Sync Server
 -----------
- * Make into a Windows Service
-   * Try to load playlist etc. in a different AppDomain(?) 
  * Support basic remote control of iTunes (Can we do that from a service?)
    * Play any specific songs available on the device (Via Context Menu)
    * Play any playlists (Choose from list)

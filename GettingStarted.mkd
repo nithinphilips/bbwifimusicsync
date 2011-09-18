@@ -1,0 +1,92 @@
+Wireless Music Sync for BlackBerry&reg;
+=======================================
+Wireless Music Sync for BlackBerry keeps the music on your BlackBerry devices
+in sync with your Desktop music library wirelessly. It presently works with
+iTunes on Windows as the music source.
+
+Wireless Music Sync for BlackBerry is still beta software is not suited for the
+faint of heart. It is however fully functional and can handle day to day use.
+If you have any comments, suggestions or issues contact the developer at
+[nithin@nithinphilips.com](mailto:nithin@nithinphilips.com)
+
+Getting Started
+---------------
+Before installing the Wireless Music Sync on your desktop, make sure you have
+[.NET Framework 4.0](http://msdn.microsoft.com/en-us/netframework/aa569263) and
+[iTunes](https://www.apple.com/itunes/) installed. You should also add some of the
+music you want to sync to iTunes.
+
+The first step to setting up music sync is to install the server application on
+your Windows PC. You can download the latest installer from the SourceForge project 
+website: https://sourceforge.net/projects/bbwifimusicsync/
+
+Once installed, the server application will start a webserver on port `9000` on your
+computer. You can access the server you can access the server via the URL
+http://localhost:9000/
+
+To access this page from your BlackBerry phone, you will need to identify the
+IP address of your computer. To do that, on Windows 7:
+
+ 1. Click on the **Start Menu**
+ 2. Open the **Control Panel**.
+ 3. Then navigate to the **Network and Internet** group. 
+ 4. Then, click on the **View network status and tasks** link. The **Network
+    and Sharing Center** will open.
+ 5. Under the *View your active networks* section, look for the link that says,
+    **Local Area Connection**, if you have wired network connection, or
+    **Wireless Network Connection**, if you have wireless network connection.
+    Click on it to open the Connection Status dialog.
+ 6. In the *Connection Status* dialog, click on the **Details...** button.
+ 7. Note the value next to the **IPv4 Address** property.
+
+From your BlackBerry browser, enter `http://<your-ipv4-address>:9000/`,
+replacing `<your-ipv4-address>` with your computer's IPv4 address.
+
+From the welcome page, follow the link to install the BlackBerry app. You may
+have to choose the version appropriate for your BlackBerry OS version.
+
+Once the BlackBerry app in installed, you can start it. It will ask you enter
+your computer's IP address and port. Enter the IP address from the earlier step
+(without the `http://` part) and for the port value, enter `9000`.
+
+Once the app is configured, you can choose the *Playlists*, *Albums* or
+*Artists* you would like to sync to you phone.  After making your selection,
+click on **Sync** from the menu to start syncing.
+
+Late on, you can simply click **Sync** to receive updated playlists from the
+computer.
+
+Using the Desktop Sync Application
+----------------------------------
+While you can sync your music entirely using the BlackBerry app, if you are
+transferring a large number of tracks, this process can take a prohibitively
+long time. The Desktop Sync application can help in those situations.
+
+ 1. Connect your BlackBerry to the computer.
+ 2. When your BlackBerry asks to choose the connection mode, choose *USB
+    Drive*.
+ 3. From the start menu, start **Wifi Music Sync Desktop Client**.
+ 4. From the *Where would you like to store your music?* dropdown, choose your
+    BlackBerry device. (*It will usually have BlackBerry somewhere in the
+    title*).
+ 5. The playlists you have already setup to have synced will be automatically
+    checked.  Make any additional selections (or deselections) and click on
+    **Sync**.
+ 6. You music will be copied to your phone.
+
+You can mix the Desktop and the BlackBerry sync applications anytime. They both
+follow the same procedures, and will not create any sync conflicts.
+
+One notable difference in the Desktop application is that it currently only
+syncs one way.  That is, the changes made on you phone playlists will not be
+transferred to iTunes.
+
+Additional Resources
+---------------------
+ * For Windows 7 users, there is a video instruction on how to [find your
+   computer's IP address (Windows
+   7)](http://windows.microsoft.com/en-US/windows7/Find-your-computers-IP-address)
+   at the Microsoft Website.
+ * Windows Vista users, see: [Find your computer's IP address (Windows
+   Vista)](http://windows.microsoft.com/en-US/windows-vista/Find-your-computers-IP-address)
+

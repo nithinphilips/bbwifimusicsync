@@ -2,9 +2,7 @@ Wireless Music Sync for BlackBerry&reg;
 =======================================
 Wireless Music Sync for BlackBerry&reg; keeps the music on your BlackBerry&reg; devices
 in sync with your Desktop music library wirelessly. It presently works with
-iTunes on Windows.  It's advantages over the RIM's Wireless Media Sync
-application is that it still works when the iTunes library contains a large
-number of songs.
+iTunes on Windows.
 
 Wireless Music Sync for BlackBerry&reg; has three components:
 
@@ -12,6 +10,10 @@ Wireless Music Sync for BlackBerry&reg; has three components:
  2. **Desktop Client**: For initial loading or large periodic transfers.
  3. **Client**: BlackBerry&reg; app. Lets you select Playlists, Albums or Artists to
     sync and Performs sync.
+
+If you are a new user, see [Getting
+Started](https://github.com/nithinphilips/bbwifimusicsync/blob/master/GettingStarted.mkd)
+for detailed installation instructions.
 
 ###Features
 
@@ -30,10 +32,13 @@ Wireless Music Sync for BlackBerry&reg; has three components:
 
 Using WiFi Music Sync
 ---------------------
-There are several ways to get started with Wireless Music Sync for BlackBerry&reg;. The recommended way
-is to initially load music on to your BlackBerry&reg; device using the **Desktop
-Client**.  You can then start the Wifi Sync application on your phone and the
-synced playlists will be kept updated.
+There are several ways to get started with Wireless Music Sync for
+BlackBerry&reg;. The recommended way is to initially load music on to your
+BlackBerry&reg; device using the **Desktop Client**.  You can then start the
+Wifi Sync application on your phone and the synced playlists will be kept
+updated. see [Getting
+Started](https://github.com/nithinphilips/bbwifimusicsync/blob/master/GettingStarted.mkd)
+for detailed installation instructions.
 
 ###Runtime Dependencies
 

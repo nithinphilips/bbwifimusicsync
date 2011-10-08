@@ -9,6 +9,7 @@ using System.Xml;
 using System.Xml.XPath;
 using System.Collections.Generic;
 using System.Diagnostics;
+using libMusicSync.Helpers;
 
 namespace libMusicSync.iTunesExport.Parser
 {
@@ -110,8 +111,7 @@ namespace libMusicSync.iTunesExport.Parser
         /// <returns>A string containing the path the default iTunes XML library location.</returns>
         public static string GetDefaultLibraryLocation()
         {
-            string mymusicDataPath = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
-            return Path.Combine(mymusicDataPath, "iTunes", "iTunes Music Library.xml");
+            return ConfigReader.GetiTunesLibraryPath();
         }
 
         #endregion

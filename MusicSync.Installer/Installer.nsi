@@ -132,6 +132,7 @@ ShowUnInstDetails hide
 Section "!MusicSync" SEC01
         !include "files_ADD.nsi"
 
+        SetOutPath "$INSTDIR"
         CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
         CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Desktop Client.lnk" "$INSTDIR\MusicSync.Desktop.exe"
         CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Server.lnk" "$INSTDIR\MusicSync.Server.exe"

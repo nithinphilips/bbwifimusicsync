@@ -73,5 +73,23 @@ namespace WifiSyncServer.Properties {
                 return ((System.Drawing.Icon)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &lt;!DOCTYPE html PUBLIC &quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot; &quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd&quot;&gt;
+        ///&lt;html xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xml:lang=&quot;en&quot; lang=&quot;en&quot;&gt;
+        ///&lt;head&gt;
+        ///    &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
+        ///    &lt;title&gt;${TITLE}&lt;/title&gt;
+        ///    &lt;style type=&quot;text/css&quot;&gt;
+        ///
+        ///            html,body { height: 100%; }
+        ///            #main {overflow:auto; padding-bottom: 100px;}  /* must be same height as the footer */
+        ///            #footer {position: relative; margin: auto; ma [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Skeleton {
+            get {
+                return ResourceManager.GetString("Skeleton", resourceCulture);
+            }
+        }
     }
 }

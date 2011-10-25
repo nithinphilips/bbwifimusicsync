@@ -75,29 +75,30 @@ namespace WifiSyncServer
         [Path("/help")]
         public IEnumerable<object> Help()
         {
-            yield return Response.Write(string.Format(@"<html>
-            <head>
-                <title>Wireless Music Sync for BlackBerry&reg;</title>                
-            </head>
-            <body>
-                <p>Congratulations. <a href='https://sourceforge.net/projects/bbwifimusicsync/'>Wireless Music Sync for BlackBerry&reg;</a> server is up and running.</p>
+            string content = string.Format(
+                @"<p>Congratulations. <a href='https://sourceforge.net/projects/bbwifimusicsync/'>Wireless Music Sync for BlackBerry&reg;</a> server is up and running.</p>
                 <p>You are running version {0}.</p>
-                <p>You can install the BlackBerry&reg; app <a href='/app'>here</a>.</p>
-            </body>", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version));
+                <p>You can install the BlackBerry&reg; app <a href='/app'>here</a>.</p>", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+
+            string skeleton = Resources.Skeleton;
+            skeleton = skeleton.Replace("${TITLE}", "Wireless Music Sync"); 
+            skeleton = skeleton.Replace("${CONTENT}", content);
+
+            yield return Response.Write(skeleton);
 
         }
 
         [Path("/app")]
         public IEnumerable<object> AppIndex()
         {
-            yield return Response.Write(string.Format(@"<html>
-            <head>
-                <title>Wireless Music Sync for BlackBerry&reg;</title>                
-            </head>
-            <body>
-                <p><a href='app/6.0.0/WifiMusicSync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 6</a>.</p>
-                <p><a href='app/5.0.0/WifiMusicSync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 5</a>.</p>
-            </body>"));
+            string content = @"<p><a href='app/6.0.0/WifiMusicSync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 6 &amp; 7</a>.</p>
+                <p><a href='app/5.0.0/WifiMusicSync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 5</a>.</p>";
+
+            string skeleton = Resources.Skeleton;
+            skeleton = skeleton.Replace("${TITLE}", "Wireless Music Sync");
+            skeleton = skeleton.Replace("${CONTENT}", content);
+
+            yield return Response.Write(skeleton);
         }
 
         [Path("/app/{version}/{filename}")]

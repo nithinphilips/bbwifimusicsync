@@ -1,8 +1,8 @@
 Notes On Building Wireless Music Sync for BlackBerry&reg; App
 =============================================================
-The App supports both BlackBerry OS 5 and 6.
+The App supports BlackBerry OS 5, 6 and 7.
 
-The app can be built using [BlackBerry Eclipse JDE 1.3](http://us.blackberry.com/developers/javaappdev/javaplugin.jsp)
+The app can be built using [BlackBerry Eclipse JDE 1.3](http://us.blackberry.com/developers/javaappdev/javaplugin.jsp) or newer.
 
 Recommended Settings
 --------------------
@@ -20,8 +20,11 @@ Changing Target JRE
 
 org.json.me Issues
 ------------------
-SDK 6.0.0 includes `org.json.me` package and the source files must be excuded
-from the build for the compiling to work.
+SDK 6.0.0 and above includes `org.json.me` package and the source files must be
+excuded from the build for the compiling to work.
+
+### For OS 7.0.0 Builds
+ * Currently there are no 7.0 specific features. Build against the 6.0.0 API instead.
 
 ### For OS 6.0.0 Builds
  1. Right click on **org.json.me** package in the Package Explorer.

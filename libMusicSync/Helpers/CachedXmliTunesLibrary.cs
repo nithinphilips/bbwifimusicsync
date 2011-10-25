@@ -25,7 +25,7 @@ namespace libMusicSync.Helpers
 {
     public class CachedXmliTunesLibrary
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(typeof(CachedXmliTunesLibrary).Name);
+        private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(typeof(CachedXmliTunesLibrary).Name);
 
         ObjectCache cache = MemoryCache.Default;
         const string CACHE_KEY = "XmliTunesLibrary";
@@ -54,26 +54,26 @@ namespace libMusicSync.Helpers
                 {
                     
                     // Only load libray if it has been modified.
-                    log.Info("Loading iTunes XML library from disk.");
+                    Log.Info("Loading iTunes XML library from disk.");
                     long aTick = DateTime.Now.Ticks;
                     library = new XmliTunesLibrary(libraryPath);
                     long bTick = DateTime.Now.Ticks;
 
                     CacheItemPolicy policy = new CacheItemPolicy();
-                    policy.SlidingExpiration = new TimeSpan(0, 5, 0); // Keep cache for 5 mins.
+                    policy.SlidingExpiration = new TimeSpan(0, 10, 0); // Keep cache for 10 mins.
                     policy.ChangeMonitors.Add(new HostFileChangeMonitor(new string[] { libraryPath }));
                     policy.RemovedCallback = delegate(CacheEntryRemovedArguments arg)
                                                  {
-                                                     log.InfoFormat("Evicted {0} from cache (Reason: {1})", arg.CacheItem.Key, arg.RemovedReason);
-                                                     GC.Collect(); // Iffy?
+                                                     Log.InfoFormat("Evicted {0} from cache (Reason: {1})", arg.CacheItem.Key, arg.RemovedReason);
+                                                     //GC.Collect(); // Iffy?
                                                  };
                     cache.Set(CACHE_KEY, library, policy);
 
-                    log.InfoFormat("Library loaded and cached in {0}ms", (int)new TimeSpan(bTick - aTick).TotalMilliseconds);
+                    Log.InfoFormat("Library loaded and cached in {0}ms", (int)new TimeSpan(bTick - aTick).TotalMilliseconds);
                 }
                 else
                 {
-                    log.Info("Using cached iTunes XML library");
+                    Log.Info("Using cached iTunes XML library");
                 }
 
                 return library;

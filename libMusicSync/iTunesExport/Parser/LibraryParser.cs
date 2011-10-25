@@ -10,6 +10,7 @@ using System.Xml.XPath;
 using System.Collections.Generic;
 using System.Diagnostics;
 using libMusicSync.Helpers;
+using log4net;
 
 namespace libMusicSync.iTunesExport.Parser
 {
@@ -18,6 +19,8 @@ namespace libMusicSync.iTunesExport.Parser
     /// </summary>
     public class LibraryParser
     {
+        private static readonly ILog Log = LogManager.GetLogger("LibMusicSync");
+
         private string _originalMusicFolder = null;
         private string _musicFolder = null;
         private Dictionary<int, ITrack> _tracks = null;
@@ -120,6 +123,8 @@ namespace libMusicSync.iTunesExport.Parser
 
         private void ParseLibrary( string fileLocation )
         {
+            Log.Info("Parsing library file: " + fileLocation);
+
             StreamReader stream = new StreamReader(fileLocation, System.Text.Encoding.GetEncoding("utf-8"));
             XmlTextReader xmlReader = new XmlTextReader(stream);
             xmlReader.XmlResolver = null;
@@ -155,6 +160,8 @@ namespace libMusicSync.iTunesExport.Parser
             // Can't move on if we don't know where the music is stored.
             if (_musicFolder == null)
                 throw new Exception("Unable to parse Music Library element from iTunes Music Library");
+
+            Log.Info("Using Music folder: " + _musicFolder);
 
             // This query gets us down to the point in the library that contains individual track details.
             nodeIterator = xPathNavigator.Select( "/plist/dict/dict/dict" );
@@ -200,7 +207,7 @@ namespace libMusicSync.iTunesExport.Parser
                     {
                         if (!int.TryParse(nodeIterator.Current.Value, out id))
                         {
-                            Debug.WriteLine("Error parsing integer value: " + nodeIterator.Current.Value);
+                            Log.Error("Error parsing integer value: " + nodeIterator.Current.Value);
                         }
                     }
                 }
@@ -235,7 +242,7 @@ namespace libMusicSync.iTunesExport.Parser
                     {
                         if (!int.TryParse(nodeIterator.Current.Value, out year))
                         {
-                            Debug.WriteLine("Error parsing integer value: " + nodeIterator.Current.Value);
+                            Log.Error("Error parsing integer value: " + nodeIterator.Current.Value);
                         }
                     }
                 }
@@ -245,7 +252,7 @@ namespace libMusicSync.iTunesExport.Parser
                     {
                         if (!int.TryParse(nodeIterator.Current.Value, out size))
                         {
-                            Debug.WriteLine("Error parsing integer value: " + nodeIterator.Current.Value);
+                            Log.Error("Error parsing integer value: " + nodeIterator.Current.Value);
                         }
                     }
                 }
@@ -255,7 +262,7 @@ namespace libMusicSync.iTunesExport.Parser
                     {
                         if (!int.TryParse(nodeIterator.Current.Value, out tracktime))
                         {
-                            Debug.WriteLine("Error parsing integer value: " + nodeIterator.Current.Value);
+                            Log.Error("Error parsing integer value: " + nodeIterator.Current.Value);
                         }
                     }
                 }
@@ -267,7 +274,8 @@ namespace libMusicSync.iTunesExport.Parser
                         inLibrary = location.IndexOf( _originalMusicFolder ) != -1;
                         if( inLibrary )
                         {
-                            location = location.Replace( _originalMusicFolder, String.Empty );
+                            // We are replacing the file://localhost/C:/Music/Folder with C:/Music/Folder
+                            location = location.Replace( _originalMusicFolder, _musicFolder );
                         }
                         else
                         {
@@ -332,7 +340,7 @@ namespace libMusicSync.iTunesExport.Parser
                         {
                             if (!int.TryParse(nodeIterator.Current.Value, out id))
                             {
-                                Debug.WriteLine("Error parsing integer value: " + nodeIterator.Current.Value);
+                                Log.Error("Error parsing integer value: " + nodeIterator.Current.Value);
                             }
                         }
                     }
@@ -356,7 +364,7 @@ namespace libMusicSync.iTunesExport.Parser
                         }
                         else
                         {
-                            Debug.WriteLine("Error parsing integer value: " + trackIterator.Current.Value);
+                            Log.Error("Error parsing integer value: " + trackIterator.Current.Value);
                         }
                     }
                 }

@@ -74,6 +74,7 @@ Credits
  * [Steven M. Cohn](http://www.codeproject.com/script/Membership/View.aspx?mid=225718) for
    [USBManager](http://www.codeproject.com/KB/cs/UsbManager.aspx). 
    Also check out [iTuner](https://ituner.codeplex.com/).
+ * [Twit88](http://twit88.com/) for [QRCodeLib](http://twit88.com/home/opensource/qrcode).
  * [Nir Dobovizki](http://www.nbdtech.com/) for 
    [WPF reflection control](http://www.nbdtech.com/Blog/archive/2007/11/21/WPF-Reflection-Control.aspx).
  * [Eric Daugherty](https://sourceforge.net/users/edaugherty) for 

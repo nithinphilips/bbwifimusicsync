@@ -8,6 +8,7 @@ deliverables/
 *_ReSharper*/
 *.suo
 *.user
+tags
 README.html
 GettingStarted.html
 MusicSync.Installer/*.exe

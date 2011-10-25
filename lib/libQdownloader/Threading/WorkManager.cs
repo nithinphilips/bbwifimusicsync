@@ -461,12 +461,12 @@ namespace LibQdownloader.Threading
                     {
                         while (jobs.Count == 0)
                         {
-                            Log.Debug("Queue empty. Monitoring activity.");
+                            Log.Debug("Queue empty. Idling.");
                             Monitor.Wait(syncLock); // wait for any work
                         }
                         job = jobs.Dequeue();
                         activeJobs.Add(job);
-                        Log.Debug("Pop! Starting work.");
+                        //Log.Debug("Pop! Starting work.");
                     }
 
                     // If we're paused, this will block.

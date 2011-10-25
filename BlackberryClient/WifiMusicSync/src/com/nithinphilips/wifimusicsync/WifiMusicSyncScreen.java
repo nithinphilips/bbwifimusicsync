@@ -479,6 +479,7 @@ public class WifiMusicSyncScreen extends MainScreen
                                                 final SyncResponse response = subscriber.updateSubscription();
 
                                                 ProgressDialog.closeProgress();
+                                                setStatusMessage("Cleaning up...");
 
                                                 if (response != null)
                                                 {
@@ -496,6 +497,7 @@ public class WifiMusicSyncScreen extends MainScreen
                                                     });
 
                                                     PlaylistDownloader.executeActions(actions);
+                                                    setStatusMessage("Done");
                                                 }
                                                 else
                                                 {

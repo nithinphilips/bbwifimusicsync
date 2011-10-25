@@ -53,6 +53,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Microsoft.CCI", "Microsoft.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "libQdownloader", "lib\libQdownloader\libQdownloader.csproj", "{6703AF3C-3731-4066-A180-7980810E32A7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MusicSync.Configurator", "MusicSync.Configurator\MusicSync.Configurator.csproj", "{60880B74-9C50-4F42-9969-8221A5C176CB}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = WifiMusicSync.vsmdi
@@ -816,6 +818,41 @@ Global
 		{6703AF3C-3731-4066-A180-7980810E32A7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{6703AF3C-3731-4066-A180-7980810E32A7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{6703AF3C-3731-4066-A180-7980810E32A7}.Release|x86.ActiveCfg = Release|Any CPU
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.CompilerOnly|Any CPU.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.CompilerOnly|Mixed Platforms.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.CompilerOnly|Mixed Platforms.Build.0 = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.CompilerOnly|x86.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.CompilerOnly|x86.Build.0 = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.Debug|x86.ActiveCfg = Debug|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.Debug|x86.Build.0 = Debug|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.FastpathSim|Any CPU.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.FastpathSim|Mixed Platforms.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.FastpathSim|Mixed Platforms.Build.0 = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.FastpathSim|x86.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.FastpathSim|x86.Build.0 = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NightlyDebug|Any CPU.ActiveCfg = Debug|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NightlyDebug|Mixed Platforms.ActiveCfg = Debug|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NightlyDebug|Mixed Platforms.Build.0 = Debug|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NightlyDebug|x86.ActiveCfg = Debug|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NightlyDebug|x86.Build.0 = Debug|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NightlyRelease|Any CPU.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NightlyRelease|Mixed Platforms.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NightlyRelease|Mixed Platforms.Build.0 = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NightlyRelease|x86.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NightlyRelease|x86.Build.0 = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NotifyPropertyChanged|Any CPU.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NotifyPropertyChanged|Mixed Platforms.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NotifyPropertyChanged|Mixed Platforms.Build.0 = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NotifyPropertyChanged|x86.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.NotifyPropertyChanged|x86.Build.0 = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.Release|Any CPU.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.Release|Mixed Platforms.Build.0 = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.Release|x86.ActiveCfg = Release|x86
+		{60880B74-9C50-4F42-9969-8221A5C176CB}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

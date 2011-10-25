@@ -1,0 +1,8 @@
+{
+    "DeviceId" : "afa720b413524f6f862904769f43c18d",
+    "PlaylistDevicePath" : "file:///SDCard/Blackberry/music/WiFiSync/Ar_The National.hpl",
+    "DeviceMediaRoot"    : "file:///SDCard/Blackberry/music/WiFiSync",
+    "PlaylistData"       : [
+        "file://file/to/remove.mp3"
+    ]
+}

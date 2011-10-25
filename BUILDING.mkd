@@ -1,0 +1,21 @@
+Building Wifi Music Sync
+========================
+
+You can use either Visual Studio or [Rake](http://rake.rubyforge.org/) with
+[Albacore](http://albacorebuild.net/) to build the project.  Ruby, which is
+required for Rake can be easily installed using
+[RubyInstaller](http://rubyinstaller.org/). Once Ruby is intalled, used the
+`gem` command to install Rake and Albacore.
+
+    gem install rake
+    gem install albacore
+
+For more information on Albacore, visit the [Albacore
+Wiki](https://github.com/derickbailey/Albacore/wiki/).
+
+Building the BlackBerry App
+---------------------------
+The BlackBerry app build process has not yet been integrated into the Rake
+based build system, so you have to use Eclipse and BlackBerry JDK to build it.
+
+[Steps to build the BlackBerry App](https://github.com/nithinphilips/bbwifimusicsync/blob/master/BlackberryClient/WifiMusicSync/README.md)

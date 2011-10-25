@@ -46,7 +46,7 @@ To run the server application you need:
 
  * Windows XP or higher.
  * [.NET FX 4.0](http://msdn.microsoft.com/en-us/netframework/aa569263)
- * [iTunes](https://www.apple.com/itunes/)
+ * [iTunes](https://www.apple.com/itunes/) (Optional)
 
 ###Build Dependencies
 
@@ -84,6 +84,9 @@ Credits
    [Faenza](https://tiheum.deviantart.com/art/Faenza-Icons-173323228),
    [Elementary](https://launchpad.net/elementaryicons) or
    [Ultimate-Gnome](https://code.google.com/p/ultimate-gnome/) icon themes.
+
+ * Thanks to Brian Gold for testing the use of iTunes libraries stored on
+   network shares.
 
 License
 -------

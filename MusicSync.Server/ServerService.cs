@@ -395,7 +395,7 @@ namespace WifiSyncServer
                 // changes that were made on the DESKTOP. Apply to DEVICE.
                 IEnumerable<SyncAction> changesOnDesktop = DiffHandler.Diff(desktopPlaylist, devicePlaylist);
 
-                // Make sure we don't delete any tracks still present by other playlists.
+                // Make sure we don't delete any tracks still present in other playlists.
                 if (subManager != null)
                     changesOnDesktop = subManager.FixProposedDeletes(library, changesOnDesktop);
 
@@ -406,9 +406,9 @@ namespace WifiSyncServer
                 string playlistRefPath = DataManager.GetReferencePlaylistPath(playlistPath);
                 string pendingChangesPath = DataManager.GetChangeSetCollectionPath(playlistPath);
 
+#if ENABLE_SYNC_TO_ITUNES
                 if (File.Exists(playlistRefPath) && !Helper.IsAlbumOrArtistPlaylist(playlistName))
                 {
-
                     // load any pending changes
                     ChangeSetCollection pendingChanges = ChangeSetCollection.DeserializeOrCreate(pendingChangesPath);
 
@@ -437,6 +437,7 @@ namespace WifiSyncServer
 
                     if(!currentChangeSet.IsEmpty)
                         pendingChanges.Add(currentChangeSet);
+
 
                     if (ComiTunesLibrary.IsItunesRunning())
                     {
@@ -472,8 +473,9 @@ namespace WifiSyncServer
                         pendingChanges.Clear();
                     }else
                     {
+                        
                         if(!currentChangeSet.IsEmpty)
-                            ApplyChangeSet(request.DeviceMediaRoot, currentChangeSet, reconciledPlaylist);
+                            ApplyChangeSet(request.DeviceMediaRoot, currentChangeSet, reconciledPlaylist);  
                     }
 
                     ChangeSetCollection.Serialize(pendingChanges, pendingChangesPath);
@@ -481,12 +483,16 @@ namespace WifiSyncServer
                 }
                 else
                 {
-                    reconciledPlaylist = desktopPlaylist;
-                }
+#endif
 
-               
-               
-                foreach (var change in changesOnDesktop)
+                    reconciledPlaylist = desktopPlaylist;
+
+#if ENABLE_SYNC_TO_ITUNES
+                }
+#endif
+
+
+                    foreach (var change in changesOnDesktop)
                 {
                     if (change.Type != SyncType.Add) continue;
 

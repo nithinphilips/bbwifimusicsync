@@ -126,7 +126,7 @@ namespace WifiSyncServer
             Log.Info("All this has happened before, and all this will happen again.");
         }
 
-        static string GetAccessUrl()
+        public static string GetAccessUrl()
         {
             return string.Format("http://{0}:{1}", GetIP(), Settings.Default.Port);
         }

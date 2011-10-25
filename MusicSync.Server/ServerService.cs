@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using iTunesLib;
 using Kayak;
 using Kayak.Framework;
@@ -43,7 +44,9 @@ namespace WifiSyncServer
         private static readonly ILog Log = LogManager.GetLogger("MusicSync.Server");
         static readonly Dictionary<string, string> SongDb = new Dictionary<string, string>();
         static readonly Dictionary<string, string> PlaylistDb = new Dictionary<string, string>();
+        static readonly Dictionary<int, string> QrCodeDb = new Dictionary<int, string>();
         static readonly CachedXmliTunesLibrary CachedXmlLibrary = new CachedXmliTunesLibrary();
+
 
         private static readonly Dictionary<string, string> mimeTypes = new Dictionary<string, string>();
 
@@ -52,11 +55,29 @@ namespace WifiSyncServer
             mimeTypes.Add(".jad", "text/vnd.sun.j2me.app-descriptor");
             mimeTypes.Add(".cod", "application/vnd.rim.cod");
             mimeTypes.Add(".jar", "application/java-archive");
+
+            QrCodeDb.Add(1, Program.GetAccessUrl() + "/app");
+        }
+
+        [Path("/qr/{index}")]
+        public FileInfo GetFavIcon(int index)
+        {
+            Response.Headers.Add("Content-Type", "image/png");
+
+            string data = "";
+            if(QrCodeDb.ContainsKey(index))
+            {
+                data = QrCodeDb[index];
+            }
+
+            return QRCodeHelper.GetQRImageFile(data);
         }
 
         [Path("/favicon.ico")]
         public FileInfo GetFavIcon()
         {
+            Response.Headers.Add("Content-Type", "image/vnd.microsoft.icon");   
+
             string faviconFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                                               "Music Sync", "Resources", "favicon.ico");
             if(!File.Exists(faviconFile))
@@ -77,12 +98,25 @@ namespace WifiSyncServer
         {
             string content = string.Format(
                 @"<p>Congratulations. <a href='https://sourceforge.net/projects/bbwifimusicsync/'>Wireless Music Sync for BlackBerry&reg;</a> server is up and running.</p>
-                <p>You are running version {0}.</p>
-                <p>You can install the BlackBerry&reg; app <a href='/app'>here</a>.</p>", System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                <p>To install the Wireless Music Sync BlackBerry&reg; app, <a href='/app' title='Install the BlackBerry app'>follow this link</a> or scan the <a href='http://en.wikipedia.org/wiki/QR_code'>QRCode</a>:</p>
+                <a href='/app'><img style='padding: 20px; border: 1px solid #ccc' src='/qr/{0}' title='{1}' alt='{1}'/></a>
+                <p>To scan, open <a href='http://us.blackberry.com/apps-software/appworld/download.jsp'>BlackBerry App World</a> on your phone and from the menu, choose <em>Scan a Barcode.</em></p>
+                <p>To learn more about Wireless Music Sync, have a look at the <a href='https://github.com/nithinphilips/bbwifimusicsync/blob/master/README.md'>README</a> file. 
+                   If you need more help, <a href='https://github.com/nithinphilips/bbwifimusicsync/blob/master/GettingStarted.mkd'>detailed instructions</a> are also available.</p>
+                <h3>Additional Links</h3>
+                <ul>
+                    <li>Found a problem? <a href='http://sourceforge.net/tracker/?func=add&group_id=402939&atid=1669971'>File a bug report.</a></li>
+                    <li>Need something to do? <a href='http://sourceforge.net/projects/bbwifimusicsync/files/'>Check if a new version is available.</a></li>
+                    <li>Would you like some freedom with your software? <a href='http://www.gnu.org/licenses/gpl.html'>Read the GNU GPL v3 license agreement.</a></li>
+                    <li>And of course, you can always <a href='https://github.com/nithinphilips/bbwifimusicsync'>look under the hood.</a></li>
+                </ul>", 
+                "1", QrCodeDb[1]);
 
             string skeleton = Resources.Skeleton;
-            skeleton = skeleton.Replace("${TITLE}", "Wireless Music Sync"); 
+            skeleton = skeleton.Replace("${TITLE}", "Wireless Music Sync");
             skeleton = skeleton.Replace("${CONTENT}", content);
+            skeleton = skeleton.Replace("${VERSION}",
+                                        System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
             yield return Response.Write(skeleton);
 
@@ -91,12 +125,14 @@ namespace WifiSyncServer
         [Path("/app")]
         public IEnumerable<object> AppIndex()
         {
-            string content = @"<p><a href='app/6.0.0/WifiMusicSync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 6 &amp; 7</a>.</p>
+            string content = @"<p><a href='app/6.0.0/WifiMusicSync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 6 or 7</a>.</p>
                 <p><a href='app/5.0.0/WifiMusicSync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 5</a>.</p>";
 
             string skeleton = Resources.Skeleton;
             skeleton = skeleton.Replace("${TITLE}", "Wireless Music Sync");
             skeleton = skeleton.Replace("${CONTENT}", content);
+            skeleton = skeleton.Replace("${VERSION}",
+                                        System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
             yield return Response.Write(skeleton);
         }

@@ -76,6 +76,7 @@
     <Compile Include="Helpers\DataManager.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Helpers\IITTrackEnumerator.cs" />
+    <Compile Include="Helpers\QRCodeHelper.cs" />
     <Compile Include="iTunes\ComiTunesLibrary.cs" />
     <Compile Include="Model\ChangeSet.cs" />
     <Compile Include="Model\ChangeSetCollection.cs" />
@@ -122,6 +123,10 @@
     <ProjectReference Include="..\lib\Kayak\Kayak\Kayak.csproj">
       <Project>{79DDD0CE-6F79-4212-A972-8618AD6E405F}</Project>
       <Name>Kayak %28Kayak\Kayak%29</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\lib\QRCode\QRCodeLib\QRCodeLib.csproj">
+      <Project>{E98126B2-AF17-4783-96B9-856D6744DCA3}</Project>
+      <Name>QRCodeLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 PRODUCT       = "bbwifimusicsync"
 PRODUCT_LONG  = "Wireless Music Sync"
 DESCRIPTION   = ""
-VERSION       = "0.2.0"                 # We omit the build segment of the version number.
+VERSION       = "0.3.0"                 # We omit the build segment of the version number.
 AUTHORS       = "Nithin Philips"
 COPYRIGHT     = "(c) 2011 #{AUTHORS}"
 PROJECT_URL   = "https://sourceforge.net/projects/bbwifimusicsync/"
@@ -128,7 +128,7 @@ task :clean do
         FileUtils.rm_rf BUILD_DIR
 end
 
-task :assemblyinfo => [:libasminfo, :testsasminfo, :serverasminfo, :desktopasminfo]
+task :assemblyinfo => [:libasminfo, :testsasminfo, :serverasminfo, :desktopasminfo, :configuratorasminfo]
 
 assemblyinfo :libasminfo => :clean do |a|
         a.title        = "libMusicSync"
@@ -176,6 +176,20 @@ assemblyinfo :desktopasminfo => :clean do |a|
         a.title        = "MusicSync.Desktop"
         a.description  = "A desktop client for syncing music to BlackBerry phones"
         a.output_file  = "MusicSync.Server/Properties/AssemblyInfo.cs"
+
+        a.product_name = PRODUCT_LONG
+        a.version      = VERSION
+        a.file_version = VERSION
+        a.copyright    = COPYRIGHT
+        a.company_name = AUTHORS
+        a.trademark    = TRADEMARKS
+        a.namespaces "System.Runtime.CompilerServices"
+end
+
+assemblyinfo :configuratorasminfo => :clean do |a|
+        a.title        = "MusicSync.Configurator"
+        a.description  = "A tool to configure Wireless Music Sync"
+        a.output_file  = "MusicSync.Configurator/Properties/AssemblyInfo.cs"
 
         a.product_name = PRODUCT_LONG
         a.version      = VERSION

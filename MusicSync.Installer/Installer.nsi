@@ -152,6 +152,7 @@ FunctionEnd
 Section Uninstall
         ReadRegStr $ICONS_GROUP ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "${PRODUCT_STARTMENU_REGVAL}"
 
+        Delete "$INSTDIR\uninst.exe"
         !include "files_REM.nsi"
 
         Delete "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Desktop Client.lnk"

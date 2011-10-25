@@ -1,15 +1,16 @@
 ﻿<Window x:Class="MusicSync.Configurator.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:Utilities="clr-namespace:WifiSyncDesktop.Utilities" Title="El Configurator" Height="193" Width="542">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:Utilities="clr-namespace:WifiSyncDesktop.Utilities" Title="El Configurator" Height="193" Width="542" WindowStartupLocation="CenterScreen" Icon="music-sync-configurator.ico">
     <Window.CommandBindings>
         <CommandBinding Command="Save" CanExecute="CommandBinding_CanExecute" Executed="CommandBinding_Executed" />
+        <CommandBinding Command="Close" CanExecute="Close_CanExecute" Executed="Close_Executed" />
     </Window.CommandBindings>
     <DockPanel LastChildFill="True">
         <!-- Title Block -->
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
             <StackPanel.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#FF9AA0AE" Offset="0" />
+                    <GradientStop Color="#FFB22E2F" Offset="0" />
                     <GradientStop Color="#FF000000" Offset="1" />
                 </LinearGradientBrush>
             </StackPanel.Background>
@@ -19,7 +20,8 @@
             </Utilities:ReflectionControl>
         </StackPanel>
 
-        <StackPanel Margin="0,0,5,5" DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Margin="0,5,5,10" DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Margin="0,0,5,0" Padding="20,2" Command="Close">Discard</Button>
             <Button Padding="20,2" Command="Save">Save</Button>
         </StackPanel>
 
@@ -27,6 +29,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -40,6 +43,7 @@
 
             <Label Margin="5" Grid.Row="1" Grid.Column="0" HorizontalContentAlignment="Right">iTunes Library Path:</Label>
             <TextBox Margin="5" Grid.Row="1" Grid.Column="1" Text="{Binding Path=iTunesLibraryPath}" />
+            <Button Margin="5"  Grid.Row="1" Grid.Column="2" Width="25px" Click="Button_Click">...</Button>
 
             <!--<CheckBox Margin="5" Grid.Row="2" Grid.ColumnSpan="2" IsChecked="{Binding Path=OneWaySync}">Server->Device Sync Only</CheckBox>
 

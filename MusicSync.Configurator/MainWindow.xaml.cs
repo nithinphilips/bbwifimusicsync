@@ -40,5 +40,36 @@ namespace MusicSync.Configurator
             settings.Save();
             Application.Current.Shutdown(0);
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            // Configure open file dialog box
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.Title = "Choose an iTunes Library";
+            dlg.FileName = "iTunes Music Library.xml"; // Default file name
+            dlg.DefaultExt = ".xml"; // Default file extension
+            dlg.Filter = "iTunes XML Library (.xml)|*.xml"; // Filter files by extension
+
+            // Show open file dialog box
+            Nullable<bool> result = dlg.ShowDialog();
+
+            // Process open file dialog box results
+            if (result == true)
+            {
+                // Open document
+                settings.iTunesLibraryPath = dlg.FileName;
+            }
+
+        }
+
+        private void Close_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = true;
+        }
+
+        private void Close_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            App.Current.Shutdown(0);
+        }
     }
 }

@@ -22,7 +22,6 @@
 !define SHCNE_ASSOCCHANGED 0x08000000
 !define SHCNF_FLUSH        0x1000
 
-
 SetCompressor lzma
 
 ; These fields add properties to the generated installer exe.
@@ -39,7 +38,7 @@ VIAddVersionKey PrivateBuild "No"
 VIAddVersionKey ProductName "${PRODUCT_NAME}"
 VIAddVersionKey ProductVersion "${PRODUCT_VERSION}"
 VIAddVersionKey CompanyName "${PRODUCT_PUBLISHER}"
-VIAddVersionKey LegalCopyright "© 2010 ${PRODUCT_PUBLISHER}"
+VIAddVersionKey LegalCopyright "(C) 2011 ${PRODUCT_PUBLISHER}"
 VIAddVersionKey FileVersion "${PRODUCT_VERSION}"
 VIAddVersionKey LegalTrademarks "All Rights Reserved"
 VIAddVersionKey FileDescription "Installer for ${PRODUCT_NAME}"
@@ -64,7 +63,6 @@ VIAddVersionKey FileDescription "Installer for ${PRODUCT_NAME}"
 ;-----------------------------------------------------------------------
 ; MUI Settings
 ;-----------------------------------------------------------------------
-!define MUI_ABORTWARNING
 !define MUI_COMPONENTSPAGE_SMALLDESC
 
 ;--------------------------------
@@ -81,8 +79,6 @@ VIAddVersionKey FileDescription "Installer for ${PRODUCT_NAME}"
 !insertmacro MUI_PAGE_LICENSE $(myLicenseData)
 ; Directory page
 !insertmacro MUI_PAGE_DIRECTORY
-; Components page
-!insertmacro MUI_PAGE_COMPONENTS
 ; Start menu page
 var ICONS_GROUP
 !define MUI_STARTMENUPAGE_NODISABLE
@@ -133,126 +129,33 @@ InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails hide
 ShowUnInstDetails hide
 
-Section "!Desktop Client" SEC01
-SectionIn RO
-
-        SetOutPath "$INSTDIR"
-        SetOverwrite ifnewer
-        File "..\README.md"
-        File "..\COPYING.txt"
-
-        SetOutPath "$INSTDIR\MusicSync.Desktop"
-        SetOverwrite ifnewer
-        File "..\MusicSync.Desktop\bin\Release\Afterthought.dll"
-        File "..\MusicSync.Desktop\bin\Release\libMusicSync.dll"
-        File "..\MusicSync.Desktop\bin\Release\libQdownloader.dll"
-        File "..\MusicSync.Desktop\bin\Release\log4net.dll"
-        File "..\MusicSync.Desktop\bin\Release\MusicSync.Desktop.exe"
-        File "..\MusicSync.Desktop\bin\Release\NotifyPropertyChanged.dll"
+Section "!MusicSync" SEC01
+        !include "files_ADD.nsi"
 
         CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
-        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Desktop Client.lnk" "$INSTDIR\MusicSync.Desktop\MusicSync.Desktop.exe"
-SectionEnd
-
-Section "!Server" SEC02
-SectionIn RO
-
-        SetOutPath "$INSTDIR\MusicSync.Server"
-        SetOverwrite ifnewer
-        File "..\MusicSync.Server\bin\Release\Kayak.dll"
-        File "..\MusicSync.Server\bin\Release\Kayak.Framework.dll"
-        File "..\MusicSync.Server\bin\Release\libMusicSync.dll"
-        File "..\MusicSync.Server\bin\Release\log4net.dll"
-        File "..\MusicSync.Server\bin\Release\log4net.xml"
-        File "..\MusicSync.Server\bin\Release\MusicSync.Server.exe"
-        File "..\MusicSync.Server\music-sync-server.ico"
-        File "..\MusicSync.Server\bin\Release\System.CoreEx.dll"
-        File "..\MusicSync.Server\bin\Release\System.Observable.dll"
-        File "..\MusicSync.Server\bin\Release\System.Reactive.dll"
-        File "..\MusicSync.Server\bin\Release\System.Threading.dll"
-
-        CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
+        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Desktop Client.lnk" "$INSTDIR\MusicSync.Desktop.exe"
+        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Server.lnk" "$INSTDIR\MusicSync.Server.exe"
         CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Install Wifi Music Sync App OTA.lnk" "http://localhost:9000/app"
-        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Server.lnk" "$INSTDIR\MusicSync.Server\MusicSync.Server.exe"
-
-        SetOutPath "$INSTDIR\MusicSync.Server\app\5.0.0"
-        SetOverwrite ifnewer
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.cod"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.csl"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.cso"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.debug"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.jad"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.jar"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync.rapc"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync-1.cod"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\5.0.0\WifiMusicSync-1.debug"
-
-        SetOutPath "$INSTDIR\MusicSync.Server\app\6.0.0"
-        SetOverwrite ifnewer
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.cod"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.csl"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.cso"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.debug"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.jad"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.jar"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync.rapc"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync-1.cod"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Web\6.0.0\WifiMusicSync-1.debug"
-
 SectionEnd
 
-Section "!BlackBerry App" SEC03
-SectionIn RO
-
-        SetOutPath "$INSTDIR\MusicSync.BlackBerryApp"
-        SetOverwrite ifnewer
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\WifiMusicSync.alx"
-
-        SetOutPath "$INSTDIR\MusicSync.BlackBerryApp\5.0.0"
-        SetOverwrite ifnewer
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.cod"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.csl"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.cso"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.debug"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.jad"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.jar"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync.rapc"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\5.0.0\WifiMusicSync-1.debug"
-
-        SetOutPath "$INSTDIR\MusicSync.BlackBerryApp\6.0.0"
-        SetOverwrite ifnewer
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.cod"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.csl"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.cso"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.debug"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.jad"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.jar"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync.rapc"
-        File "..\BlackberryClient\WifiMusicSync\deliverables\Standard\6.0.0\WifiMusicSync-1.debug"
-
+Section -AdditionalIcons
+  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Visit Website.lnk" "${PRODUCT_WEB_SITE}"
+  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
-
-;Assign descriptions to sections
-  !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-    !insertmacro MUI_DESCRIPTION_TEXT ${SEC01} "Desktop Client."
-    !insertmacro MUI_DESCRIPTION_TEXT ${SEC02} "Server"
-    !insertmacro MUI_DESCRIPTION_TEXT ${SEC03} "BlackBerry app for installation via Desktop Manager"
-  !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 Function LaunchLink
-  SetOutPath "$INSTDIR\MusicSync.Server"
-  Exec '"$INSTDIR\MusicSync.Server\${PRODUCT_EXECUTABLE}"'
+  SetOutPath "$INSTDIR"
+  Exec '"$INSTDIR\${PRODUCT_EXECUTABLE}"'
 FunctionEnd
 
 Section Uninstall
         ReadRegStr $ICONS_GROUP ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "${PRODUCT_STARTMENU_REGVAL}"
 
-        RMDir /r "$INSTDIR"
+        !include "files_REM.nsi"
 
         Delete "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Desktop Client.lnk"
-        Delete "$SMPROGRAMS\$ICONS_GROUP\Install Wifi Music Sync App OTA.lnk"
         Delete "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Server.lnk"
-
+        Delete "$SMPROGRAMS\$ICONS_GROUP\Install Wifi Music Sync App OTA.lnk"
         Delete "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"
         Delete "$SMPROGRAMS\$ICONS_GROUP\Visit Website.lnk"
 
@@ -262,11 +165,6 @@ Section Uninstall
         DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
 
         SetAutoClose true
-SectionEnd
-
-Section -AdditionalIcons
-  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Visit Website.lnk" "${PRODUCT_WEB_SITE}"
-  CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
 
 Section -Post

@@ -24,6 +24,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using log4net;
 using WifiSyncDesktop.Helpers;
 using WifiSyncDesktop.Model;
 using LibQdownloader.Utilities;
@@ -37,6 +38,8 @@ namespace WifiSyncDesktop.Windows
     /// </summary>
     public partial class MainWindow : Window
     {
+        private static readonly ILog Log = LogManager.GetLogger("WifiMusicSync.Desktop");
+
         SyncSettings viewModelSync = new SyncSettings();
         CopyProgressModel viewModelCopy = new CopyProgressModel();
         private FileOperationManager _operationMan;
@@ -47,15 +50,18 @@ namespace WifiSyncDesktop.Windows
         public MainWindow()
         {
             InitializeComponent();
-
+            Log.Info("UI initialized.");
             Current = 0;
 
             _operationMan = new FileOperationManager();
+            Log.Info("File Operation Manager initialized.");
 
             Parallel.Invoke(() =>
             {
                 viewModelSync.LoadPlaylists();
+                Log.Info("Playlists loaded.");
                 viewModelSync.LoadDrives();
+                Log.Info("Drives loaded. " + viewModelSync.Drives.Count + " drives found.");
             });
             
 
@@ -139,6 +145,7 @@ namespace WifiSyncDesktop.Windows
         void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             _operationMan.Dispose();
+            Log.Info("All this has happened before, and all this will happen again.");
         }
 
         void copyMan_WorkCompleted(object sender, EventArgs e)

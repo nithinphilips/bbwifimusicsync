@@ -29,6 +29,7 @@ using libMusicSync.Extensions;
 using libMusicSync.Helpers;
 using libMusicSync.iTunesExport.Parser;
 using LibQdownloader.Utilities;
+using log4net;
 using WifiSyncDesktop.Helpers;
 using NotifyPropertyChanged;
 
@@ -37,6 +38,8 @@ namespace WifiSyncDesktop.Model
     [NotifyPropertyChanged]
     public class SyncSettings : INotifyPropertyChangedAmendment
     {
+        private static readonly ILog Log = LogManager.GetLogger("WifiMusicSync.Desktop");
+
         UsbManager man = new UsbManager();
 
         public void LoadDrives()
@@ -69,6 +72,12 @@ namespace WifiSyncDesktop.Model
 
         void man_StateChanged(UsbStateChangedEventArgs e)
         {
+            if(e.Disk != null)
+                Log.Info("USB State Changed: " + e.State + ", " + e.Disk.Name);
+            else
+                Log.Info("USB State Changed: " + e.State);
+            
+
             switch (e.State)
             {
                 case UsbStateChange.Added:
@@ -172,7 +181,7 @@ namespace WifiSyncDesktop.Model
             }
             else
             {
-                Console.WriteLine("Filtering to: {0}", FilterText);
+                Log.Debug("Filtering to: " + FilterText);
                 ((ListCollectionView) CollectionViewSource.GetDefaultView(this.Artists)).Filter = TextFilterPredicate;
                 ((ListCollectionView) CollectionViewSource.GetDefaultView(this.Albums)).Filter = TextFilterPredicate;
                 ((ListCollectionView) CollectionViewSource.GetDefaultView(this.Playlists)).Filter = TextFilterPredicate;

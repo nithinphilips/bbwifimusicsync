@@ -19,6 +19,7 @@
 
 using System.IO;
 using System.Windows;
+using log4net;
 using log4net.Config;
 
 namespace WifiSyncDesktop
@@ -28,16 +29,19 @@ namespace WifiSyncDesktop
     /// </summary>
     public partial class App : Application
     {
+        private static readonly ILog Log = LogManager.GetLogger("WifiMusicSync.Desktop");
+
         public App()
         {
-            XmlConfigurator.Configure(new FileInfo("log.config"));
+            XmlConfigurator.Configure(new FileInfo("desktop.log.config"));
 
-            Application.Current.DispatcherUnhandledException += new System.Windows.Threading.DispatcherUnhandledExceptionEventHandler(Current_DispatcherUnhandledException);
+            Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
         }
 
         void Current_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            throw e.Exception;
+            Log.Error("An unhandled exception", e.Exception);
+            Log.Info("All this has happened before, and all this will happen again.");
         }
     }
 }

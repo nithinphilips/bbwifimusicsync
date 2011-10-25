@@ -35,23 +35,38 @@ namespace WifiSyncDesktop.Threading
 
         protected override bool DoWork(FileOperation job)
         {
+            bool result = false;
+
             if (job.OperationType == FileOperationType.Copy)
             {
                 FileCopier worker = new FileCopier();
                 base.AddActiveWorker(worker);
-                worker.Work(job);
+                try
+                {
+                    worker.Work(job);
+                    result = true;
+                }catch(Exception ex)
+                {
+                    log.Error("Job failed: " + job, ex);
+                }
                 base.RemoveActiveWorker(worker);
-                return true;
             }else if(job.OperationType == FileOperationType.Delete)
             {
                 FileDeleter worker = new FileDeleter();
                 base.AddActiveWorker(worker);
-                worker.Work(job);
+                try
+                {
+                    worker.Work(job);
+                    result = true;
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Job failed: " + job, ex);
+                }
                 base.RemoveActiveWorker(worker);
-                return true;
             }
 
-            return false;
+            return result;
         }
 
         void worker_JobProgress(object sender, FileOperationEventArgs e)

@@ -63,7 +63,7 @@ namespace WifiSyncDesktop.Helpers
 
                 if (File.Exists(targetPath)) continue; // Don't do unnecessary work.
 
-                Log.DebugFormat("Creating COPY operation: {0} to {1}", item.Location, targetPath);
+                Log.DebugFormat("Preparing COPY operation: {0} to {1}", item.Location, targetPath);
                 yield return new FileOperation
                 {
                     OperationType = FileOperationType.Copy,
@@ -78,7 +78,7 @@ namespace WifiSyncDesktop.Helpers
 
             foreach (string garbageTrack in existingTracks)
             {
-                Log.DebugFormat("Creating DELETE operation: {0}", garbageTrack);
+                Log.DebugFormat("Preparing DELETE operation: {0}", garbageTrack);
                 yield return new FileOperation
                 {
                     OperationType = FileOperationType.Delete,
@@ -94,9 +94,6 @@ namespace WifiSyncDesktop.Helpers
         public static void CheckExistingPlaylists(this SyncSettings s)
         {
             if (string.IsNullOrWhiteSpace(s.SyncPath) || !Directory.Exists(s.SyncPath)) return;
-
-
-
 
             var existingPlaylistNames =
                 from f in Utilities.Utility.GetFiles(s.SyncPath, SearchOption.TopDirectoryOnly, "*.m3u", "*.hpl")
@@ -147,8 +144,9 @@ namespace WifiSyncDesktop.Helpers
                 foreach (var track in item.Playlist.Tracks)
                 {
                     playlist.Add(track.GetPlaylistLine(tRoot));
-                    //Console.WriteLine(track.GetPlaylistLine(root, ));
                 }
+
+                Log.Info("Writing playlist file: " + playlistPath);
                 Helper.SavePlaylist(playlist, playlistPath);
             }
         }

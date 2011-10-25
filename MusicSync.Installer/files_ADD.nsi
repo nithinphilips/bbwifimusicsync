@@ -32,6 +32,7 @@ File "..\build\bin\bbwifimusicsync-0.2.0\System.CoreEx.dll"
 File "..\build\bin\bbwifimusicsync-0.2.0\System.Observable.dll"
 File "..\build\bin\bbwifimusicsync-0.2.0\System.Reactive.dll"
 File "..\build\bin\bbwifimusicsync-0.2.0\System.Threading.dll"
+File "..\build\bin\bbwifimusicsync-0.2.0\ThoughtWorks.QRCode.dll"
 
 SetOutPath "$INSTDIR\app"
 SetOverwrite ifnewer

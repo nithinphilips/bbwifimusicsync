@@ -135,7 +135,8 @@ Section "!MusicSync" SEC01
         CreateDirectory "$SMPROGRAMS\$ICONS_GROUP"
         CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Desktop Client.lnk" "$INSTDIR\MusicSync.Desktop.exe"
         CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Server.lnk" "$INSTDIR\MusicSync.Server.exe"
-        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Install Wifi Music Sync App OTA.lnk" "http://localhost:9000/app"
+        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Configurator.lnk" "$INSTDIR\MusicSync.Configurator.exe"
+        CreateShortCut "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Server Control Panel.lnk" "http://localhost:9000/"
 SectionEnd
 
 Section -AdditionalIcons
@@ -155,9 +156,10 @@ Section Uninstall
 
         Delete "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Desktop Client.lnk"
         Delete "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Server.lnk"
-        Delete "$SMPROGRAMS\$ICONS_GROUP\Install Wifi Music Sync App OTA.lnk"
-        Delete "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"
+        Delete "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Configurator.lnk"
+        Delete "$SMPROGRAMS\$ICONS_GROUP\Wifi Music Sync - Server Control Panel.lnk"
         Delete "$SMPROGRAMS\$ICONS_GROUP\Visit Website.lnk"
+        Delete "$SMPROGRAMS\$ICONS_GROUP\Uninstall.lnk"
 
         RMDir "$SMPROGRAMS\$ICONS_GROUP"
 

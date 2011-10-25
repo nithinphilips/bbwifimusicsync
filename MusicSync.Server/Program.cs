@@ -19,7 +19,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
+using System.Net;
+using System.Net.Sockets;
 using System.Windows.Forms;
 using System.IO;
 using Kayak.Framework;
@@ -34,7 +37,7 @@ namespace WifiSyncServer
 {
     public sealed class Program
     {
-        private static readonly ILog log = LogManager.GetLogger("WifiSyncServer");
+        private static readonly ILog Log = LogManager.GetLogger("MusicSync.Server");
 
         static void Main(string[] args)
         {
@@ -81,7 +84,10 @@ namespace WifiSyncServer
              * 11. Hopefully music player will auto update.
              */
 
-            XmlConfigurator.Configure(new FileInfo("log.config"));
+            XmlConfigurator.Configure(new FileInfo("server.log.config"));
+
+            Application.ThreadException += Application_ThreadException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             var server = new KayakServer(new System.Net.IPEndPoint(0, Settings.Default.Port));
             var behavior = new KayakFrameworkBehavior();
@@ -89,8 +95,9 @@ namespace WifiSyncServer
 
             var framework = server.UseFramework();
 
-            log.Info("Now: " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToLongTimeString());
-            log.Info("Wifi Sync Server listening on " + server.ListenEndPoint);
+            Log.Info("Now: " + DateTime.Now.ToLongDateString() + " " + DateTime.Now.ToLongTimeString());
+            Log.Info("Wifi Sync Server listening on " + GetIP() + ":" + server.ListenEndPoint.Port);
+            
 
             NotifyIcon notifyIcon = new NotifyIcon();
 
@@ -100,8 +107,13 @@ namespace WifiSyncServer
                                                              Application.Exit();
                                                          });
 
+            MenuItem controlPanelMenu = new MenuItem("Show Control Panel", (sender, e) =>
+                                                                           {
+                                                                               Process.Start(GetAccessUrl());
+                                                                           });
+
             notifyIcon.Icon = Resources.music_sync_server;
-            notifyIcon.ContextMenu = new ContextMenu(new MenuItem[] { exitMenu });
+            notifyIcon.ContextMenu = new ContextMenu(new MenuItem[] { controlPanelMenu, exitMenu });
             notifyIcon.Text = "Music Sync Server Running";
             notifyIcon.Visible = true;
             
@@ -111,6 +123,44 @@ namespace WifiSyncServer
             // unsubscribe from server (close the listening socket)
             framework.Dispose();
 
+            Log.Info("All this has happened before, and all this will happen again.");
+        }
+
+        static string GetAccessUrl()
+        {
+            return string.Format("http://{0}:{1}", GetIP(), Settings.Default.Port);
+        }
+
+        static string GetIP()
+        {
+            IPHostEntry host;
+            string localIP = "?";
+            host = Dns.GetHostEntry(Dns.GetHostName());
+            foreach (IPAddress ip in host.AddressList)
+            {
+                if (ip.AddressFamily == AddressFamily.InterNetwork)
+                {
+                    localIP = ip.ToString();
+                    break;
+                }
+            }
+            return localIP;
+
+        }
+
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Exception ex = e.ExceptionObject as Exception;
+
+            if(ex == null)
+                Log.Error("An unhandled exception: " + e.ExceptionObject);
+            else
+                Log.Error("An unhandled exception", ex);
+        }
+
+        static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            Log.Error("An unhandled exception", e.Exception);
         }
 
         

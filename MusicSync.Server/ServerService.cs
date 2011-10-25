@@ -40,7 +40,7 @@ namespace WifiSyncServer
 {
     public class ServerService : KayakService
     {
-        private static readonly ILog Log = LogManager.GetLogger("WifiMusicSync.Server");
+        private static readonly ILog Log = LogManager.GetLogger("MusicSync.Server");
         static readonly Dictionary<string, string> SongDb = new Dictionary<string, string>();
         static readonly Dictionary<string, string> PlaylistDb = new Dictionary<string, string>();
         static readonly CachedXmliTunesLibrary CachedXmlLibrary = new CachedXmliTunesLibrary();
@@ -54,6 +54,22 @@ namespace WifiSyncServer
             mimeTypes.Add(".jar", "application/java-archive");
         }
 
+        [Path("/favicon.ico")]
+        public FileInfo GetFavIcon()
+        {
+            string faviconFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                                              "Music Sync", "Resources", "favicon.ico");
+            if(!File.Exists(faviconFile))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(faviconFile));
+                using (FileStream fs = File.OpenWrite(faviconFile))
+                {
+                    Resources.music_sync_server_favicon.Save(fs);
+                }
+            }
+
+            return new FileInfo(faviconFile);
+        }
 
         [Path("/")]
         [Path("/help")]

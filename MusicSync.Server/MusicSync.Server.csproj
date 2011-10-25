@@ -126,7 +126,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="log.config">
+    <None Include="server.log.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </None>
@@ -136,6 +136,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="music-sync-server-favicon.ico" />
     <Content Include="music-sync-server.ico" />
   </ItemGroup>
   <ItemGroup>

@@ -1,21 +1,93 @@
 Building Wifi Music Sync
 ========================
+This document describes how to build the code and contribute changes.
 
 You can use either Visual Studio or [Rake](http://rake.rubyforge.org/) with
-[Albacore](http://albacorebuild.net/) to build the project.  Ruby, which is
-required for Rake can be easily installed using
-[RubyInstaller](http://rubyinstaller.org/). Once Ruby is intalled, used the
-`gem` command to install Rake and Albacore.
+[Albacore](http://albacorebuild.net/) to build the project. Building with Rake
+is the preferred method.
 
-    gem install rake
-    gem install albacore
+Setting Up the Build Environment
+--------------------------------
+ 1. Install [Git for Windows](https://code.google.com/p/msysgit/)
+ 2. Install the [Windows 7 and .NET 4.0
+    SDK](http://msdn.microsoft.com/en-us/windows/bb980924.aspx).
+ 3. Install Ruby using the [RubyInstaller](http://rubyinstaller.org/).
+ 4. After installing ruby, from the Command Prompt, run:
+
+        gem install rake
+        gem install albacore
+        gem install rgl
+        gem install rubyzip
+
+ 5. Make sure that the paths to the tools, git, .NET framework tools and ruby
+    are in your PATH.
 
 For more information on Albacore, visit the [Albacore
-Wiki](https://github.com/derickbailey/Albacore/wiki/).
+wiki](https://github.com/derickbailey/Albacore/wiki/).
+
+Getting the Source and Building
+-------------------------------
+You can checkout the latest source code via git. Two public mirrors are
+available, at
+[SourceForge](http://bbwifimusicsync.git.sourceforge.net/git/gitweb.cgi?p=bbwifimusicsync/bbwifimusicsync)
+and [GitHub](https://github.com/nithinphilips/bbwifimusicsync).
+
+From SourceForge:
+
+    git clone git://bbwifimusicsync.git.sourceforge.net/gitroot/bbwifimusicsync/bbwifimusicsync
+
+Or, from GitHub:
+
+    git clone git://github.com/nithinphilips/bbwifimusicsync.git
+
+To build Wireless Music Sync, open the Command prompt at the project root and
+run:
+
+    rake
+
+The default target compiles the code, builds the installer and creates all the
+packages necessary for distribution. There are a few different targets
+available for other tasks:
+
+ * **dist**: The default. Compiles code, builds installer, packages binaries
+   and source code for distribution.
+ * **dist_with\_log**: Same as dist, except logging will be enabled.
+ * **installer**: Compiles code and builds the installer.
+ * **build**: Compiles the code.
+ * **dist_zip**: Compiles the code and packages the binaries into a zip file.
+ * **dist_src**: Packages the source code into a zip file. Note: Currently this
+   task fails to include the Afterthought source.
+ * **clean**: Deletes all the output created by all other tasks.
+ * **dep_graph**: Creates a nice graph with all available targets and their
+   relationship.
+
+To run tasks, add the task name after the rake command. For example:  `rake
+dist`.
 
 Building the BlackBerry App
 ---------------------------
 The BlackBerry app build process has not yet been integrated into the Rake
 based build system, so you have to use Eclipse and BlackBerry JDK to build it.
 
-[Steps to build the BlackBerry App](https://github.com/nithinphilips/bbwifimusicsync/blob/master/BlackberryClient/WifiMusicSync/README.md)
+See [Steps to build the BlackBerry
+App](https://github.com/nithinphilips/bbwifimusicsync/blob/master/BlackberryClient/WifiMusicSync/README.md)
+for more information.
+
+Contributing To the Project
+---------------------------
+It's easy to contribute to Wireless Music Sync. You can simply
+[fork](http://help.github.com/fork-a-repo/) the repository on GitHub and when
+you're done, send me a [pull
+request](http://help.github.com/send-pull-requests/) to have your changes
+integrated into the primary repo. You can also send your changes as standard
+patch files.
+
+Wireless Music Sync utilizes a wide variety of technologies. The Server and the
+Desktop Client are written in C#, the BlackBerry Client is written in [CLDC
+Java](http://java.sun.com/products/cldc/) and the build scripts are written in
+Ruby. There should be something that matches your skill in there somewhere. If
+you need help, you can get in touch with me at <nithin@nithinphilips.com>
+
+Please note that if you'd like to work on something that involves a lot of
+change, especially to APIs and such, please get in touch before you start
+working. Otherwise, your submissions may be rejected.

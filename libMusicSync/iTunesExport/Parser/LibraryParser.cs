@@ -125,58 +125,62 @@ namespace libMusicSync.iTunesExport.Parser
         {
             Log.Info("Parsing library file: " + fileLocation);
 
-            StreamReader stream = new StreamReader(fileLocation, System.Text.Encoding.GetEncoding("utf-8"));
-            XmlTextReader xmlReader = new XmlTextReader(stream);
-            xmlReader.XmlResolver = null;
-            XPathDocument xPathDocument = new XPathDocument(xmlReader);
-            XPathNavigator xPathNavigator = xPathDocument.CreateNavigator();
-
-            XPathNodeIterator nodeIterator = xPathNavigator.Select( "/plist/dict" );
-            nodeIterator.MoveNext();
-            nodeIterator = nodeIterator.Current.SelectChildren( XPathNodeType.All );
-            while( nodeIterator.MoveNext() )
+            using (StreamReader stream = new StreamReader(fileLocation, System.Text.Encoding.GetEncoding("utf-8")))
             {
-                if( nodeIterator.Current.Value.Equals( "Music Folder" ) )
+                using (XmlTextReader xmlReader = new XmlTextReader(stream))
                 {
-                    if( nodeIterator.MoveNext() )
+                    xmlReader.XmlResolver = null;
+                    XPathDocument xPathDocument = new XPathDocument(xmlReader);
+                    XPathNavigator xPathNavigator = xPathDocument.CreateNavigator();
+
+                    XPathNodeIterator nodeIterator = xPathNavigator.Select("/plist/dict");
+                    nodeIterator.MoveNext();
+                    nodeIterator = nodeIterator.Current.SelectChildren(XPathNodeType.All);
+                    while (nodeIterator.MoveNext())
                     {
-                        // Parse out the location of the music folder used by the active library.
-                        _originalMusicFolder = nodeIterator.Current.Value;
-                        _musicFolder = _originalMusicFolder.Replace( "file://localhost/", String.Empty );
+                        if (nodeIterator.Current.Value.Equals("Music Folder"))
+                        {
+                            if (nodeIterator.MoveNext())
+                            {
+                                // Parse out the location of the music folder used by the active library.
+                                _originalMusicFolder = nodeIterator.Current.Value;
+                                _musicFolder = _originalMusicFolder.Replace("file://localhost/", String.Empty);
 
-                        // Fix to check for UNC paths, which don't have a drive letter and need the additional
-                        // slash at the front. Thanks to Chris Jenkins for finding this one.
-                        if (_musicFolder.StartsWith("/"))
-                            _musicFolder = string.Format("/{0}", _musicFolder);
+                                // Fix to check for UNC paths, which don't have a drive letter and need the additional
+                                // slash at the front. Thanks to Chris Jenkins for finding this one.
+                                if (_musicFolder.StartsWith("/"))
+                                    _musicFolder = string.Format("/{0}", _musicFolder);
 
-                        _musicFolder = HttpUtility.UrlDecode( _musicFolder );
-                        _musicFolder = _musicFolder.Replace( '/', Path.DirectorySeparatorChar );
-                        break;
+                                _musicFolder = HttpUtility.UrlDecode(_musicFolder);
+                                _musicFolder = _musicFolder.Replace('/', Path.DirectorySeparatorChar);
+                                break;
+                            }
+                        }
+                    }
+
+
+                    // Can't move on if we don't know where the music is stored.
+                    if (_musicFolder == null)
+                        throw new Exception("Unable to parse Music Library element from iTunes Music Library");
+
+                    Log.Info("Using Music folder: " + _musicFolder);
+
+                    // This query gets us down to the point in the library that contains individual track details.
+                    nodeIterator = xPathNavigator.Select("/plist/dict/dict/dict");
+                    while (nodeIterator.MoveNext())
+                    {
+                        // Parse the track details, wherein a Track reference will be added to _tracks.
+                        ParseTrack(nodeIterator.Current.SelectChildren(XPathNodeType.All));
+                    }
+
+                    // After tracks, we're looking at the playlists that are listed in the library.
+                    nodeIterator = xPathNavigator.Select("/plist/dict/array/dict");
+                    while (nodeIterator.MoveNext())
+                    {
+                        // Parse the playlist details wherein a Playlist reference will be added to _playlists.
+                        ParsePlaylist(nodeIterator.Current.SelectChildren(XPathNodeType.All));
                     }
                 }
-            }
-
-
-            // Can't move on if we don't know where the music is stored.
-            if (_musicFolder == null)
-                throw new Exception("Unable to parse Music Library element from iTunes Music Library");
-
-            Log.Info("Using Music folder: " + _musicFolder);
-
-            // This query gets us down to the point in the library that contains individual track details.
-            nodeIterator = xPathNavigator.Select( "/plist/dict/dict/dict" );
-            while( nodeIterator.MoveNext() )
-            {
-                // Parse the track details, wherein a Track reference will be added to _tracks.
-                ParseTrack( nodeIterator.Current.SelectChildren( XPathNodeType.All ) );
-            }
-
-            // After tracks, we're looking at the playlists that are listed in the library.
-            nodeIterator = xPathNavigator.Select ("/plist/dict/array/dict");
-            while( nodeIterator.MoveNext() )
-            {
-                // Parse the playlist details wherein a Playlist reference will be added to _playlists.
-                ParsePlaylist( nodeIterator.Current.SelectChildren( XPathNodeType.All ) );
             }
         }
 

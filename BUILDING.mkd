@@ -55,8 +55,7 @@ available for other tasks:
  * **installer**: Compiles code and builds the installer.
  * **build**: Compiles the code.
  * **dist_zip**: Compiles the code and packages the binaries into a zip file.
- * **dist_src**: Packages the source code into a zip file. Note: Currently this
-   task fails to include the Afterthought source.
+ * **dist_src**: Packages the source code into a zip file.
  * **clean**: Deletes all the output created by all other tasks.
  * **dep_graph**: Creates a nice graph with all available targets and their
    relationship.

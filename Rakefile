@@ -30,27 +30,25 @@ require 'rgl/implicit'
 require 'zip/zip'
 require 'zip/zipfilesystem'
 
-
-
 task :default => [:dist]
-
 task :dist => [:clean, :dist_zip, :dist_src, :installer, :test]
-
 task :dist_with_log => [:clean, :copylogconfig, :dist_zip, :dist_src, :installer, :test]
 
-#Albacore.configure do |config|
-#  config.rapcpath = ""
-#end
-
-desc "Compile"
+desc "Compile Wireless Music Sync"
 msbuild :compile  => :assemblyinfo do |msb|
     msb.properties :configuration => CONFIGURATION, "OutputPath" => OUTPUT_DIR
     msb.targets :Clean, :Build
     msb.solution = "WifiMusicSync.sln"
-    msb.verbosity = "quiet"
+    # q[uiet], m[inimal], n[ormal], d[etailed], and diag[nostic]
+    msb.verbosity = "detailed"
+
+    msb.log_level = :verbose
+    Dir.mkdir(BUILD_DIR) unless File.directory? BUILD_DIR
+    # Disable console logging and send output to a file.
+    msb.parameters = "/noconsolelogger", "/fileLogger", "/fileloggerparameters:logfile=\"#{BUILD_DIR}/msbuild.log\""
 end
 
-desc "Moving binaries"
+desc "Organize Wireless Music Sync binaries"
 task :build => :compile  do
     FileUtils.rm_rf BIN_DIR
     Dir.mkdir("#{BIN_DIR}")
@@ -72,13 +70,13 @@ task :build => :compile  do
     FileUtils.cp_r binaries, "#{BIN_DIR}/#{PACKAGE}/MusicSync.BlackBerryApp"
 end
 
-desc "Copy log conifg files to the bin dir"
+desc "Copy log config files to enable logging"
 task :copylogconfig => :build  do
     files = FileList["#{OUTPUT_DIR}/*.log.config"]
     FileUtils.cp_r files, "#{BIN_DIR}/#{PACKAGE}/"
 end
 
-desc "Packaging source"
+desc "Package source code"
 task :dist_src do |z|
 
     gitModules = [
@@ -87,16 +85,13 @@ task :dist_src do |z|
     ]
 
     workingdir = Dir.pwd
-
     FileUtils.rm_rf "#{BUILD_DIR}/src"
     gitModules.each { |m|
         prefix = m["prefix"]
         filename = "#{BUILD_DIR}/src-temp.zip"
-
         Dir.chdir(m["dir"])
         sh "git archive HEAD --format=zip -9 --prefix=\"#{prefix}/\" > \"#{filename}\""
         Dir.chdir(workingdir)
-
         extract_zip(filename, "#{BUILD_DIR}/src")
         FileUtils.rm_rf filename
     }
@@ -124,14 +119,14 @@ def extract_zip(file, dest)
     }
 end
 
-desc "Packaging binaries"
+desc "Package binaries"
 zip :dist_zip => [:build] do |z|
     z.directories_to_zip BIN_DIR
     z.output_file = "#{BIN_PACKAGE}.zip"
     z.output_path = BUILD_DIR
 end
 
-desc "Updating installer file list"
+desc "Update installer file list"
 nsisfilelist :installerfiles => [:build] do |n|
     #nsisfilelist :installerfiles do |n|
     n.dirs << File.expand_path("#{BIN_DIR}/#{PACKAGE}/")
@@ -139,16 +134,15 @@ nsisfilelist :installerfiles => [:build] do |n|
     n.remove_files_list = File.expand_path("MusicSync.Installer/files_REM.nsi")
 end
 
-desc "Building installer"
-exec :installer => [:installerfiles] do |exec|
-    exec.command = NSIS_PATH
-    exec.parameters = [
-        "/V3",
-        "/DPRODUCT_VERSION=#{VERSION}",
-        "/DOUT_FILE=#{BUILD_DIR}/#{INS_PACKAGE}.exe",
-        File.expand_path("MusicSync.Installer/Installer.nsi")]
+desc "Build installer"
+nsis :installer => [:installerfiles] do |n|
+    n.installer_file = File.expand_path("MusicSync.Installer/Installer.nsi")
+    n.verbosity = 4
+    n.log_file = File.expand_path("#{BUILD_DIR}/installer.log")
+    n.defines :PRODUCT_VERSION => VERSION, :OUT_FILE => "#{BUILD_DIR}/#{INS_PACKAGE}.exe"
 end
 
+desc "Run tests"
 mstest :test => [:compile] do |test|
     test.command = "C:/Program Files (x86)/Microsoft Visual Studio 10.0/Common7/IDE/mstest.exe"
     test.assemblies "#{OUTPUT_DIR}/MusicSync.Tests.dll"
@@ -159,6 +153,7 @@ def ensure_submodules()
     system("git submodule update")
 end
 
+desc "Cleanup files"
 task :clean do
     FileUtils.rm_rf BUILD_DIR
 end
@@ -167,6 +162,7 @@ rapc :build_bb do |r|
     r.output = PRODUCT
 end
 
+desc "Create rapc manifest"
 rapcmanifest :rapcmanifest do |m|
     m.output_file = "file.rapc"
     m.name = PRODUCT
@@ -179,6 +175,7 @@ rapcmanifest :rapcmanifest do |m|
     m.focus_icons << "music-sync-glow-68.png"
 end
 
+desc "Create assembly info"
 task :assemblyinfo => [:libasminfo, :testsasminfo, :serverasminfo, :desktopasminfo, :configuratorasminfo]
 
 assemblyinfo :libasminfo do |a|

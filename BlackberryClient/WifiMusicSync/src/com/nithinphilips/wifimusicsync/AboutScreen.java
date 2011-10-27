@@ -2,6 +2,8 @@
 
 package com.nithinphilips.wifimusicsync;
 
+import com.nithinphilips.AssemblyInfo;
+
 import net.rim.blackberry.api.browser.Browser;
 import net.rim.device.api.system.Bitmap;
 import net.rim.device.api.ui.Field;
@@ -98,7 +100,7 @@ public class AboutScreen extends MainScreen
         container.setMargin(5, 5, 5, 5);
 
         BitmapField iconField = new BitmapField(Bitmap.getBitmapResource("music-sync-68.png"));
-        RichTextField popupTitleField = new RichTextField("Music Sync", RichTextField.NON_FOCUSABLE | Field.FIELD_BOTTOM);
+        RichTextField popupTitleField = new RichTextField(AssemblyInfo.Title, RichTextField.NON_FOCUSABLE | Field.FIELD_BOTTOM);
 
         HorizontalFieldManager headerContainer = new HorizontalFieldManager();
         headerContainer.add(iconField);
@@ -111,8 +113,8 @@ public class AboutScreen extends MainScreen
         technicalTitleField.setFont(defaultFont.derive(Font.BOLD, defaultFont.getHeight() + 1));
         technicalTitleField.setMargin(5, 0, 0, 0);
 
-        LabelField copyrightField = new LabelField("(C) 2011 Nithin Philips.");
-        LabelField descriptionField = new LabelField("Music Sync allows you to wirelessly sync your iTunes playlists and with your Blackberry device.");
+        LabelField copyrightField = new LabelField(AssemblyInfo.Copyright);
+        LabelField descriptionField = new LabelField(AssemblyInfo.Description);
 
         LabelField iconsInfoField = new LabelField("Icons shamelessy ripped from Ultimate-Gnome, Faenza and Elementary icon themes. This application uses components from KeePassBB <http://f5bbutils.fairview5.com/keepassbb2/>");
         LabelField gnuField0 = new LabelField(
@@ -122,8 +124,8 @@ public class AboutScreen extends MainScreen
         LabelField gnuField2 = new LabelField(
                 "You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.");
 
-        LabelField dateField = new LabelField("Build Date: Sun, 30 Jan 2011");
-        LabelField revField = new LabelField("Build Revision: $Rev$");
+        LabelField dateField = new LabelField("Build Date: " + AssemblyInfo.Date);
+        LabelField revField = new LabelField("Version: " + AssemblyInfo.Version);
 
         copyrightField.setFont(medFont);
         descriptionField.setFont(tinyFont);

@@ -162,6 +162,17 @@ rapc :build_bb do |r|
     r.output = PRODUCT
 end
 
+desc "Create a java class with information about the app"
+javaassemblyinfo :javaasminfo do |j|
+    j.title        = PRODUCT_LONG
+    j.description  = DESCRIPTION
+    j.version      = VERSION
+    j.copyright    = COPYRIGHT
+    j.class_name   = "AssemblyInfo"
+    j.package_name = "com.nithinphilips"
+    j.output_dir   = File.expand_path("BlackberryClient/WifiMusicSync/src/com/nithinphilips")
+end
+
 desc "Create rapc manifest"
 rapcmanifest :rapcmanifest do |m|
     m.output_file = "file.rapc"
@@ -175,7 +186,7 @@ rapcmanifest :rapcmanifest do |m|
     m.focus_icons << "music-sync-glow-68.png"
 end
 
-desc "Create assembly info"
+desc "Create assemblyinfo files"
 task :assemblyinfo => [:libasminfo, :testsasminfo, :serverasminfo, :desktopasminfo, :configuratorasminfo]
 
 assemblyinfo :libasminfo do |a|

@@ -1,0 +1,184 @@
+Wireless Music Sync Communication Protocol
+==========================================
+The document describes the protocol used for communication between the Wireless
+Music Sync Server and Clients.
+
+Structured information is passed between the parties as
+[JSON](http://www.json.org/) data. JSON was chosen because it is widely
+supported and parsers are available in almost every programming language.
+Furthermore, the Kayak Server Framework used by the server provides
+transparent conversion between JSON data and .NET objects, greatly simplifying
+the server code.
+
+The Request Object
+------------------
+A Request object is the super class from which all request sent to the server are derived from.
+In JSON, the Request object has the following structure:
+
+    {
+        "DeviceId"        : "afa720b413524f6f862904769f43c18d",
+        "DeviceMediaRoot" : "file:///SDCard/Blackberry/music/WiFiSync"
+    }
+
+###Properties
+ * **DeviceId**: A GUID which uniquely identified the client to the server.
+ * **DeviceMediaRoot**: The URL to the root folder where the media is stored.
+   It is used to generate playlists and perform diffs etc.
+
+The Response Object
+-------------------
+Like the Request object, the Reponse object is the super class for all the
+responses returned by the server. In JSON, it has the following structure:
+
+    {
+        "Error"              : 0,
+        "ErrorMessage"       : null,
+        "ServerId"           : "WiFiMusicSync 1.0"
+    }
+
+###Properties
+ * **Error**: An integer that identifies an error.
+ * **ErrorMessage**: Detailed description of the error.
+ * **ServerId**: A string that identified the server type. It only indicates
+   the server version, and does not identify the server.
+
+The Subscription Object
+-----------------------
+**Inherits**: Request
+
+This object is sent to the server inform it of all the playlist that the client
+would like to sync.
+
+    {
+        "DeviceMediaRoot"  : "file:///SDCard/Blackberry/music/WiFiSync",
+        "DeviceId"  : "afa720b413524f6f862904769f43c18d",
+        "Playlists" : [
+            "Al_Scott Pilgrim vs. the World",
+            "Favorites"
+        ]
+    }
+
+###Properties
+ * **Playlists**: A string array of playlists to be synced.
+
+The PlaylistRequest Object
+--------------------------
+**Inherits**: Request
+
+The object sent to the server to request updates to a playlist.
+
+    {
+        "DeviceId" : "afa720b413524f6f862904769f43c18d",
+        "PlaylistDevicePath" : "file:///SDCard/Blackberry/music/WiFiSync/Al_Scott Pilgrim vs. the World.hpl",
+        "DeviceMediaRoot"    : "file:///SDCard/Blackberry/music/WiFiSync",
+        "PlaylistData"       : [
+            "file:///SDCard/Blackberry/music/WiFiSync/Songs/Compilations/Scott Pilgrim vs. the World/01 - We Are Sex Bob-omb.mp3"
+        ]
+    }
+
+
+###Properties
+ * **PlaylistDevicePath**: The absolute path to location of the playlist on the
+   client.
+ * **PlalistData**: An array of strings, each an absolute path to a track
+   belonging to the playlist.
+
+The SyncResponse Object
+-----------------------
+**Inherits**: Response
+
+The response sent by the server after a query.
+
+    {
+        "PlaylistServerPath" : "/playlists/960d7fa19986b122072603dbbadfaecbdfe9d79f",
+        "PlaylistDevicePath" : "file:///SDCard/Blackberry/music/WiFiSync/Al_Scott Pilgrim vs. the World.hpl",
+        "Actions"            : [
+            {
+                "Type" : "Remove",
+                "DeviceLocation" : "file:///SDCard/Blackberry/music/WiFiSync/Songs/Compilations/Scott Pilgrim vs. the World/01 - We Are Sex Bob-omb.mp3",
+                "TrackPath"      : null
+            },
+            {
+                "Type" : "Add",
+                "DeviceLocation" : "file:///SDCard/Blackberry/music/WiFiSync/Songs/Compilations/Scott Pilgrim vs. the World/01 - We Are Sex Bob-omb.mp3",
+                "TrackPath"      : "/songs/24e344e099b769e8f32753d0d2e0d5c380aa4579"
+            }
+        ],
+        "Error"              : 0,
+        "ErrorMessage"       : null,
+        "ServerId"           : "WiFiMusicSync 1.0"
+}
+
+
+###Properties
+ * **PlaylistServerPath**: The relative path on the server from where the
+   updated playlist can be downloaded.
+ * **PlaylistDevicePath**: The absolute path the location of the playlist on
+   the device.
+ * **Actions**: An array of ChangSet objects, describing the actions that must
+   be taken by the client.
+
+The ChangeSet Object
+--------------------
+Describes the actions that must be taken by the client to bring it in sync with
+the server.
+
+    {
+        "Type"           : "Add",
+        "DeviceLocation" : "file:///SDCard/Blackberry/music/WiFiSync/Songs/Compilations/Scott Pilgrim vs. the World/22 - Summertime.mp3",
+        "TrackPath"      : "/songs/450a01587a6b204d341409970862dac4646b5944"
+     }
+
+OR
+
+    {
+        "Type"           : "Remove",
+        "DeviceLocation" : "file:///SDCard/Blackberry/music/WiFiSync/Songs/Compilations/Scott Pilgrim vs. the World/01 - We Are Sex Bob-omb.mp3",
+        "TrackPath"      : null
+    },
+
+###Properties
+ * **Type**: `Add` or `Remove`, indicates the type of change.
+ * **DeviceLocation**: The abolute path the file which is affected by this
+   change.
+ * **TrackPath**: The relative path on the server from where the track can be
+   downloaded. Only applies to `Add` type of changesets.
+
+Server Methods
+--------------
+The server exposes 5 different methods:
+
+   `/getplaylists`, `/getartists`, `/getalbums`, `/subscribe` and `/query`.
+
+ * `/getplaylists`.
+   
+   **Parameters**: none
+
+   Retrieves a list of all playlists available on the server.
+
+ * `/getartists`
+   
+   **Parameters**: none
+
+   Retrieves a list of all artists available on the server
+
+ * `/getalbums`
+   
+   **Parameters**: none
+
+   Retrieves a list of all albums available on the server
+
+ * `/subscribe`
+
+   **Parameters**: `POST` A Subscription object.
+
+   Informs the server which playlists, albums or artists the client would like
+   to sync.  Later, the client can use this information to cleanup orphaned
+   media files.
+
+  * `/query`
+
+   **Parameters**: `POST` A PlaylistRequest object.
+
+   Queries the server to get of list of tracks that need to be added or deleted
+   from the client.

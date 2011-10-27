@@ -16,7 +16,6 @@ Started](https://github.com/nithinphilips/bbwifimusicsync/blob/master/GettingSta
 for detailed installation instructions.
 
 ###Features
-
  * Sync a Playlist, an Album or an Artist.
  * Fast, On-Demand sync.
  * Supports both OS 5 and 6.
@@ -25,7 +24,6 @@ for detailed installation instructions.
  * Open protocol and code, modify it to your heart's content.
 
 ###Planned Features
-
  * File based backend support.
  * Support for other popular music players.
  * Linux server.
@@ -41,7 +39,6 @@ Started](https://github.com/nithinphilips/bbwifimusicsync/blob/master/GettingSta
 for detailed installation instructions.
 
 ###Runtime Dependencies
-
 To run the server application you need:
 
  * Windows XP or higher.
@@ -49,7 +46,6 @@ To run the server application you need:
  * [iTunes](https://www.apple.com/itunes/) (Optional)
 
 ###Build Dependencies
-
 To build Wireless Music Sync for BlackBerry&reg; you need:
 
  * [.NET Framework](http://msdn.microsoft.com/en-us/netframework/default) + Tools (>= 4.0)
@@ -59,9 +55,15 @@ To build Wireless Music Sync for BlackBerry&reg; you need:
  * [iTunes](http://www.apple.com/itunes/) (>= 9.0)
  * *And* [Visual Studio.NET 2010](https://www.microsoft.com/express/Downloads/)+ (Optional) It is the easiest way to build.
 
+Known Issues
+------------
+ * The BlackBerry app cannot sync playlists with special characters in the
+   name, characters that cannot be represented in the BlackBerry file system
+   (FAT32) file names. Playlists with Unicode characters in the name will
+   usually fail to sync.
+
 Get It
 ------
-
  * [Download the Latest Release](http://sourceforge.net/projects/bbwifimusicsync/files/)
  * [Fork it on GitHub](https://github.com/nithinphilips/bbwifimusicsync) or 
    [Get Source Code](http://sourceforge.net/projects/bbwifimusicsync/develop)

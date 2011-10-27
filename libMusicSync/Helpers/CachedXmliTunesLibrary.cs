@@ -1,4 +1,6 @@
-﻿/**********************************************************************
+﻿//#define HEAVY_LOGGING // Uncomment for even more logging.
+
+/**********************************************************************
  * WifiMusicSync
  * Copyright (C) 2011 Nithin Philips <nithin@nithinphilips.com>
  * 
@@ -18,8 +20,11 @@
  **********************************************************************/
 
 using System;
+using System.Linq;
+using System.Linq.Expressions;
 using libMusicSync.iTunes;
 using System.Runtime.Caching;
+using log4net;
 
 namespace libMusicSync.Helpers
 {
@@ -69,7 +74,37 @@ namespace libMusicSync.Helpers
                                                  };
                     cache.Set(CACHE_KEY, library, policy);
 
+
                     Log.InfoFormat("Library loaded and cached in {0}ms", (int)new TimeSpan(bTick - aTick).TotalMilliseconds);
+
+#if HEAVY_LOGGING
+                    using (ThreadContext.Stacks["NDC"].Push("Albums"))
+                    {
+                        Log.Debug(library.Albums.Count() + " Albums Loaded");
+                        foreach (var playlist in library.Albums)
+                        {
+                            Log.Debug(string.Format("{0,4}", playlist.Tracks.Count()) + " in " + playlist.Name);
+                        }
+                    }
+                    
+                    using (ThreadContext.Stacks["NDC"].Push("Artists"))
+                    {
+                        Log.Debug(library.Artists.Count() + " Artists Loaded");
+                        foreach (var playlist in library.Artists)
+                        {
+                            Log.Debug(string.Format("{0,4}", playlist.Tracks.Count()) + " in " + playlist.Name);
+                        }
+                    }
+
+                    using (ThreadContext.Stacks["NDC"].Push("Playlists"))
+                    {
+                        Log.Debug(library.Playlists.Count() + " Playlists Loaded");
+                        foreach (var playlist in library.Playlists)
+                        {
+                            Log.Debug(string.Format("{0,4}", playlist.Tracks.Count()) + " in " + playlist.Name);
+                        }
+                    }
+#endif
                 }
                 else
                 {

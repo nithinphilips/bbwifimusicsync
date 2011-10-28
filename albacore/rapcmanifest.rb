@@ -66,7 +66,7 @@ class RapcManifest
                                   f.puts "RIM-MIDlet-Icon-1-#{icon_index}: #{icon},focused"
                           end
 
-                          f.puts "RIM_MIDlet-Icon-Count-1: #{icon_index}" if icon_index > 0
+                          f.puts "RIM-MIDlet-Icon-Count-1: #{icon_index}" if icon_index > 0
 
                           flags = 0x00
                           flags |= 0xE1-((2*startupTier)<<4) if runonstartup
@@ -83,8 +83,6 @@ class RapcManifest
                         flags |= 0xE1 - ((2 * startuptier) << 4) if runonstartup
                         f.puts "RIM-Library-Flags: #{flags}"
                   end
-                  f.puts "RIM-MIDlet-Icon-Count-1: 1"
-
           end
   end
 

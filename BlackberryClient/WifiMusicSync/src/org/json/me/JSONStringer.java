@@ -1,5 +1,3 @@
-//#preprocess
-//#implicit BlackBerrySDK5.0.0
 
 package org.json.me;
 

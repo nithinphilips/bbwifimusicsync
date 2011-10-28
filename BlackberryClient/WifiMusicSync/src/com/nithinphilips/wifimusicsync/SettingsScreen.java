@@ -39,12 +39,12 @@ public class SettingsScreen extends MainScreen{
 
 //#ifdef BlackBerrySDK6.0.0
     	StandardTitleBar _titleBar = new StandardTitleBar();
-        _titleBar.addTitle("Settings");
+        _titleBar.addTitle("Options");
         _titleBar.addNotifications();
         _titleBar.addSignalIndicator();
         this.setTitle(_titleBar);
 //#else
-        this.setTitle(new LabelField("Settings"));
+        this.setTitle(new LabelField("Options"));
 //#endif
 
 		((VerticalFieldManager) getMainManager()).setBackground(BackgroundFactory.createSolidBackground(UiFactory.COLOR_SCREEN_BACKGROUND));

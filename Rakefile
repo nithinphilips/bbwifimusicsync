@@ -8,7 +8,7 @@ PROJECT_URL   = "https://sourceforge.net/projects/bbwifimusicsync/"
 TRADEMARKS    = "BlackBerry(r) is a registered trademark of Research in Motion"
 
 NSIS_PATH     = "C:/Program Files (x86)/NSIS/makensis.exe"
-
+RIM_JDE_PATH  = "C:/Users/Nithin/AppData/Local/Eclipse"
 
 CONFIGURATION = "Release"
 BUILD_DIR     = File.expand_path("build")
@@ -158,8 +158,54 @@ task :clean do
     FileUtils.rm_rf BUILD_DIR
 end
 
-rapc :build_bb do |r|
-    r.output = PRODUCT
+task :build_bbapp => [:build_bbapp5, :build_bbapp6]
+
+rapc :build_bbapp5 => [:rapcmanifest5, :javaasminfo] do |r|
+    r.output     = PRODUCT
+    r.command    = "#{RIM_JDE_PATH}/plugins/net.rim.ejde.componentpack5.0.0_5.0.0.25/components/bin/rapc.exe"
+    r.imports    = "#{RIM_JDE_PATH}/plugins/net.rim.ejde.componentpack5.0.0_5.0.0.25/components/lib/net_rim_api.jar"
+
+    r.destdir    = "BlackberryClient/WifiMusicSync/deliverables/Standard/5.0.0/WifiMusicSync"
+    r.rapcfile   = "BlackberryClient/WifiMusicSync/deliverables/Standard/5.0.0/WifiMusicSync.rapc"
+    r.tags       = ["BlackBerrySDK5.0.0"]
+    r.source     = FileList["BlackberryClient/WifiMusicSync/src/**/*.java", "BlackberryClient/WifiMusicSync/res/**/*"]
+end
+
+rapc :build_bbapp6 => [:rapcmanifest6, :javaasminfo] do |r|
+    r.output     = PRODUCT
+    r.command    = "#{RIM_JDE_PATH}/plugins/net.rim.ejde.componentpack6.0.0_6.0.0.30/components/bin/rapc.exe"
+    r.imports    = "#{RIM_JDE_PATH}/plugins/net.rim.ejde.componentpack6.0.0_6.0.0.30/components/lib/net_rim_api.jar"
+
+    r.destdir    = "BlackberryClient/WifiMusicSync/deliverables/Standard/6.0.0/WifiMusicSync"
+    r.rapcfile   = "BlackberryClient/WifiMusicSync/deliverables/Standard/6.0.0/WifiMusicSync.rapc"
+    r.tags       = ["BlackBerrySDK6.0.0"]
+    r.source = FileList["BlackberryClient/WifiMusicSync/src/**/*.java", "BlackberryClient/WifiMusicSync/res/**/*"].exclude(/json/)
+end
+
+desc "Create rapc manifest"
+rapcmanifest :rapcmanifest5 do |m|
+    m.output_file = "BlackberryClient/WifiMusicSync/deliverables/Standard/5.0.0/WifiMusicSync.rapc"
+    m.name        = PRODUCT
+    m.title       = PRODUCT_LONG
+    m.version     = "1.0.0"
+    m.vendor      = AUTHORS
+    m.description = DESCRIPTION
+    m.type        = "CLDC"
+    m.icons       << "../../../res/music-sync-68.png"
+    m.focus_icons << "../../../res/music-sync-glow-68.png"
+end
+
+desc "Create rapc manifest"
+rapcmanifest :rapcmanifest6 do |m|
+    m.output_file = "BlackberryClient/WifiMusicSync/deliverables/Standard/6.0.0/WifiMusicSync.rapc"
+    m.name        = PRODUCT
+    m.title       = PRODUCT_LONG
+    m.version     = "1.0.0"
+    m.vendor      = AUTHORS
+    m.description = DESCRIPTION
+    m.type        = "CLDC"
+    m.icons       << "../../../res/music-sync-68.png"
+    m.focus_icons << "../../../res/music-sync-glow-68.png"
 end
 
 desc "Create a java class with information about the app"
@@ -171,19 +217,6 @@ javaassemblyinfo :javaasminfo do |j|
     j.class_name   = "AssemblyInfo"
     j.package_name = "com.nithinphilips"
     j.output_dir   = File.expand_path("BlackberryClient/WifiMusicSync/src/com/nithinphilips")
-end
-
-desc "Create rapc manifest"
-rapcmanifest :rapcmanifest do |m|
-    m.output_file = "file.rapc"
-    m.name = PRODUCT
-    m.title = PRODUCT_LONG
-    m.version = "1.0.0"
-    m.vendor = AUTHORS
-    m.description = DESCRIPTION
-    m.type = "CLDC"
-    m.icons << "music-sync-68.png"
-    m.focus_icons << "music-sync-glow-68.png"
 end
 
 desc "Create assemblyinfo files"

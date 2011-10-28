@@ -47,6 +47,7 @@ import net.rim.device.api.ui.image.ImageFactory;
 
 import com.fairview5.keepassbb2.common.ui.ProgressDialog;
 import com.nithinphilips.Debug;
+import com.nithinphilips.AssemblyInfo;
 import com.nithinphilips.wifimusicsync.components.ProgressListModel;
 import com.nithinphilips.wifimusicsync.components.WifiMusicSyncProperties;
 import com.nithinphilips.wifimusicsync.controller.PlaylistDownloader;
@@ -104,12 +105,12 @@ public class WifiMusicSyncScreen extends MainScreen
 
 //#ifdef BlackBerrySDK6.0.0
         StandardTitleBar _titleBar = new StandardTitleBar();
-        _titleBar.addTitle("Music Sync");
+        _titleBar.addTitle(AssemblyInfo.Title);
         _titleBar.addNotifications();
         _titleBar.addSignalIndicator();
         this.setTitle(_titleBar);
 //#else
-        this.setTitle(new LabelField("Music Sync"));
+        this.setTitle(new LabelField(AssemblyInfo.Title));
 //#endif
 
         this.myListView = new ListField();

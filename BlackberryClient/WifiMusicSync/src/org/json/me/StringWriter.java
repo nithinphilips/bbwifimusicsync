@@ -1,5 +1,3 @@
-//#preprocess
-//#implicit BlackBerrySDK5.0.0
 
 /*
 Copyright (c) 2002 JSON.org

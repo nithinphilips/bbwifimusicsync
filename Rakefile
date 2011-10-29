@@ -7,11 +7,9 @@ COPYRIGHT     = "(c) 2011 #{AUTHORS}"
 PROJECT_URL   = "https://sourceforge.net/projects/bbwifimusicsync/"
 TRADEMARKS    = "BlackBerry(r) is a registered trademark of Research in Motion"
 
-NSIS_PATH     = "C:/Program Files (x86)/NSIS/makensis.exe"
-RIM_JDE_PATH  = "C:/Users/Nithin/AppData/Local/Eclipse"
-
 CONFIGURATION = "Release"
 BUILD_DIR     = File.expand_path("build")
+BB_BUILD_DIR  = "BlackberryClient/WifiMusicSync/deliverables"
 OUTPUT_DIR    = "#{BUILD_DIR}/out"
 BIN_DIR       = "#{BUILD_DIR}/bin"
 SRC_DIR       = "#{BUILD_DIR}/src"
@@ -25,6 +23,7 @@ INS_PACKAGE   = "#{PACKAGE}-setup"
 
 require 'albacore'
 FileList["./albacore/*.rb"].each { |f| require f }
+#FileList["./albacore/config/*.rb"].each { |f| require f }
 require 'rgl/dot'
 require 'rgl/implicit'
 require 'zip/zip'
@@ -43,18 +42,16 @@ msbuild :compile  => :assemblyinfo do |msb|
     msb.verbosity = "detailed"
 
     msb.log_level = :verbose
-    Dir.mkdir(BUILD_DIR) unless File.directory? BUILD_DIR
+    FileUtils.mkdir_p(BUILD_DIR)
     # Disable console logging and send output to a file.
     msb.parameters = "/noconsolelogger", "/fileLogger", "/fileloggerparameters:logfile=\"#{BUILD_DIR}/msbuild.log\""
 end
 
 desc "Organize Wireless Music Sync binaries"
-task :build => :compile  do
+task :build => [:compile, :build_bbapp]  do
     FileUtils.rm_rf BIN_DIR
-    Dir.mkdir("#{BIN_DIR}")
-    Dir.mkdir("#{BIN_DIR}/#{PACKAGE}")
-    Dir.mkdir("#{BIN_DIR}/#{PACKAGE}/app")
-    Dir.mkdir("#{BIN_DIR}/#{PACKAGE}/MusicSync.BlackBerryApp")
+    FileUtils.mkdir_p("#{BIN_DIR}/#{PACKAGE}/app")
+    FileUtils.mkdir_p("#{BIN_DIR}/#{PACKAGE}/MusicSync.BlackBerryApp")
 
     binaries = FileList["#{OUTPUT_DIR}/*.dll", "#{OUTPUT_DIR}/*.exe", "#{OUTPUT_DIR}/*.exe.config", "#{OUTPUT_DIR}/*.dll.config", "README.md", "COPYING.txt"]
     .exclude(/Backup/)
@@ -128,7 +125,6 @@ end
 
 desc "Update installer file list"
 nsisfilelist :installerfiles => [:build] do |n|
-    #nsisfilelist :installerfiles do |n|
     n.dirs << File.expand_path("#{BIN_DIR}/#{PACKAGE}/")
     n.add_files_list = File.expand_path("MusicSync.Installer/files_ADD.nsi")
     n.remove_files_list = File.expand_path("MusicSync.Installer/files_REM.nsi")
@@ -158,33 +154,40 @@ task :clean do
     FileUtils.rm_rf BUILD_DIR
 end
 
-task :build_bbapp => [:build_bbapp5, :build_bbapp6]
+
+task :build_bbapp => [:compile_bbapp, :sign_cod]
+task :compile_bbapp => [:clean_bb, :build_bbapp5, :build_bbapp6]
+
+sigtool :sign_cod => [:compile_bbapp] do |s|
+    s.codfile    = FileList[ "#{BB_BUILD_DIR}/**/*.cod" ]
+end
+
+task :clean_bb do
+    FileUtils.rm_rf BB_BUILD_DIR
+end
 
 rapc :build_bbapp5 => [:rapcmanifest5, :javaasminfo] do |r|
     r.output     = PRODUCT
-    r.command    = "#{RIM_JDE_PATH}/plugins/net.rim.ejde.componentpack5.0.0_5.0.0.25/components/bin/rapc.exe"
-    r.imports    = "#{RIM_JDE_PATH}/plugins/net.rim.ejde.componentpack5.0.0_5.0.0.25/components/lib/net_rim_api.jar"
-
-    r.destdir    = "BlackberryClient/WifiMusicSync/deliverables/Standard/5.0.0/WifiMusicSync"
-    r.rapcfile   = "BlackberryClient/WifiMusicSync/deliverables/Standard/5.0.0/WifiMusicSync.rapc"
-    r.tags       = ["BlackBerrySDK5.0.0"]
+    r.sdkversion = "5.0.0"
+    r.destdir    = BB_BUILD_DIR
+    r.createweb  = true
+    r.quiet      = true
     r.source     = FileList["BlackberryClient/WifiMusicSync/src/**/*.java", "BlackberryClient/WifiMusicSync/res/**/*"]
 end
 
 rapc :build_bbapp6 => [:rapcmanifest6, :javaasminfo] do |r|
     r.output     = PRODUCT
-    r.command    = "#{RIM_JDE_PATH}/plugins/net.rim.ejde.componentpack6.0.0_6.0.0.30/components/bin/rapc.exe"
-    r.imports    = "#{RIM_JDE_PATH}/plugins/net.rim.ejde.componentpack6.0.0_6.0.0.30/components/lib/net_rim_api.jar"
-
-    r.destdir    = "BlackberryClient/WifiMusicSync/deliverables/Standard/6.0.0/WifiMusicSync"
-    r.rapcfile   = "BlackberryClient/WifiMusicSync/deliverables/Standard/6.0.0/WifiMusicSync.rapc"
-    r.tags       = ["BlackBerrySDK6.0.0"]
+    r.sdkversion = "6.0.0"
+    r.destdir    = BB_BUILD_DIR
+    r.createweb  = true
+    r.quiet      = true
     r.source = FileList["BlackberryClient/WifiMusicSync/src/**/*.java", "BlackberryClient/WifiMusicSync/res/**/*"].exclude(/json/)
 end
 
 desc "Create rapc manifest"
 rapcmanifest :rapcmanifest5 do |m|
-    m.output_file = "BlackberryClient/WifiMusicSync/deliverables/Standard/5.0.0/WifiMusicSync.rapc"
+    FileUtils.mkdir_p("#{BB_BUILD_DIR}/Standard/5.0.0/")
+    m.output_file = "#{BB_BUILD_DIR}/Standard/5.0.0/bbwifimusicsync.rapc"
     m.name        = PRODUCT
     m.title       = PRODUCT_LONG
     m.version     = "1.0.0"
@@ -197,7 +200,8 @@ end
 
 desc "Create rapc manifest"
 rapcmanifest :rapcmanifest6 do |m|
-    m.output_file = "BlackberryClient/WifiMusicSync/deliverables/Standard/6.0.0/WifiMusicSync.rapc"
+    FileUtils.mkdir_p("#{BB_BUILD_DIR}/Standard/6.0.0/")
+    m.output_file = "#{BB_BUILD_DIR}/Standard/6.0.0/bbwifimusicsync.rapc"
     m.name        = PRODUCT
     m.title       = PRODUCT_LONG
     m.version     = "1.0.0"

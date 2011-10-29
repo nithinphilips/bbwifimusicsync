@@ -1,21 +1,24 @@
 require 'ostruct'
 require 'albacore/support/openstruct'
 
-module RapcConfig
+module NsisConfig
     include Albacore::Configuration
 
-    def self.rapcconfig
-        @config ||= OpenStruct.new.extend(OpenStructToHash).extend(RapcConfig)
+    def self.nsisconfig
+        @config ||= OpenStruct.new.extend(OpenStructToHash).extend(NsisConfig)
     end
 
-    def rapc
-        config ||= RapcConfig.rapcconfig
+    def nsis
+        config ||= NsisConfig.nsisconfig
         yield(config) if block_given?
         config
     end
 
    def self.included(mod)
-       # nothing to do
+      # nothing to do
    end
 
 end
+
+
+

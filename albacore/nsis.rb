@@ -1,8 +1,10 @@
 require 'albacore/albacoretask'
+require './albacore/config/nsisconfig.rb'
 
 class Nsis
   include Albacore::Task
   include Albacore::RunCommand
+  include NsisConfig
 
   attr_accessor :installer_file, :verbosity, :priority, :log_file, :nocd, :noconfig
   attr_hash :defines
@@ -12,6 +14,7 @@ class Nsis
     @noconfig = false
     @command = "makensis.exe"
     super()
+    update_attributes Albacore.configuration.nsis.to_hash
   end
 
   def execute

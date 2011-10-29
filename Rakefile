@@ -187,29 +187,27 @@ end
 desc "Create rapc manifest"
 rapcmanifest :rapcmanifest5 do |m|
     FileUtils.mkdir_p("#{BB_BUILD_DIR}/Standard/5.0.0/")
-    m.output_file = "#{BB_BUILD_DIR}/Standard/5.0.0/bbwifimusicsync.rapc"
-    m.name        = PRODUCT
-    m.title       = PRODUCT_LONG
-    m.version     = "1.0.0"
-    m.vendor      = AUTHORS
-    m.description = DESCRIPTION
-    m.type        = "CLDC"
-    m.icons       << "../../../res/music-sync-68.png"
-    m.focus_icons << "../../../res/music-sync-glow-68.png"
+    m.output_file    = "#{BB_BUILD_DIR}/Standard/5.0.0/#{PRODUCT}.rapc"
+    m.title = m.name = PRODUCT_LONG
+    m.version        = VERSION  # Blackberry app versions cannot start with 0
+    m.vendor         = AUTHORS
+    m.description    = DESCRIPTION
+    m.type           = "CLDC"
+    m.icons          << "../../../res/music-sync-68.png"
+    m.focus_icons    << "../../../res/music-sync-glow-68.png"
 end
 
 desc "Create rapc manifest"
 rapcmanifest :rapcmanifest6 do |m|
     FileUtils.mkdir_p("#{BB_BUILD_DIR}/Standard/6.0.0/")
-    m.output_file = "#{BB_BUILD_DIR}/Standard/6.0.0/bbwifimusicsync.rapc"
-    m.name        = PRODUCT
-    m.title       = PRODUCT_LONG
-    m.version     = "1.0.0"
-    m.vendor      = AUTHORS
-    m.description = DESCRIPTION
-    m.type        = "CLDC"
-    m.icons       << "../../../res/music-sync-68.png"
-    m.focus_icons << "../../../res/music-sync-glow-68.png"
+    m.output_file    = "#{BB_BUILD_DIR}/Standard/6.0.0/#{PRODUCT}.rapc"
+    m.title = m.name = PRODUCT_LONG
+    m.version        = VERSION
+    m.vendor         = AUTHORS
+    m.description    = DESCRIPTION
+    m.type           = "CLDC"
+    m.icons          << "../../../res/music-sync-68.png"
+    m.focus_icons    << "../../../res/music-sync-glow-68.png"
 end
 
 desc "Create a java class with information about the app"

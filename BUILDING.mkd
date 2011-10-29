@@ -40,6 +40,33 @@ Or, from GitHub:
 
     git clone git://github.com/nithinphilips/bbwifimusicsync.git
 
+
+Before you can build Wireless Music Sync with Rake, you'll need to create 3
+configuration files.
+
+ * `sign_cod.yml`
+
+        sigtooljar: "<JDE ROOT>/plugins/net.rim.ejde/vmTools/SignatureTool.jar"
+        password: "<your RIM signing keys password>"
+
+ * `build_bbapp5.yml`
+
+        command: "<JDE ROOT>/plugins/net.rim.ejde.componentpack5.0.0_5.0.0.25/components/bin/rapc.exe"
+        jdkbin: "C:/Program Files (x86)/Java/jdk1.6.0_16/bin"
+        imports: "<JDE ROOT>/plugins/net.rim.ejde.componentpack5.0.0_5.0.0.25/components/lib/net_rim_api.jar"
+
+ * `build_bbapp6.yml`
+
+        command: "<JDE ROOT>/plugins/net.rim.ejde.componentpack6.0.0_6.0.0.30/components/bin/rapc.exe"
+        jdkbin: "C:/Program Files (x86)/Java/jdk1.6.0_16/bin"
+        imports: "<JDE ROOT>/plugins/net.rim.ejde.componentpack6.0.0_6.0.0.30/components/lib/net_rim_api.jar"
+
+Place these configuration files in the root of the project. `JDE ROOT` is the
+path the your BlackBerry JDE installation. For signing to work, you'll need the
+signing keys from RIM.  See [Steps to build the BlackBerry
+App](https://github.com/nithinphilips/bbwifimusicsync/blob/master/BlackberryClient/WifiMusicSync/README.md)
+for more information.
+
 To build Wireless Music Sync, open the Command prompt at the project root and
 run:
 
@@ -63,14 +90,7 @@ available for other tasks:
 To run tasks, add the task name after the rake command. For example:  `rake
 dist`.
 
-Building the BlackBerry App
----------------------------
-The BlackBerry app build process has not yet been integrated into the Rake
-based build system, so you have to use Eclipse and BlackBerry JDK to build it.
-
-See [Steps to build the BlackBerry
-App](https://github.com/nithinphilips/bbwifimusicsync/blob/master/BlackberryClient/WifiMusicSync/README.md)
-for more information.
+<img src="dep_graph.png" />
 
 Contributing To the Project
 ---------------------------

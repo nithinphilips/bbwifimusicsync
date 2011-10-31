@@ -23,7 +23,6 @@ INS_PACKAGE   = "#{PACKAGE}-setup"
 
 require 'albacore'
 FileList["./albacore/*.rb"].each { |f| require f }
-#FileList["./albacore/config/*.rb"].each { |f| require f }
 require 'rgl/dot'
 require 'rgl/implicit'
 require 'zip/zip'
@@ -32,6 +31,33 @@ require 'zip/zipfilesystem'
 task :default => [:dist]
 task :dist => [:clean, :dist_zip, :dist_src, :installer, :test]
 task :dist_with_log => [:clean, :copylogconfig, :dist_zip, :dist_src, :installer, :test]
+
+Albacore.configure do |config|
+    config.rapcmanifest.output  = config.rapc.output  = PRODUCT
+    config.rapcmanifest.destdir = config.rapc.destdir = BB_BUILD_DIR
+
+    config.rapc.createweb = true
+    config.rapc.nowarn    = true
+
+    config.rapcmanifest do |m|
+        m.title = m.name = PRODUCT_LONG
+        m.version        = VERSION
+        m.vendor         = AUTHORS
+        m.description    = DESCRIPTION
+        m.type           = :CLDC
+        m.icon           = "../../../res/music-sync-68.png"
+        m.focus_icon     = "../../../res/music-sync-glow-68.png"
+    end
+
+    config.assemblyinfo do |a|
+        a.product_name = PRODUCT_LONG
+        a.version      = VERSION
+        a.file_version = VERSION
+        a.copyright    = COPYRIGHT
+        a.company_name = AUTHORS
+        a.trademark    = TRADEMARKS
+    end
+end
 
 desc "Compile Wireless Music Sync"
 msbuild :compile  => :assemblyinfo do |msb|
@@ -154,12 +180,11 @@ task :clean do
     FileUtils.rm_rf BUILD_DIR
 end
 
-
 task :build_bbapp => [:compile_bbapp, :sign_cod]
 task :compile_bbapp => [:clean_bb, :build_bbapp5, :build_bbapp6]
 
 sigtool :sign_cod => [:compile_bbapp] do |s|
-    s.codfile    = FileList[ "#{BB_BUILD_DIR}/**/*.cod" ]
+    s.codfiles    = FileList[ "#{BB_BUILD_DIR}/**/*.cod" ]
 end
 
 task :clean_bb do
@@ -167,47 +192,23 @@ task :clean_bb do
 end
 
 rapc :build_bbapp5 => [:rapcmanifest5, :javaasminfo] do |r|
-    r.output     = PRODUCT
     r.sdkversion = "5.0.0"
-    r.destdir    = BB_BUILD_DIR
-    r.createweb  = true
-    r.quiet      = true
-    r.source     = FileList["BlackberryClient/WifiMusicSync/src/**/*.java", "BlackberryClient/WifiMusicSync/res/**/*"]
+    r.sources    = FileList["BlackberryClient/WifiMusicSync/src/**/*.java", "BlackberryClient/WifiMusicSync/res/**/*"]
 end
 
 rapc :build_bbapp6 => [:rapcmanifest6, :javaasminfo] do |r|
-    r.output     = PRODUCT
     r.sdkversion = "6.0.0"
-    r.destdir    = BB_BUILD_DIR
-    r.createweb  = true
-    r.quiet      = true
-    r.source = FileList["BlackberryClient/WifiMusicSync/src/**/*.java", "BlackberryClient/WifiMusicSync/res/**/*"].exclude(/json/)
+    r.sources    = FileList["BlackberryClient/WifiMusicSync/src/**/*.java", "BlackberryClient/WifiMusicSync/res/**/*"].exclude(/json/)
 end
 
 desc "Create rapc manifest"
 rapcmanifest :rapcmanifest5 do |m|
-    FileUtils.mkdir_p("#{BB_BUILD_DIR}/Standard/5.0.0/")
-    m.output_file    = "#{BB_BUILD_DIR}/Standard/5.0.0/#{PRODUCT}.rapc"
-    m.title = m.name = PRODUCT_LONG
-    m.version        = VERSION  # Blackberry app versions cannot start with 0
-    m.vendor         = AUTHORS
-    m.description    = DESCRIPTION
-    m.type           = "CLDC"
-    m.icons          << "../../../res/music-sync-68.png"
-    m.focus_icons    << "../../../res/music-sync-glow-68.png"
+    m.sdkversion     = "5.0.0"
 end
 
 desc "Create rapc manifest"
 rapcmanifest :rapcmanifest6 do |m|
-    FileUtils.mkdir_p("#{BB_BUILD_DIR}/Standard/6.0.0/")
-    m.output_file    = "#{BB_BUILD_DIR}/Standard/6.0.0/#{PRODUCT}.rapc"
-    m.title = m.name = PRODUCT_LONG
-    m.version        = VERSION
-    m.vendor         = AUTHORS
-    m.description    = DESCRIPTION
-    m.type           = "CLDC"
-    m.icons          << "../../../res/music-sync-68.png"
-    m.focus_icons    << "../../../res/music-sync-glow-68.png"
+    m.sdkversion     = "6.0.0"
 end
 
 desc "Create a java class with information about the app"
@@ -228,70 +229,30 @@ assemblyinfo :libasminfo do |a|
     a.title        = "libMusicSync"
     a.description  = "A supporting library for wirelessly syncing music to BlackBerry phones"
     a.output_file  = "libMusicSync/Properties/AssemblyInfo.cs"
-
-    a.product_name = PRODUCT_LONG
-    a.version      = VERSION
-    a.file_version = VERSION
-    a.copyright    = COPYRIGHT
-    a.company_name = AUTHORS
-    a.trademark    = TRADEMARKS
-    a.namespaces "System.Runtime.CompilerServices"
 end
 
 assemblyinfo :testsasminfo do |a|
     a.title        = "MusicSync.Tests"
     a.description  = "A set of tests for Wireless Music Sync features"
     a.output_file  = "MusicSync.Tests/Properties/AssemblyInfo.cs"
-
-    a.product_name = PRODUCT_LONG
-    a.version      = VERSION
-    a.file_version = VERSION
-    a.copyright    = COPYRIGHT
-    a.company_name = AUTHORS
-    a.trademark    = TRADEMARKS
-    a.namespaces "System.Runtime.CompilerServices"
 end
 
 assemblyinfo :serverasminfo do |a|
     a.title        = "MusicSync.Server"
     a.description  = "A server for wirelessly syncing music to BlackBerry phones"
     a.output_file  = "MusicSync.Server/Properties/AssemblyInfo.cs"
-
-    a.product_name = PRODUCT_LONG
-    a.version      = VERSION
-    a.file_version = VERSION
-    a.copyright    = COPYRIGHT
-    a.company_name = AUTHORS
-    a.trademark    = TRADEMARKS
-    a.namespaces "System.Runtime.CompilerServices"
 end
 
 assemblyinfo :desktopasminfo do |a|
     a.title        = "MusicSync.Desktop"
     a.description  = "A desktop client for syncing music to BlackBerry phones"
     a.output_file  = "MusicSync.Desktop/Properties/AssemblyInfo.cs"
-
-    a.product_name = PRODUCT_LONG
-    a.version      = VERSION
-    a.file_version = VERSION
-    a.copyright    = COPYRIGHT
-    a.company_name = AUTHORS
-    a.trademark    = TRADEMARKS
-    a.namespaces "System.Runtime.CompilerServices"
 end
 
 assemblyinfo :configuratorasminfo do |a|
     a.title        = "MusicSync.Configurator"
     a.description  = "A tool to configure Wireless Music Sync"
     a.output_file  = "MusicSync.Configurator/Properties/AssemblyInfo.cs"
-
-    a.product_name = PRODUCT_LONG
-    a.version      = VERSION
-    a.file_version = VERSION
-    a.copyright    = COPYRIGHT
-    a.company_name = AUTHORS
-    a.trademark    = TRADEMARKS
-    a.namespaces "System.Runtime.CompilerServices"
 end
 
 desc "Generate a graph of all the tasks and their relationship"

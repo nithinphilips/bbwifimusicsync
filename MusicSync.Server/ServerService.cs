@@ -107,7 +107,7 @@ namespace WifiSyncServer
                 <ul>
                     <li>Found a problem? <a href='http://sourceforge.net/tracker/?func=add&group_id=402939&atid=1669971'>File a bug report.</a></li>
                     <li>Need something to do? <a href='http://sourceforge.net/projects/bbwifimusicsync/files/'>Check if a new version is available.</a></li>
-                    <li>Would you like some freedom with your software? <a href='http://www.gnu.org/licenses/gpl.html'>Read the GNU GPL v3 license agreement.</a></li>
+                    <li><a href='http://www.gnu.org/licenses/gpl.html'>Read the GNU GPL v3 license agreement.</a></li>
                     <li>And of course, you can always <a href='https://github.com/nithinphilips/bbwifimusicsync'>look under the hood.</a></li>
                 </ul>", 
                 "1", QrCodeDb[1]);
@@ -125,8 +125,8 @@ namespace WifiSyncServer
         [Path("/app")]
         public IEnumerable<object> AppIndex()
         {
-            string content = @"<p><a href='app/6.0.0/WifiMusicSync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 6 or 7</a>.</p>
-                <p><a href='app/5.0.0/WifiMusicSync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 5</a>.</p>";
+            string content = @"<p><a href='app/6.0.0/bbwifimusicsync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 6 or 7</a>.</p>
+                <p><a href='app/5.0.0/bbwifimusicsync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 5</a>.</p>";
 
             string skeleton = Resources.Skeleton;
             skeleton = skeleton.Replace("${TITLE}", "Wireless Music Sync");

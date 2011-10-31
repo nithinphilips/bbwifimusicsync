@@ -27,6 +27,7 @@ namespace MusicSyncTests
             Assert.IsTrue(notified);
         }
 
+        // This test will fail when no drives are available.
         [TestMethod]
         public void AutoNotifyPropertyChangesManualPropertiesTest()
         {

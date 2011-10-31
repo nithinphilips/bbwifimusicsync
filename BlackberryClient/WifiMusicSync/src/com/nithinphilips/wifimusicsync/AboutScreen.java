@@ -31,7 +31,7 @@ public class AboutScreen extends MainScreen
 
         net.rim.device.api.ui.Font defaultFont = this.getFont();
         net.rim.device.api.ui.Font titleFont = defaultFont.derive(Font.BOLD, defaultFont.getHeight() + 5);
-        net.rim.device.api.ui.Font tinyFont = defaultFont.derive(0, defaultFont.getHeight() - 5);
+        net.rim.device.api.ui.Font tinyFont = defaultFont.derive(0, 14);
         net.rim.device.api.ui.Font medFont = defaultFont.derive(0, defaultFont.getHeight() - 3);
 
 //#ifdef BlackBerrySDK6.0.0
@@ -109,33 +109,27 @@ public class AboutScreen extends MainScreen
         popupTitleField.setFont(titleFont);
         popupTitleField.setMargin(0, 0, 5, 0);
 
-        RichTextField technicalTitleField = new RichTextField("Release Details", RichTextField.NON_FOCUSABLE);
-        technicalTitleField.setFont(defaultFont.derive(Font.BOLD, defaultFont.getHeight() + 1));
-        technicalTitleField.setMargin(5, 0, 0, 0);
-
         LabelField copyrightField = new LabelField(AssemblyInfo.Copyright);
+        LabelField revField = new LabelField("Version: " + AssemblyInfo.Version + " Date: " + AssemblyInfo.Date);
         LabelField descriptionField = new LabelField(AssemblyInfo.Description);
 
-        LabelField iconsInfoField = new LabelField("Icons shamelessy ripped from Ultimate-Gnome, Faenza and Elementary icon themes. This application uses components from KeePassBB <http://f5bbutils.fairview5.com/keepassbb2/>");
         LabelField gnuField0 = new LabelField(
                 "This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.");
         LabelField gnuField1 = new LabelField(
                 "This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.");
         LabelField gnuField2 = new LabelField(
                 "You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.");
-
-        LabelField dateField = new LabelField("Build Date: " + AssemblyInfo.Date);
-        LabelField revField = new LabelField("Version: " + AssemblyInfo.Version);
+        LabelField iconsInfoField = new LabelField("Icons shamelessy ripped from Ultimate-Gnome, Faenza and Elementary icon themes. This application uses components from KeePassBB <http://f5bbutils.fairview5.com/keepassbb2/>");
 
         copyrightField.setFont(medFont);
-        descriptionField.setFont(tinyFont);
+        revField.setFont(medFont);
+        descriptionField.setFont(medFont);
         iconsInfoField.setFont(tinyFont);
         gnuField0.setFont(tinyFont);
         gnuField1.setFont(tinyFont);
         gnuField2.setFont(tinyFont);
-        dateField.setFont(tinyFont);
-        revField.setFont(tinyFont);
 
+        revField.setMargin(5, 0, 0, 0);
         descriptionField.setMargin(5, 0, 0, 0);
         iconsInfoField.setMargin(5, 0, 0, 0);
         gnuField0.setMargin(5, 0, 0, 0);
@@ -143,16 +137,12 @@ public class AboutScreen extends MainScreen
         container.add(headerContainer);
         container.add(new SeparatorField());
         container.add(copyrightField);
+        container.add(revField);
         container.add(descriptionField);
-
-        container.add(iconsInfoField);
         container.add(gnuField0);
         container.add(gnuField1);
         container.add(gnuField2);
-        container.add(technicalTitleField);
-        container.add(new SeparatorField());
-        container.add(dateField);
-        container.add(revField);
+        container.add(iconsInfoField);
 
         add(container);
     }

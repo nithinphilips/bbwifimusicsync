@@ -1,10 +1,10 @@
 Rake Tasks for BlackBerry
 =========================
-These are a collection of [Rake](http://rake.rubyforge.org/) taks for compiling
-BlackBerry apps. The tasks use
-[Albacore](https://github.com/derickbailey/Albacore/) libraries, so you'll need
-them as well as Rake. These task are mostly based on the [BB Ant
-Tools](http://http://bb-ant-tools.sourceforge.net/) project.
+These are a collection of [Rake](http://rake.rubyforge.org/) tasks for
+compiling BlackBerry apps. The tasks use
+[Albacore](https://github.com/derickbailey/Albacore/) libraries, so to use
+these tasks you'll need Albacore, along with Rake. These tasks are mostly based
+on the [BB Ant Tools](http://http://bb-ant-tools.sourceforge.net/) project.
 
 You should read the [Albacore Getting Started
 guide](https://github.com/derickbailey/Albacore/wiki/Getting-Started) before
@@ -18,31 +18,35 @@ correct file names are always used. These properties are:
  * **output**:
 
 Set these properties to the same value in the related RapcManifest and Rapc
-tasks. The calculated paths will be
-`<destdir>\Standard\<sdkversion>\output.xxx` and
-`<destdir>\Web\<sdkversion>\output.xxx`, for OTA deployable output.
+tasks. The calculated paths will be:
+
+ * `<destdir>\Standard\<sdkversion>\output.xxx`, and
+ * `<destdir>\Web\<sdkversion>\output.xxx`, for OTA deployable output.
 
 Configuration
 -------------
-As with other Albacore tasks, the BlackBerry tasks can be read configuration
+As with other Albacore tasks, the BlackBerry tasks can read configuration
 from an external `.yml` file. This is useful for site-specific configuration
-details, such as RIM signing key password, JDE and JAVA paths, etc.
+details, such as RIM signing key password, JDE and JAVA paths, etc. You can
+also use the [centralized configuration
+blocks](https://github.com/derickbailey/Albacore/wiki/Configuration) to reduce
+duplicate code.
 
-The configuration file must have the same name as the task, for example,
+The configuration files must have the same name as the task, for example,
 consider the following task:
 
     sigtool :sign_cod => [:build] do |s|
         s.codfiles    = FileList[ "deliverables/**/*.cod" ]
     end
 
-To set the `password` property, create a file named `sign_cod.yml` in the same 
-directory as the `Rakefile` and enter the following:
+Since the task is named `sign_cod`, to set the `password` property, create a
+file named `sign_cod.yml` in the same directory as the `Rakefile` and enter the
+following:
 
     password: "<your password>"
 
 Now, you don't have to manually enter the password every time, nor do you have
-to worry about accidentally checking it into the version control repository if
-it had been set in the `Rakefile`.
+to worry about accidentally checking it into the version control repository.
 
 Read more about the [Albacore YAML
 configuration](https://github.com/derickbailey/Albacore/wiki/YAMLConfig).
@@ -59,8 +63,8 @@ compiler. In the JDE, this file is generated from
 CLDC and MIDLET apps can have multiple entry points, with different icons etc.
 If your app has only one entry point, you can set any property available in the
 EntryPoint class directly on the RapcManifest class. For additional entry
-points, create the necessary EntryPoint objects and either set or push into the
-`entry_points` property.
+points, create the necessary EntryPoint objects and set the `entry_points`
+property.
 
 Example:
 
@@ -270,7 +274,7 @@ Example:
    *Required.* The version of the SDK that is targeted. It is used for
    calculating paths and declaring tags. eg: "5.0.0".
 
- * **source**<br/>
+ * **source** (Alias **sources**)<br/>
    *Required.* A list of all source files and resource files. Required.
 
  * **imports**<br/>
@@ -323,7 +327,7 @@ Example:
    *Optional.* The password for the signing keys. Removes the interactive
    password prompt. This implicitly sets "close" and "request" to *true*.
 
- * **codfile**<br/>
+ * **codfile** (Alias **codfiles**)<br/>
    *Required.* Cod files to sign.
 
 ###JavaAsmInfo task

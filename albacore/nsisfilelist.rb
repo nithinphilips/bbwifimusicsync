@@ -1,27 +1,45 @@
-# See http://bb-ant-tools.sourceforge.net/docs for details.
+# NSIS requires all paths to use the Windows \ separator, so we
+# use File::ALT_SEPARATOR. So, obviously this task will not
+# work on a UNIX box.
 
 require 'albacore/albacoretask'
 
 class NsisFileList
     include Albacore::Task
     include Albacore::RunCommand
+    include NsisFileListConfig
 
     attr_accessor :add_files_list, :remove_files_list
 
     attr_array :dirs           # Directories containing source files.
 
+    alias :dir :dirs
+    alias :dir= :dirs=
+
+    alias :rem_files_list :remove_files_list
+    alias :rem_files_list= :remove_files_list=
+
     def initialize
         @dirs = []
         super()
+        update_attributes Albacore.configuration.nsisfilelist.to_hash
     end
 
     def execute
-        cwd = File.expand_path(".").gsub!("/", "\\")
+        cwd = Dir.pwd.gsub(File::SEPARATOR, File::ALT_SEPARATOR) # Use platform specific path separator
+
+        FileUtils.mkdir_p(File.dirname(@add_files_list))
+        FileUtils.mkdir_p(File.dirname(@remove_files_list))
+
+        @logger.info "Generating Add Files list file At: " + File.expand_path(@add_files_list)
+        @logger.info "Generating Remove Files list file At: " + File.expand_path(@remove_files_list)
+
+        @dirs = [@dirs] if @dirs.is_a? String
 
         File.open(@add_files_list, 'w') do |add_file|
             File.open(@remove_files_list, 'w') do |rem_file|
                 for dir in @dirs
-                    dir.gsub!("/", "\\")
+                    dir.gsub!(File::SEPARATOR, File::ALT_SEPARATOR)
                     RecurseTree(dir, add_file, rem_file, dir, cwd)
                 end
             end
@@ -43,7 +61,7 @@ class NsisFileList
         dir = Dir.open(directory)
 
         for path in dir
-            path = directory + "\\" + path;
+            path = directory + File::ALT_SEPARATOR + path;
             unless FileTest.directory?(path)
                 add_line = path.sub(cwd, "..")
                 add_file.puts "File \"#{add_line}\""
@@ -56,7 +74,7 @@ class NsisFileList
         for path in dir
             next if path == "." or path == ".."
 
-            path = directory + "\\" + path;
+            path = directory + File::ALT_SEPARATOR + path;
 
             if File.lstat(path).directory? then
                 RecurseTree(path, add_file, rem_file, src_root, cwd)

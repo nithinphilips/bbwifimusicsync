@@ -1,5 +1,5 @@
 require 'albacore/albacoretask'
-require './albacore/config/nsisconfig.rb'
+require File.join(File.expand_path(File.dirname(__FILE__)), 'config', 'nsisconfig.rb')
 
 class Nsis
   include Albacore::Task

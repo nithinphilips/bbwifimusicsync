@@ -60,7 +60,7 @@ namespace WifiSyncDesktop.Windows
             {
                 viewModelSync.LoadPlaylists();
                 Log.Info("Playlists loaded.");
-                viewModelSync.LoadDrives();
+                viewModelSync.LoadDrives(viewModelSync.ShowAllDrives);
                 Log.Info("Drives loaded. " + viewModelSync.Drives.Count + " drives found.");
             });
             

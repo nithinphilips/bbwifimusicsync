@@ -42,32 +42,36 @@ namespace WifiSyncDesktop.Model
 
         UsbManager man = new UsbManager();
 
-        public void LoadDrives()
+        public void LoadDrives(bool alldrives)
         {
-#if DRIVE_DEBUG
-            var drives = from drive in DriveInfo.GetDrives()
-                          where drive.IsReady
-                         select new UsbDisk { 
-                             Name = drive.Name, 
-                             AvailableFreeSpace = (ulong)drive.AvailableFreeSpace, 
-                             Model = "", 
-                             TotalSize = (ulong)drive.TotalSize, 
-                             VolumeLabel = drive.VolumeLabel
-                         };
-
-            this.Drives = new UsbDiskCollection();
-            foreach (var usbDisk in drives)
+            if (alldrives)
             {
-                this.Drives.Add(usbDisk);
+                var drives = from drive in DriveInfo.GetDrives()
+                             where drive.IsReady
+                             select new UsbDisk
+                             {
+                                 Name = drive.Name,
+                                 AvailableFreeSpace = (ulong)drive.AvailableFreeSpace,
+                                 Model = "",
+                                 TotalSize = (ulong)drive.TotalSize,
+                                 VolumeLabel = drive.VolumeLabel
+                             };
+
+                this.Drives = new UsbDiskCollection();
+                foreach (var usbDisk in drives)
+                {
+                    this.Drives.Add(usbDisk);
+                }
+
+                UpdateCurrentPath();
             }
+            else
+            {
+                this.Drives = man.GetAvailableDisks();
+                UpdateCurrentPath();
 
-            UpdateCurrentPath();
-#else
-            this.Drives = man.GetAvailableDisks();
-            UpdateCurrentPath();
-
-            man.StateChanged += man_StateChanged;
-#endif
+                man.StateChanged += man_StateChanged;
+            }
         }
 
         void man_StateChanged(UsbStateChangedEventArgs e)
@@ -249,6 +253,20 @@ namespace WifiSyncDesktop.Model
         public long Capacity { get; set; }
         public long SelectedTracksSize { get; set; }
         public UsbDiskCollection Drives { get; set; }
+        
+        private bool _showAllDrives;
+        public bool ShowAllDrives
+        {
+            get { return _showAllDrives; }
+            set
+            {
+                if(_showAllDrives != value)
+                {
+                    _showAllDrives = value;
+                    LoadDrives(_showAllDrives);
+                }
+            }
+        }
 
         private string _filterText;
         public string FilterText

@@ -34,7 +34,7 @@ namespace MusicSyncTests
             SyncSettings sync = new SyncSettings();
             bool notified = false;
 
-            sync.LoadDrives();
+            sync.LoadDrives(sync.ShowAllDrives);
             sync.PropertyChanged += (s, e) => { notified = true; };
 
             sync.Path = null;

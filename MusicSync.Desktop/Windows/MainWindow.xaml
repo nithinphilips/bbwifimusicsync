@@ -43,7 +43,12 @@
         <CommandBinding Command="Close" Executed="close_Executed" />
     </Window.CommandBindings>
     <DockPanel LastChildFill="True">
-        
+        <Menu DockPanel.Dock="Top" IsMainMenu="True">
+            <MenuItem Header="Options">
+                <MenuItem IsCheckable="True" IsChecked="{Binding ShowAllDrives}" Header="Show All Drives" />
+            </MenuItem>
+        </Menu>
+    <DockPanel LastChildFill="True">
         <!-- Title Block -->
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
             <StackPanel.Background>
@@ -190,5 +195,6 @@
                 </Grid>
             </DockPanel>
         </Grid>
+    </DockPanel>
     </DockPanel>
 </Window>

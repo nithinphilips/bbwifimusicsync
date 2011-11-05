@@ -7,7 +7,7 @@
             * { margin: 0; }
             html,body { height: 100%; }
             #main {overflow:auto; padding-bottom: 80px; }  /* must be same height as the footer */
-            #footer {position: relative; margin: auto; margin-top: -80px; height:80px; width:800px; clear:both;} 
+            #footer {position: relative; margin: auto; margin-top: -82px; height:80px; width:800px; clear:both; padding: 0 10px; border: 1px solid #ccc; border-bottom: none;-moz-border-radius: 5px 5px 0 0;}
             html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}
             body{line-height:1;}
             ol,ul{list-style:none}
@@ -30,7 +30,7 @@
             ol{list-style:decimal}
             ul{list-style:square}
             li{margin-left:30px}
-            p,dl,hr,h1,h2,h3,h4,h5,h6,ol,ul,pre,table,address,fieldset{margin-bottom:20px}
+            p,dl,hr,h1,h2,h3,h4,h5,h6,ol,ul,pre,table,address,fieldset{padding-top:20px}
 
             html,body{height:100%}
             h1,h2,h3,h4,h5,h6{font-family:Helvetica,Arial,'Liberation Sans',FreeSans,sans-serif}
@@ -41,14 +41,15 @@
             h5{font-size:120%}
             h6{font-size:100%}
             a{color:#0198D5}
-            #content{width:800px;margin:auto;margin-top:0px;margin-bottom:0px;padding:0px 10px 0px 20px;border:1px solid #ccc;min-height:100%;border:1px solid #EEE}
+            #content{width:800px;margin:auto;margin-top:0px;margin-bottom:0px;padding:0px 10px 0px 20px; min-height:100%;}
             pre{background:#eee;color:#444;border:1px solid #aaa}
             td,th{border:1px solid #ddd;padding:0 5px}
             sup{font-size:smaller;vertical-align:super}
             .printOnly{display:none}
             #blackberrytm { float:right; }
             @media print{html,body{height:100%}
-                    #content{width:99%;margin:10px;padding:0;border:0;box-shadow:none;min-height:0}
+                #content{width:99%;margin:10px;padding:0;border:0;box-shadow:none;min-height:0}
+                #footer { display: none; }
                     h1{box-shadow:none}
                     pre{border:0}
                     .printOnly{display:inline}
@@ -161,9 +162,10 @@
     </div>
 
     <div id="footer">
-            <hr />
-            <p id="blackberrytm">BlackBerry&reg; is a <a href="http://us.blackberry.com/legal/trademarks.jsp">registered trademark</a> of Research in Motion.</p>
-
+        <p style="text-align: right;" id="blackberrytm">BlackBerry&reg; is a <a href="http://us.blackberry.com/legal/trademarks.jsp">registered trademark</a> of Research in Motion.
+        <br/>
+        Wireless Music Sync is <a href="http://www.gnu.org/philosophy/free-sw.html">Free Software</a>.
+        </p>
             <p><a href="http://sourceforge.net/projects/bbwifimusicsync/">${TITLE} ${VERSION}</a>
             <br />
             <a href="http://sourceforge.net/" title="visit SourceForge.net">

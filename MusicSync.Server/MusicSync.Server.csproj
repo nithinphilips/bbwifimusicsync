@@ -141,6 +141,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\StatusUpdater.js" />
     <None Include="Resources\Skeleton.html" />
     <None Include="music-sync-server-favicon.ico" />
     <Content Include="music-sync-server.ico" />

@@ -23,6 +23,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Windows.Forms;
 using System.IO;
 using Kayak.Framework;
@@ -38,6 +39,7 @@ namespace WifiSyncServer
     public sealed class Program
     {
         private static readonly ILog Log = LogManager.GetLogger("MusicSync.Server");
+        private static NotifyIcon notifyIcon;
 
         static void Main(string[] args)
         {
@@ -88,6 +90,7 @@ namespace WifiSyncServer
 
             Application.ThreadException += Application_ThreadException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            ServerService.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(ServerService_PropertyChanged);
 
             var server = new KayakServer(new System.Net.IPEndPoint(0, Settings.Default.Port));
             var behavior = new KayakFrameworkBehavior();
@@ -99,7 +102,7 @@ namespace WifiSyncServer
             Log.Info("Wifi Sync Server listening on " + GetIP() + ":" + server.ListenEndPoint.Port);
             
 
-            NotifyIcon notifyIcon = new NotifyIcon();
+            notifyIcon = new NotifyIcon();
 
             MenuItem exitMenu = new MenuItem("Exit", (sender, e) =>
                                                          {
@@ -114,7 +117,7 @@ namespace WifiSyncServer
 
             notifyIcon.Icon = Resources.music_sync_server;
             notifyIcon.ContextMenu = new ContextMenu(new MenuItem[] { controlPanelMenu, exitMenu });
-            notifyIcon.Text = "Music Sync Server Running";
+            notifyIcon.Text = Application.ProductName + "\n" + ServerService.Status;
             notifyIcon.Visible = true;
             
             Application.EnableVisualStyles();
@@ -125,6 +128,30 @@ namespace WifiSyncServer
 
             Log.Info("All this has happened before, and all this will happen again.");
         }
+
+        static void ServerService_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if(notifyIcon != null)
+            {
+                var t = Application.ProductName + "\n" + ServerService.Status;
+                if(t.Length > 127)
+                {
+                    t = t.Substring(0, 124) + "...";
+                }
+                SetNotifyIconText(notifyIcon, t);
+            }
+        }
+
+        public static void SetNotifyIconText(NotifyIcon ni, string text)
+        {
+            if (text.Length >= 128) throw new ArgumentOutOfRangeException("Text limited to 127 characters");
+            Type t = typeof(NotifyIcon);
+            BindingFlags hidden = BindingFlags.NonPublic | BindingFlags.Instance;
+            t.GetField("text", hidden).SetValue(ni, text);
+            if ((bool)t.GetField("added", hidden).GetValue(ni))
+                t.GetMethod("UpdateIcon", hidden).Invoke(ni, new object[] { true });
+        }
+
 
         public static string GetAccessUrl()
         {

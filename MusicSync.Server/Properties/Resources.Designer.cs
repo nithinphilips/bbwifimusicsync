@@ -81,14 +81,37 @@ namespace WifiSyncServer.Properties {
         ///    &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=utf-8&quot; /&gt;
         ///    &lt;title&gt;${TITLE}&lt;/title&gt;
         ///    &lt;style type=&quot;text/css&quot;&gt;
-        ///
+        ///            * { margin: 0; }
         ///            html,body { height: 100%; }
-        ///            #main {overflow:auto; padding-bottom: 100px;}  /* must be same height as the footer */
-        ///            #footer {position: relative; margin: auto; ma [rest of string was truncated]&quot;;.
+        ///            #main {overflow:auto; padding-bottom: 80px; }  /* must be same height as the footer */
+        ///            #footer {position [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string Skeleton {
             get {
                 return ResourceManager.GetString("Skeleton", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to $(document).ready(onReady);
+        ///
+        ///function onReady()
+        ///{
+        ///    setInterval(updateStatus, 10000);
+        ///}
+        ///
+        ///function updateStatus()
+        ///{
+        ///    $.getJSON(&apos;/getStatus&apos;, function(data)
+        ///        {
+        ///            $(&quot;#serverStatus&quot;).setInnerHTML(data.Status);
+        ///        });
+        ///}
+        ///.
+        /// </summary>
+        internal static string StatusUpdater {
+            get {
+                return ResourceManager.GetString("StatusUpdater", resourceCulture);
             }
         }
     }

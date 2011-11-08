@@ -19,7 +19,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using iTunesLib;
 using Kayak;
@@ -46,9 +48,58 @@ namespace WifiSyncServer
         static readonly Dictionary<string, string> PlaylistDb = new Dictionary<string, string>();
         static readonly Dictionary<int, string> QrCodeDb = new Dictionary<int, string>();
         static readonly CachedXmliTunesLibrary CachedXmlLibrary = new CachedXmliTunesLibrary();
-
-
         private static readonly Dictionary<string, string> mimeTypes = new Dictionary<string, string>();
+        public static event PropertyChangedEventHandler PropertyChanged;
+
+        private static Timer resetTimer;
+        static void ResetStatusLater()
+        {
+            if(resetTimer != null)
+            {
+                resetTimer.Dispose();
+                resetTimer = null;
+            }
+
+            resetTimer = new Timer(state => Status = "Idle.", null, 30000, Timeout.Infinite);
+        }
+
+        private static void OnPropertyChanged(string propertyName)
+        {
+            if(PropertyChanged != null)
+            {
+                PropertyChanged(null, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        private static string _status = "Idle.";
+
+        public static string Status
+        {
+            get { return _status; }
+            private set { 
+                if(_status != value)
+                {
+                    _status = value;
+                    OnPropertyChanged("Status");
+                }
+            }
+        }
+
+        public static string ReplaceInTemplate(string content, string title = "Wireless Music Sync", string version = null)
+        {
+            var _version = version;
+            if(string.IsNullOrEmpty(_version))
+            {
+                _version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            }
+
+            string skeleton = Resources.Skeleton;
+            skeleton = skeleton.Replace("${TITLE}", title);
+            skeleton = skeleton.Replace("${CONTENT}", content);
+            skeleton = skeleton.Replace("${VERSION}", _version);
+
+            return skeleton;
+        }
 
         static ServerService()
         {
@@ -57,6 +108,13 @@ namespace WifiSyncServer
             mimeTypes.Add(".jar", "application/java-archive");
 
             QrCodeDb.Add(1, Program.GetAccessUrl() + "/app");
+        }
+
+        [Path("/getStatus")]
+        public object GetStatus()
+        {
+            var curStatus = Status;
+            return new { Status = curStatus };
         }
 
         [Path("/qr/{index}")]
@@ -96,9 +154,12 @@ namespace WifiSyncServer
         [Path("/help")]
         public IEnumerable<object> Help()
         {
+            string script = "<script type=\"text/javascript\">" + Resources.StatusUpdater + "</script>";
+
             string content = string.Format(
-                @"<p>Congratulations. <a href='https://sourceforge.net/projects/bbwifimusicsync/'>Wireless Music Sync for BlackBerry&reg;</a> server is up and running.</p>
-                <p>To install the Wireless Music Sync BlackBerry&reg; app, <a href='/app' title='Install the BlackBerry app'>follow this link</a> or scan the <a href='http://en.wikipedia.org/wiki/QR_code'>QRCode</a>:</p>
+                @"<p>Congratulations. <a href='https://sourceforge.net/projects/bbwifimusicsync/'>Wireless Music Sync for BlackBerry&reg;</a> server works!</p>
+                <p><strong>Current Status:</strong> <span id='serverStatus'>Cannot get status. Is Javascript enabled?</span></p>
+                <p style='padding-bottom: 10px;'>To install the Wireless Music Sync BlackBerry&reg; app, <a href='/app' title='Install the BlackBerry app'>follow this link</a> or scan the <a href='http://en.wikipedia.org/wiki/QR_code'>QRCode</a>:</p>
                 <a href='/app'><img style='padding: 20px; border: 1px solid #ccc' src='/qr/{0}' title='{1}' alt='{1}'/></a>
                 <p>To scan, open <a href='http://us.blackberry.com/apps-software/appworld/download.jsp'>BlackBerry App World</a> on your phone and from the menu, choose <em>Scan a Barcode.</em></p>
                 <p>To learn more about Wireless Music Sync, have a look at the <a href='https://github.com/nithinphilips/bbwifimusicsync/blob/master/README.md'>README</a> file. 
@@ -112,14 +173,7 @@ namespace WifiSyncServer
                 </ul>", 
                 "1", QrCodeDb[1]);
 
-            string skeleton = Resources.Skeleton;
-            skeleton = skeleton.Replace("${TITLE}", "Wireless Music Sync");
-            skeleton = skeleton.Replace("${CONTENT}", content);
-            skeleton = skeleton.Replace("${VERSION}",
-                                        System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
-
-            yield return Response.Write(skeleton);
-
+            yield return Response.Write(ReplaceInTemplate(script + content));
         }
 
         [Path("/app")]
@@ -128,13 +182,7 @@ namespace WifiSyncServer
             string content = @"<p><a href='app/6.0.0/bbwifimusicsync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 6 or 7</a>.</p>
                 <p><a href='app/5.0.0/bbwifimusicsync.jad'>Install Wireless Music Sync for BlackBerry&reg; OS 5</a>.</p>";
 
-            string skeleton = Resources.Skeleton;
-            skeleton = skeleton.Replace("${TITLE}", "Wireless Music Sync");
-            skeleton = skeleton.Replace("${CONTENT}", content);
-            skeleton = skeleton.Replace("${VERSION}",
-                                        System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString());
-
-            yield return Response.Write(skeleton);
+            yield return Response.Write(ReplaceInTemplate(content));
         }
 
         [Path("/app/{version}/{filename}")]
@@ -144,13 +192,16 @@ namespace WifiSyncServer
             string file = "app/" + version + "/" + filename;
             if (File.Exists(file))
             {
-                Log.Info("Sending file: " + file);
+                Status = "Sending BlackBerry App.";
+                Log.Info(Status);
 
                 string ext = Path.GetExtension(file);
                 if(ext != null && mimeTypes.ContainsKey(ext))
                 {
                     Response.Headers.Add("Content-Type",  mimeTypes[ext]);   
                 }
+
+                ResetStatusLater();
                 return new FileInfo(file);
             }
 
@@ -160,19 +211,14 @@ namespace WifiSyncServer
             return null;
         }
 
-        [Path("/hello")]
-        public object SayHello()
-        {
-            Log.Info("Saying hello");
-            return new { Message = "Greetings from Wonderfalls" };
-        }
-
         [Path("/songs/{id}")]
         public FileInfo GetSong(string id)
         {
             if (SongDb.ContainsKey(id))
             {
-                Log.Info("Sending file: " + SongDb[id]);
+                Status = "Sending file: " + SongDb[id];
+                Log.Info(Status);
+                ResetStatusLater();
                 return new FileInfo(SongDb[id]);
             }
 
@@ -188,9 +234,11 @@ namespace WifiSyncServer
             if (PlaylistDb.ContainsKey(id))
             {
                 string playlistPath = PlaylistDb[id];
+                Status = "Playlist " + id + " had been synced.";
                 Log.Info("Commiting playlist as reference.");
                 File.Copy(playlistPath, DataManager.GetReferencePlaylistPath(playlistPath), true);
                 Log.Info("Sending playlist: " + playlistPath);
+                ResetStatusLater();
                 return new FileInfo(playlistPath);
             }
 
@@ -218,6 +266,7 @@ namespace WifiSyncServer
                                      select t.GetPlaylistLine(data.DeviceMediaRoot)).ToArray();
             }
 
+            ResetStatusLater();
             return data;
         }
 #endif
@@ -225,6 +274,7 @@ namespace WifiSyncServer
         [Path("/getplaylists")]
         public object GetPlaylists()
         {
+            Status = "Listing playlists";
             Log.Info("Listing playlists");
 
             // Note: t.Tracks.Count() causes the entire library to be enumerated and
@@ -238,12 +288,14 @@ namespace WifiSyncServer
                                       TrackCount = playlist.Tracks.Count() 
                                   };
 
+            ResetStatusLater();
             return new { Playlists = playlistEnumerator };
         }
 
         [Path("/getartists")]
         public object GetArtists()
         {
+            Status = "Listing artists";
             Log.Info("Listing artists");
 
             // Note: t.Tracks.Count() causes the entire library to be enumerated and
@@ -258,6 +310,7 @@ namespace WifiSyncServer
                                          TrackCount = playlist.Tracks.Count()
                                      };
 
+            ResetStatusLater();
             return new { Playlists = resultEnumerator };
         }
 
@@ -265,6 +318,7 @@ namespace WifiSyncServer
         public object GetAlbums()
         {
             //TODO: Add album view to Library.
+            Status = "Listing albums";
             Log.Info("Listing albums");
 
             // Note: t.Tracks.Count() causes the entire library to be enumerated and
@@ -279,6 +333,7 @@ namespace WifiSyncServer
                                        TrackCount = playlist.Tracks.Count()
                                    };
 
+            ResetStatusLater();
             return new { Playlists = resultEnumerator };
         }
 
@@ -342,6 +397,7 @@ namespace WifiSyncServer
             Subscription oldSubscription = DataManager.GetSubscription(newSubscription.SafeDeviceId);
             if (oldSubscription != null)
             {
+                Status = "Updating subscription";
                 Log.Info("Updating subscription");
                 SubscriptionManager man = new SubscriptionManager(oldSubscription); // Current subscription
                 actions = man.GetGarbageActions(CachedXmlLibrary.Library, newSubscription);
@@ -349,6 +405,7 @@ namespace WifiSyncServer
             }
             else
             {
+                Status = "New subscription.";
                 Log.Info("New subscription.");
                 actions = new SyncAction[] {};
             }
@@ -363,6 +420,7 @@ namespace WifiSyncServer
 
             SyncResponse response = new SyncResponse { Actions = actions };
             Log.Debug("Sending cleanup data:" + Environment.NewLine + response);
+            ResetStatusLater();
             return response;
         }
         
@@ -380,6 +438,7 @@ namespace WifiSyncServer
 
             using (ThreadContext.Stacks["NDC"].Push("Client " + request.DeviceId))
             {
+                Status = "Client " + request.DeviceId + " connected.";
                 Log.Info("Client " + request.DeviceId + " connected.");
                 Log.Debug("Received Data:" + Environment.NewLine + request);
 
@@ -396,6 +455,7 @@ namespace WifiSyncServer
                 Log.Info("Loading Phone Playlist...");
                 List<string> devicePlaylist = new List<string>(request.PlaylistData);
 
+                Status = string.Format("Loading iTunes Library ({0})...", playlistName);
                 Log.InfoFormat("Loading iTunes Library ({0})...", playlistName);
                 List<string> desktopPlaylist;
 
@@ -552,6 +612,7 @@ namespace WifiSyncServer
                 syncResponse.Actions.UnEscapeAllDeviceLocations();
                 Log.Debug("Sending Data:" + Environment.NewLine + syncResponse.ToString());
 
+                ResetStatusLater();
                 return syncResponse;
             }
         }
